@@ -84,7 +84,10 @@ class _PSQIState extends State<PSQI> {
                     child: ElevatedButton(
                       onPressed: () {
                         _controller.nextPage();
-                        },
+                        if (_current == 19){
+                          Navigator.pop(context);
+                        }
+                      },
                       child: _current < 19 ? const Icon(Icons.arrow_forward)  : const Icon(Icons.check),
                     ),
                   ),

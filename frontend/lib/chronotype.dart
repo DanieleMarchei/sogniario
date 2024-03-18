@@ -75,20 +75,52 @@ const List<QA> questions = [
         "Mi sveglierò più tardi del solito.",
       ] 
     ),
-    // QA(
-    //   question: "Sei andato a letto alcune ore più tardi del solito, ma il giorno dopo non ti devi alzare ad un'ora particolare. Che cosa farai?",
-    //   answers: [
-    //     "Mi sveglierò alla solita ora e non mi riaddormenterò.",
-    //     "Mi sveglierò alla solita ora e poi starò lì a sonnecchiare.",
-    //     "Mi sveglierò alla solita ora e poi mi riaddormenterò.",
-    //     "Mi sveglierò più tardi del solito.",
-    //   ] 
-    // ),
+    QA(
+      question: "Questa notte dovrai stsare sveglio per lavoro dalle 4 alle 6 del mattino. Il giorno dopo non hai alcun impegno. Che cosa farai?",
+      answers: [
+        "Non andrò a letto finchè non avrò finito di lavorare.",
+        "Farò un pisolino prima e uno dopo.",
+        "Farò una buona dormita prima e un pisolino dopo.",
+        "Dormirò solo prima di lavorare.",
+      ] 
+    ),
+    QA(
+    question: "Devi fare due ore di lavoro fisicamente pesante e sei libero di pianificare la tua giornata. Considerando i tuoi ritmi, quale orario sceglieresti?", 
+    answers: [
+      "Dalle 8 e le 10 di sera.",
+      "Dalle 11 del mattino all' una.",
+      "Dalle 3 alle 5 del pomeriggio.",
+      "Dalle 7 alle 9 di sera.",
+    ]),
+    QA(question: "Hai deciso di fare ginnastica insieme ad un amico, un'ora per due volte la settimana. Il tuo amico è disponibile dalle 10 alle 11 di sera. Tenendo presente i tuoi ritmi, come te la caverai?", answers: [
+      "Sarò in ottima forma.",
+      "Sarò abbastanza in forma.",
+      "Sarà dura.",
+      "Sarò molto dura.",
+    ]),
+    QA(question: "Supponiamo che tu possa sciegliere il tuo orario di lavoro. Sai che devi lavorare per cinque ore al giorno, sai che il tuo lavoro è interessante e vieni pagato a seconda di quanto rendi. A che ora, più o meno, sceglieresti di iniziare a lavorare?", answers: [
+      "Tra le 4 e le 8 del mattino.",
+      "Tra le 8 e le 9 del mattino.",
+      "Tra le 9 del mattino e le 2 del pomeriggio.",
+      "Tra le 2 e le 5 del pomeriggio.",
+      "Tra le 5 del pomeriggio e le 4 di notte.",
+    ]),
+    QA(question: "A che ora del giorno, più o meno, ti senti al massimo?",
+    answers: [
+      "Tra le 5 e le 8 del mattino.",
+      "Tra le 8 e le 10 del mattino.",
+      "Tra le 10 del mattino e le 5 del pomeriggio.",
+      "Tra le 5 del pomerigigo e le 10 di sera.",
+      "Tra le 10 di sera e le 5 del mattino.",
+    ]),
+    QA(question: "Ci sono dei tipi mattutini, che sono più in forma al mattino, e tipi serotini, che sono più in forma la sera. Tu che tipo sei?",
+    answers: [
+      "Decisamente un tipo mattutino.",
+      "Più mattutino che serotino.",
+      "Più serotino che matuttino.",
+      "Decisamente un tipo serotino.",
+    ])
 ];
-
-
-
-
 
 class ChronoType extends StatefulWidget {
   const ChronoType({super.key});
@@ -117,11 +149,6 @@ class _ChronoTypeState extends State<ChronoType> {
                 items: List<MultipleChoiceQuestion>.generate(questions.length, (index) {
                   return MultipleChoiceQuestion(question: questions[index].question, answers: questions[index].answers,);
                 }),
-                
-                
-                // [
-                //   MultipleChoiceQuestion(question: "A che ora preferiresti alzarti, più o meno, se fossi", answers: ["boh1", "boh2"])
-                // ],
                 options: CarouselOptions(
                   enlargeCenterPage: false,
                   height: screenHeight / 1.3,
@@ -145,13 +172,16 @@ class _ChronoTypeState extends State<ChronoType> {
                       child: const Icon(Icons.arrow_back),
                     ),
                   ),
-                  Flexible(child: Text("${_current}/19")),
+                  Flexible(child: Text("${_current}/${questions.length}")),
                   Flexible(
                     child: ElevatedButton(
                       onPressed: () {
                         _controller.nextPage();
+                        if (_current == questions.length){
+                          Navigator.pop(context);
+                        }
                         },
-                      child: _current < 19 ? const Icon(Icons.arrow_forward)  : const Icon(Icons.check),
+                      child: _current < questions.length ? const Icon(Icons.arrow_forward)  : const Icon(Icons.check),
                     ),
                   ),
                 ],
