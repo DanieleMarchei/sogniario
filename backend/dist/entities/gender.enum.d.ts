@@ -1,0 +1,6 @@
+export declare enum Gender {
+    MALE = 0,
+    FEMALE = 1,
+    NOT_SPECIFIED = 2,
+    OTHER = 3
+}
