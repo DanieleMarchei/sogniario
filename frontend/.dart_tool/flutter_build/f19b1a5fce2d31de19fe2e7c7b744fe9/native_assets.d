@@ -1,1 +1,0 @@
- /home/daniele/Scrivania/sogniario/frontend/.dart_tool/flutter_build/f19b1a5fce2d31de19fe2e7c7b744fe9/native_assets.yaml: 
