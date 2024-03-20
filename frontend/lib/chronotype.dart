@@ -1,16 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/questions.dart';
+import 'package:frontend/utils.dart';
 
-class QA {
-  final String question;
-  final List<String> answers;
 
-  const QA({
-    required this.question,
-    required this.answers
-    });
-}
 
 const List<String> answersHowMuch = ["Per niente.", "Poco.", "Abbastanza.", "Molto."];
 const List<String> answersHowDifficult = ["Molto difficile.", "Abbastanza difficile.", "Abbastanza facile.", "Facile."];
@@ -150,6 +143,7 @@ class _ChronoTypeState extends State<ChronoType> {
                   return MultipleChoiceQuestion(question: questions[index].question, answers: questions[index].answers,);
                 }),
                 options: CarouselOptions(
+                  viewportFraction: 1,
                   enlargeCenterPage: false,
                   height: screenHeight / 1.3,
                   enableInfiniteScroll: false,

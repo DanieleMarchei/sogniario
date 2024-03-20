@@ -6,21 +6,26 @@ class MultipleChoiceQuestion extends StatefulWidget{
   
   final String question;
   final List<String> answers;
+  final Function? onSelected;
 
   
   const MultipleChoiceQuestion(
     {
       super.key,
       required this.question,
-      required this.answers
+      required this.answers,
+      this.onSelected
     });
   @override
   State<MultipleChoiceQuestion> createState() => _MultipleChoiceQuestionState();
 }
 
-class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion>{
+class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> with AutomaticKeepAliveClientMixin{
 
   late String selectedAnswer;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -30,26 +35,26 @@ class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Text(widget.question),
-          ...Iterable<int>.generate(widget.answers.length).map(
-                  (int idx) => ListTile(
-                    title: Text(widget.answers[idx]),
-                    leading: Radio<String>(
-                      value: widget.answers[idx],
-                      groupValue: selectedAnswer,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedAnswer = value!;
-                        });
-                      }
-                    ),
+    super.build(context);
+    return Column(
+      children: [
+        Text(widget.question),
+        ...Iterable<int>.generate(widget.answers.length).map(
+                (int idx) => ListTile(
+                  title: Text(widget.answers[idx]),
+                  leading: Radio<String>(
+                    value: widget.answers[idx],
+                    groupValue: selectedAnswer,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedAnswer = value!;
+                        if(widget.onSelected != null) widget.onSelected!(idx);
+                      });
+                    }
                   ),
                 ),
-        ],
-      )
+              ),
+      ],
     );
   }
 
@@ -71,8 +76,11 @@ class SelectHourQuestion extends StatefulWidget{
   State<SelectHourQuestion> createState() => _SelectHourQuestionState();
 }
 
-class _SelectHourQuestionState extends State<SelectHourQuestion>{
+class _SelectHourQuestionState extends State<SelectHourQuestion> with AutomaticKeepAliveClientMixin{
   late TimeOfDay answer;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -82,14 +90,13 @@ class _SelectHourQuestionState extends State<SelectHourQuestion>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    super.build(context);
+    return Column(
         children: [
           Text(widget.question),
           TimeOfDayPickerButton(text: "Ora: ")
         ],
-      )
-    );
+      );
   }
 
 }
@@ -110,8 +117,11 @@ class SelectIntQuestion extends StatefulWidget{
   State<SelectIntQuestion> createState() => _SelectIntQuestionState();
 }
 
-class _SelectIntQuestionState extends State<SelectIntQuestion>{
+class _SelectIntQuestionState extends State<SelectIntQuestion> with AutomaticKeepAliveClientMixin{
   late int answer;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -121,14 +131,13 @@ class _SelectIntQuestionState extends State<SelectIntQuestion>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    super.build(context);
+    return Column(
         children: [
           Text(widget.question),
           IntegerPickerButton(text: "Minuti: ", maxValue: widget.maxValue)
         ],
-      )
-    );
+      );
   }
 
 }
@@ -149,8 +158,11 @@ class SelectTwoIntsQuestion extends StatefulWidget{
   State<SelectTwoIntsQuestion> createState() => _SelectTwoIntsQuestionState();
 }
 
-class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion>{
+class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion> with AutomaticKeepAliveClientMixin{
   late TimeOfDay answer;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -160,14 +172,13 @@ class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    super.build(context);
+    return Column(
         children: [
           Text(widget.question),
           DoubleIntegerPickerButton(text1: "ore", text2: "minuti", maxValue: widget.maxValue1),
         ],
-      )
-    );
+      );
   }
 
 }
@@ -191,13 +202,15 @@ class SpecifyIfYesQuestion extends StatefulWidget{
   State<SpecifyIfYesQuestion> createState() => _SpecifyIfYesQuestionState();
 }
 
-class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion>{
+class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with AutomaticKeepAliveClientMixin{
 
 
   List<String> no_yes = ["No.", "Si."];
   late String _firstQuestionAnswer;
   String _secondQuestionAnswer = '';
 
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -208,10 +221,10 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion>{
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
 
 
-    return Scaffold(
-      body: Column(
+    return Column(
         children: [
           Text(widget.question1),
           ...Iterable<int>.generate(no_yes.length).map(
@@ -256,8 +269,7 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion>{
           )
           else SizedBox()
         ],
-      )
-    );
+      );
   }
 
 }

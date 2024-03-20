@@ -57,6 +57,7 @@ class _PSQIState extends State<PSQI> {
 
                 ],
                 options: CarouselOptions(
+                  viewportFraction: 1,
                   enlargeCenterPage: false,
                   height: screenHeight / 1.3,
                   enableInfiniteScroll: false,
