@@ -6,7 +6,7 @@ class MultipleChoiceQuestion extends StatefulWidget{
   
   final String question;
   final List<String> answers;
-  final Function? onSelected;
+  final void Function(int)? onSelected;
 
   
   const MultipleChoiceQuestion(
@@ -65,12 +65,15 @@ class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> with Au
 class SelectHourQuestion extends StatefulWidget{
   
   final String question;
+  final void Function(TimeOfDay)? onSelected;
+
 
   
   const SelectHourQuestion(
     {
       super.key,
       required this.question,
+      this.onSelected
     });
   @override
   State<SelectHourQuestion> createState() => _SelectHourQuestionState();
@@ -94,7 +97,7 @@ class _SelectHourQuestionState extends State<SelectHourQuestion> with AutomaticK
     return Column(
         children: [
           Text(widget.question),
-          TimeOfDayPickerButton(text: "Ora: ")
+          TimeOfDayPickerButton(text: "Ora: ", onSelectedTimeOfDay: widget.onSelected,)
         ],
       );
   }
@@ -106,12 +109,14 @@ class SelectIntQuestion extends StatefulWidget{
   
   final String question;
   final int maxValue;
+  final void Function(int)? onSelected;
   
   const SelectIntQuestion(
     {
       super.key,
       required this.question,
-      this.maxValue = 120
+      this.maxValue = 120,
+      this.onSelected
     });
   @override
   State<SelectIntQuestion> createState() => _SelectIntQuestionState();
@@ -135,7 +140,7 @@ class _SelectIntQuestionState extends State<SelectIntQuestion> with AutomaticKee
     return Column(
         children: [
           Text(widget.question),
-          IntegerPickerButton(text: "Minuti: ", maxValue: widget.maxValue)
+          IntegerPickerButton(text: "Minuti: ", maxValue: widget.maxValue, onSelectedInteger: widget.onSelected)
         ],
       );
   }
@@ -148,11 +153,13 @@ class SelectTwoIntsQuestion extends StatefulWidget{
   final String question;
   final int maxValue1 = 120;
   final int maxValue2 = 120;
+  final void Function(int, int)? onSelected;
   
   const SelectTwoIntsQuestion(
     {
       super.key,
       required this.question,
+      this.onSelected
     });
   @override
   State<SelectTwoIntsQuestion> createState() => _SelectTwoIntsQuestionState();
@@ -176,7 +183,11 @@ class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion> with Auto
     return Column(
         children: [
           Text(widget.question),
-          DoubleIntegerPickerButton(text1: "ore", text2: "minuti", maxValue: widget.maxValue1),
+          DoubleIntegerPickerButton(
+            text1: "ore", 
+            text2: "minuti", 
+            maxValue: widget.maxValue1, 
+            onIntegersSelected: widget.onSelected,),
         ],
       );
   }
@@ -189,6 +200,7 @@ class SpecifyIfYesQuestion extends StatefulWidget{
   final String question1;
   final String question2;
   final List<String> answers;
+  final void Function(int, String?, int?)? onSelected;
   
   const SpecifyIfYesQuestion(
     {
@@ -196,6 +208,7 @@ class SpecifyIfYesQuestion extends StatefulWidget{
       required this.question1,
       required this.question2,
       required this.answers,
+      this.onSelected
     });
 
   @override
@@ -207,7 +220,10 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
 
   List<String> no_yes = ["No.", "Si."];
   late String _firstQuestionAnswer;
-  String _secondQuestionAnswer = '';
+  late int idxFirstQuestion;
+  String? _optionalAnswer1;
+  String? _optionalAnswer2;
+  int? idxOptionalAnswer2;
 
   @override
   bool get wantKeepAlive => true;
@@ -216,6 +232,7 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
   void initState() {
     super.initState();
     _firstQuestionAnswer = no_yes[0];
+    idxFirstQuestion = 0;
   }
 
 
@@ -236,10 +253,20 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
                       onChanged: (String? value) {
                         setState(() {
                           _firstQuestionAnswer = value!;
-                          if (_firstQuestionAnswer == no_yes[1])
-                            _secondQuestionAnswer = widget.answers[0];
-                          else  
-                            _secondQuestionAnswer = "";
+                          idxFirstQuestion = idx;
+                          if (_firstQuestionAnswer == no_yes[1]){
+                            _optionalAnswer2 = widget.answers[0];
+                          }
+                          else{
+                            _optionalAnswer2 = null;
+                            idxOptionalAnswer2 = null;
+                          }
+
+                          _optionalAnswer1 = null;
+
+                          if(widget.onSelected != null){
+                            widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
+                          } 
                         });
                       }
                     ),
@@ -250,16 +277,27 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
             children: [
             Text(widget.question1),
             SizedBox(height: 20,),
-            InputField(labelText : "Quale?"),
+            InputField(labelText : "Quale?", onChanged: (String newText) {
+              setState(() {
+                _optionalAnswer1 = newText;
+                if(widget.onSelected != null){
+                  widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
+                } 
+              });
+            },),
             ...Iterable<int>.generate(widget.answers.length).map(
                               (int idx) => ListTile(
                                 title: Text(widget.answers[idx]),
                                 leading: Radio<String>(
                                   value: widget.answers[idx],
-                                  groupValue: _secondQuestionAnswer,
+                                  groupValue: _optionalAnswer2,
                                   onChanged: (String? value) {
                                     setState(() {
-                                      _secondQuestionAnswer = value!;
+                                      _optionalAnswer2 = value!;
+                                      idxOptionalAnswer2 = idx;
+                                      if(widget.onSelected != null){
+                                        widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
+                                      } 
                                     });
                                   }
                                 ),

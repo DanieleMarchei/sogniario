@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class DatePickerButton extends StatefulWidget {
+
   const DatePickerButton({
     super.key,
     this.restorationId,
-    required this.text
+    required this.text,
+    this.onSelectedDate,
     });
 
   final String? restorationId;
   final String text;
+  final void Function(DateTime)? onSelectedDate;
 
   @override
   State<DatePickerButton> createState() => _DatePickerState();
 }
 
-class _DatePickerState extends State<DatePickerButton>
-    with RestorationMixin {
+class _DatePickerState extends State<DatePickerButton> with RestorationMixin {
   @override
   String? get restorationId => widget.restorationId;
 
@@ -34,10 +36,7 @@ class _DatePickerState extends State<DatePickerButton>
   );
 
   @pragma('vm:entry-point')
-  static Route<DateTime> _datePickerRoute(
-    BuildContext context,
-    Object? arguments,
-  ) {
+  static Route<DateTime> _datePickerRoute(BuildContext context, Object? arguments) {
     return DialogRoute<DateTime>(
       context: context,
       builder: (BuildContext context) {
@@ -55,14 +54,14 @@ class _DatePickerState extends State<DatePickerButton>
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
     registerForRestoration(_selectedDate, 'selected_date');
-    registerForRestoration(
-        _restorableDatePickerRouteFuture, 'date_picker_route_future');
+    registerForRestoration(_restorableDatePickerRouteFuture, 'date_picker_route_future');
   }
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
       setState(() {
         _selectedDate.value = newSelectedDate;
+        if(widget.onSelectedDate != null) widget.onSelectedDate!(newSelectedDate);
       });
     }
   }
@@ -83,11 +82,13 @@ class TimeOfDayPickerButton extends StatefulWidget {
   const TimeOfDayPickerButton({
     super.key,
     this.restorationId,
-    required this.text
+    required this.text,
+    this.onSelectedTimeOfDay,
     });
 
   final String? restorationId;
   final String text;
+  final void Function(TimeOfDay)? onSelectedTimeOfDay;
 
   @override
   State<TimeOfDayPickerButton> createState() => _TimeOfDayState();
@@ -130,14 +131,14 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton>
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
     registerForRestoration(_selectedTimeOfDay, 'selected_timeofday');
-    registerForRestoration(
-        _restorableTimeOfDayRouteFuture, 'timeofday_picker_route_future');
+    registerForRestoration(_restorableTimeOfDayRouteFuture, 'timeofday_picker_route_future');
   }
 
   void _selectTimeOfDay(TimeOfDay? newSelectedTimeOfDay) {
     if (newSelectedTimeOfDay != null) {
       setState(() {
         _selectedTimeOfDay.value = newSelectedTimeOfDay;
+        if(widget.onSelectedTimeOfDay != null) widget.onSelectedTimeOfDay!(newSelectedTimeOfDay);
       });
     }
   }
@@ -172,12 +173,14 @@ class IntegerPickerButton extends StatefulWidget {
     super.key,
     this.restorationId,
     required this.text,
-    this.maxValue = 100
+    this.maxValue = 100,
+    this.onSelectedInteger
     });
 
   final String? restorationId;
   final String text;
   final int maxValue;
+  final void Function(int)? onSelectedInteger;
 
   @override
   State<IntegerPickerButton> createState() => _IntegerPickerButtonState();
@@ -236,6 +239,7 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
                     onSelectedItemChanged: (int selectedItem) {
                       setState(() {
                         _selectedInt = selectedItem;
+                        if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedItem);
                       });
                     },
                     children: List<Widget>.generate(widget.maxValue+1, (int index) {
@@ -259,13 +263,15 @@ class DoubleIntegerPickerButton extends StatefulWidget {
     this.restorationId,
     required this.text1,
     required this.text2,
-    this.maxValue = 100
+    this.maxValue = 100,
+    this.onIntegersSelected
     });
 
   final String? restorationId;
   final String text1;
   final String text2;
   final int maxValue;
+  final void Function(int, int)? onIntegersSelected;
 
   @override
   State<DoubleIntegerPickerButton> createState() => _DoubleIntegerPickerButtonState();
@@ -309,7 +315,8 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                     itemExtent: 32.0,
                     onSelectedItemChanged: (itemIndex) {
                       setState(() {
-                        _selectedInt1 = itemIndex; 
+                        _selectedInt1 = itemIndex;
+                        if(widget.onIntegersSelected != null) widget.onIntegersSelected!(_selectedInt1, _selectedInt2);
                       });
                     },
                     itemBuilder: (context, index) {
@@ -326,6 +333,7 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                 onSelectedItemChanged: (itemIndex) {
                   setState(() {
                     _selectedInt2 = itemIndex; 
+                    if(widget.onIntegersSelected != null) widget.onIntegersSelected!(_selectedInt1, _selectedInt2);
                   });
                 },
                 itemBuilder: (context, index) {

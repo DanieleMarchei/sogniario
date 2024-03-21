@@ -46,7 +46,7 @@ class AddDream extends StatefulWidget {
 class _AddDreamState extends State<AddDream> {
   int _current = 1;
   final CarouselController _controller = CarouselController();
-  Dream dream = Dream();
+  DreamData dream = DreamData();
 
   @override
   Widget build(BuildContext context) {

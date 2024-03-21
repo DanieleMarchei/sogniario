@@ -125,6 +125,8 @@ class _ChronoTypeState extends State<ChronoType> {
   int _current = 1;
   final CarouselController _controller = CarouselController();
   
+  ChronoTypeData chronoType = ChronoTypeData();
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -140,7 +142,16 @@ class _ChronoTypeState extends State<ChronoType> {
               // SizedBox(height: screenHeight * .1),
               CarouselSlider(
                 items: List<MultipleChoiceQuestion>.generate(questions.length, (index) {
-                  return MultipleChoiceQuestion(question: questions[index].question, answers: questions[index].answers,);
+                  var q = questions[index].question;
+                  var a = questions[index].answers;
+                  return MultipleChoiceQuestion(
+                    question: q, 
+                    answers: a,
+                    onSelected: (value) {
+                      setState(() {
+                        chronoType.report[index] = value;
+                      });
+                    },);
                 }),
                 options: CarouselOptions(
                   viewportFraction: 1,

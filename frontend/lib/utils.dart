@@ -8,14 +8,30 @@ class QA {
     });
 }
 
-class Dream {
+class DreamData {
   String dreamText = "";
-  List<int> report = [0,0,0,0,0,0];
-
-  Dream ();
+  List<int> report = List<int>.generate(6, (index) => 0);
 
   @override
   String toString() {
     return "${dreamText}\n${report}";
+  }
+}
+
+class PSQIData {
+  List<dynamic> report = List<dynamic>.generate(19, (index) => null);
+
+  @override
+  String toString() {
+    return report.toString();
+  }
+}
+
+class ChronoTypeData {
+  List<int> report = List<int>.generate(19, (index) => 0);
+
+  @override
+  String toString() {
+    return report.toString();
   }
 }
