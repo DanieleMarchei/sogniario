@@ -1,31 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/inputfield.dart';
+import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
 
-class MultipleChoiceQuestion extends StatefulWidget{
+class QuestionWithDirection extends StatefulWidget{
+  Axis direction;
+  bool canChangeDirection;
+
+  QuestionWithDirection({
+    super.key,
+    this.direction = Axis.horizontal,
+    this.canChangeDirection = true,
+  }){
+      if(!canChangeDirection) direction = Axis.vertical;
+    }
+  
+  @override
+  State<StatefulWidget> createState() => QuestionWithDirectionState();
+  
+}
+// AutomaticKeepAliveClientMixin prevents the automatic disposal of the widget when 
+// the current page of the carousel does not display it
+class QuestionWithDirectionState<T extends QuestionWithDirection> extends State<T> with AutomaticKeepAliveClientMixin {
+  
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Container();
+  }
+  
+  @override
+  bool get wantKeepAlive => true;
+
+}
+
+
+class MultipleChoiceQuestion extends QuestionWithDirection{
   
   final String question;
   final List<String> answers;
+
   final void Function(int)? onSelected;
 
   
-  const MultipleChoiceQuestion(
+  MultipleChoiceQuestion(
     {
       super.key,
       required this.question,
       required this.answers,
+      // super.direction,
+      // super.canChangeDirection,
       this.onSelected
-    });
+    }) : super(direction: Axis.vertical, canChangeDirection : false);
+    
   @override
   State<MultipleChoiceQuestion> createState() => _MultipleChoiceQuestionState();
 }
 
-class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> with AutomaticKeepAliveClientMixin{
+class _MultipleChoiceQuestionState extends QuestionWithDirectionState<MultipleChoiceQuestion>{
 
   late String selectedAnswer;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -36,11 +69,16 @@ class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> with Au
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.question),
+        Flexible(child: Text(widget.question,),),
+        widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
         ...Iterable<int>.generate(widget.answers.length).map(
-                (int idx) => ListTile(
+                (int idx) => Flexible(
+                  child: ListTile(
                   title: Text(widget.answers[idx]),
                   leading: Radio<String>(
                     value: widget.answers[idx],
@@ -52,7 +90,7 @@ class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> with Au
                       });
                     }
                   ),
-                ),
+                ),),
               ),
       ],
     );
@@ -62,28 +100,27 @@ class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> with Au
 
 
 
-class SelectHourQuestion extends StatefulWidget{
+class SelectHourQuestion extends QuestionWithDirection{
   
   final String question;
   final void Function(TimeOfDay)? onSelected;
-
-
   
-  const SelectHourQuestion(
+  SelectHourQuestion(
     {
       super.key,
       required this.question,
+      @override
+      super.direction,
+      super.canChangeDirection,
       this.onSelected
     });
+
   @override
   State<SelectHourQuestion> createState() => _SelectHourQuestionState();
 }
 
-class _SelectHourQuestionState extends State<SelectHourQuestion> with AutomaticKeepAliveClientMixin{
+class _SelectHourQuestionState extends QuestionWithDirectionState<SelectHourQuestion>{
   late TimeOfDay answer;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -94,9 +131,11 @@ class _SelectHourQuestionState extends State<SelectHourQuestion> with AutomaticK
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return Flex(
+      direction: widget.direction,
         children: [
           Text(widget.question),
+          widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
           TimeOfDayPickerButton(text: "Ora: ", onSelectedTimeOfDay: widget.onSelected,)
         ],
       );
@@ -105,28 +144,27 @@ class _SelectHourQuestionState extends State<SelectHourQuestion> with AutomaticK
 }
 
 
-class SelectIntQuestion extends StatefulWidget{
+class SelectIntQuestion extends QuestionWithDirection{
   
   final String question;
   final int maxValue;
   final void Function(int)? onSelected;
   
-  const SelectIntQuestion(
+  SelectIntQuestion(
     {
       super.key,
       required this.question,
       this.maxValue = 120,
+      super.direction,
+      super.canChangeDirection,
       this.onSelected
     });
   @override
   State<SelectIntQuestion> createState() => _SelectIntQuestionState();
 }
 
-class _SelectIntQuestionState extends State<SelectIntQuestion> with AutomaticKeepAliveClientMixin{
+class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuestion>{
   late int answer;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -137,9 +175,11 @@ class _SelectIntQuestionState extends State<SelectIntQuestion> with AutomaticKee
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return Flex(
+      direction: widget.direction,
         children: [
           Text(widget.question),
+          widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
           IntegerPickerButton(text: "Minuti: ", maxValue: widget.maxValue, onSelectedInteger: widget.onSelected)
         ],
       );
@@ -148,28 +188,27 @@ class _SelectIntQuestionState extends State<SelectIntQuestion> with AutomaticKee
 }
 
 
-class SelectTwoIntsQuestion extends StatefulWidget{
+class SelectTwoIntsQuestion extends QuestionWithDirection{
   
   final String question;
   final int maxValue1 = 120;
   final int maxValue2 = 120;
   final void Function(int, int)? onSelected;
   
-  const SelectTwoIntsQuestion(
+  SelectTwoIntsQuestion(
     {
       super.key,
       required this.question,
+      super.direction,
+      super.canChangeDirection,
       this.onSelected
     });
   @override
   State<SelectTwoIntsQuestion> createState() => _SelectTwoIntsQuestionState();
 }
 
-class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion> with AutomaticKeepAliveClientMixin{
+class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIntsQuestion>{
   late TimeOfDay answer;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -180,9 +219,11 @@ class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion> with Auto
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return Flex(
+      direction: widget.direction,
         children: [
           Text(widget.question),
+          widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
           DoubleIntegerPickerButton(
             text1: "ore", 
             text2: "minuti", 
@@ -195,19 +236,21 @@ class _SelectTwoIntsQuestionState extends State<SelectTwoIntsQuestion> with Auto
 }
 
 
-class SpecifyIfYesQuestion extends StatefulWidget{
+class SpecifyIfYesQuestion extends QuestionWithDirection{
   
   final String question1;
   final String question2;
   final List<String> answers;
   final void Function(int, String?, int?)? onSelected;
   
-  const SpecifyIfYesQuestion(
+  SpecifyIfYesQuestion(
     {
       super.key,
       required this.question1,
       required this.question2,
       required this.answers,
+      super.direction,
+      super.canChangeDirection = false,
       this.onSelected
     });
 
@@ -215,7 +258,7 @@ class SpecifyIfYesQuestion extends StatefulWidget{
   State<SpecifyIfYesQuestion> createState() => _SpecifyIfYesQuestionState();
 }
 
-class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with AutomaticKeepAliveClientMixin{
+class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYesQuestion>{
 
 
   List<String> no_yes = ["No.", "Si."];
@@ -224,9 +267,6 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
   String? _optionalAnswer1;
   String? _optionalAnswer2;
   int? idxOptionalAnswer2;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -242,10 +282,14 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
 
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.question1),
+          Flexible(child: Text(widget.question1)),
+          widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
           ...Iterable<int>.generate(no_yes.length).map(
-                  (int idx) => ListTile(
+                  (int idx) => Flexible(
+                    child: ListTile(
                     title: Text(no_yes[idx]),
                     leading: Radio<String>(
                       value: no_yes[idx],
@@ -270,23 +314,22 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
                         });
                       }
                     ),
-                  ),
+                  ),)
                 ),
           if (_firstQuestionAnswer == no_yes[1])
-          Column(
-            children: [
-            Text(widget.question1),
+          ...[
+            Flexible(child: Text(widget.question1)),
             SizedBox(height: 20,),
-            InputField(labelText : "Quale?", onChanged: (String newText) {
+            Flexible(child:InputField(labelText : "Quale?", onChanged: (String newText) {
               setState(() {
                 _optionalAnswer1 = newText;
                 if(widget.onSelected != null){
                   widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
                 } 
               });
-            },),
+            },),),
             ...Iterable<int>.generate(widget.answers.length).map(
-                              (int idx) => ListTile(
+                              (int idx) => Flexible( child: ListTile(
                                 title: Text(widget.answers[idx]),
                                 leading: Radio<String>(
                                   value: widget.answers[idx],
@@ -301,10 +344,9 @@ class _SpecifyIfYesQuestionState extends State<SpecifyIfYesQuestion> with Automa
                                     });
                                   }
                                 ),
-                              ),
+                              ),)
             )
             ]
-          )
           else SizedBox()
         ],
       );

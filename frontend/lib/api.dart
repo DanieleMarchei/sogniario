@@ -1,4 +1,5 @@
 import 'dart:convert' as convert;
+import 'package:frontend/utils.dart';
 import 'package:http/http.dart' as http;
 
 String server = "http://localhost:3000";
@@ -11,7 +12,7 @@ Future<Map<String, dynamic>> getDreams(int userId) async {
   return jsonResponse;
 }
 
-Future<Map<String, dynamic>> addDream(int userId) async {
+Future<Map<String, dynamic>> addDream(int userId, DreamData dream) async {
   var url = Uri.parse('http://localhost:3000/dream');
 
   var body = {

@@ -1,4 +1,4 @@
-#Tue Mar 19 11:38:47 CET 2024
+#Fri Mar 22 12:17:13 CET 2024
 base.0=/home/daniele/Scrivania/sogniario/frontend/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex

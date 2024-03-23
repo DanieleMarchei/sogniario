@@ -18,7 +18,7 @@ class Frontend extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/add_dream',
+      initialRoute: '/',
       onGenerateRoute: Routes.routes,
       debugShowCheckedModeBanner: false,
     );

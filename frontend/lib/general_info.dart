@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/formbutton.dart';
-import 'package:frontend/inputfield.dart';
+import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
 
 enum Gender {

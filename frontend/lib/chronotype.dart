@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/questions.dart';
+import 'package:frontend/responsiveReport.dart';
 import 'package:frontend/utils.dart';
 
 
@@ -115,33 +116,104 @@ const List<QA> questions = [
     ])
 ];
 
+// class ChronoType extends StatefulWidget {
+//   const ChronoType({super.key});
+//   @override
+//   State<ChronoType> createState() => _ChronoTypeState();
+// }
+
+// class _ChronoTypeState extends State<ChronoType> {
+//   int _current = 1;
+//   final CarouselController _controller = CarouselController();
+  
+//   ChronoTypeData chronoType = ChronoTypeData();
+
+//   @override
+//   Widget build(BuildContext context) {
+//     double screenHeight = MediaQuery.of(context).size.height;
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: Colors.blue,
+//         title: Text("Cronotipo"),
+//         ),
+//         body: SingleChildScrollView(
+//           child: Column(
+//             children: <Widget>[
+//               // SizedBox(height: screenHeight * .1),
+//               CarouselSlider(
+//                 items: List<MultipleChoiceQuestion>.generate(questions.length, (index) {
+//                   var q = questions[index].question;
+//                   var a = questions[index].answers;
+//                   return MultipleChoiceQuestion(
+//                     question: q, 
+//                     answers: a,
+//                     onSelected: (value) {
+//                       setState(() {
+//                         chronoType.report[index] = value;
+//                       });
+//                     },);
+//                 }),
+//                 options: CarouselOptions(
+//                   viewportFraction: 1,
+//                   enlargeCenterPage: false,
+//                   height: screenHeight / 1.3,
+//                   enableInfiniteScroll: false,
+//                   autoPlay: false,
+//                   onPageChanged: (index, reason) {
+//                     _current = index + 1;
+//                     setState((){});
+//                   },
+//                   ),
+//                 carouselController: _controller,
+//               ),
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                 children: <Widget>[
+//                   Flexible(
+//                     child: ElevatedButton(
+//                       onPressed: _current > 1 ? () {
+//                         _controller.previousPage();
+//                       } : null,
+//                       child: const Icon(Icons.arrow_back),
+//                     ),
+//                   ),
+//                   Flexible(child: Text("${_current}/${questions.length}")),
+//                   Flexible(
+//                     child: ElevatedButton(
+//                       onPressed: () {
+//                         _controller.nextPage();
+//                         if (_current == questions.length){
+//                           Navigator.pop(context);
+//                         }
+//                         },
+//                       child: _current < questions.length ? const Icon(Icons.arrow_forward)  : const Icon(Icons.check),
+//                     ),
+//                   ),
+//                 ],
+//               )
+//             ],
+//           ),
+//         ));
+//   }
+
+// }
+
+
 class ChronoType extends StatefulWidget {
   const ChronoType({super.key});
   @override
   State<ChronoType> createState() => _ChronoTypeState();
 }
 
-class _ChronoTypeState extends State<ChronoType> {
-  int _current = 1;
-  final CarouselController _controller = CarouselController();
-  
+class _ChronoTypeState extends State<ChronoType> {  
   ChronoTypeData chronoType = ChronoTypeData();
+  late List<QuestionWithDirection> chronoTypeQuestions;
 
   @override
-  Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text("Cronotipo"),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              // SizedBox(height: screenHeight * .1),
-              CarouselSlider(
-                items: List<MultipleChoiceQuestion>.generate(questions.length, (index) {
+  void initState() {
+    super.initState();
+    chronoTypeQuestions = List<MultipleChoiceQuestion>.generate(questions.length, (index) {
                   var q = questions[index].question;
                   var a = questions[index].answers;
                   return MultipleChoiceQuestion(
@@ -152,48 +224,17 @@ class _ChronoTypeState extends State<ChronoType> {
                         chronoType.report[index] = value;
                       });
                     },);
-                }),
-                options: CarouselOptions(
-                  viewportFraction: 1,
-                  enlargeCenterPage: false,
-                  height: screenHeight / 1.3,
-                  enableInfiniteScroll: false,
-                  autoPlay: false,
-                  onPageChanged: (index, reason) {
-                    _current = index + 1;
-                    setState((){});
-                  },
-                  ),
-                carouselController: _controller,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: _current > 1 ? () {
-                        _controller.previousPage();
-                      } : null,
-                      child: const Icon(Icons.arrow_back),
-                    ),
-                  ),
-                  Flexible(child: Text("${_current}/${questions.length}")),
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _controller.nextPage();
-                        if (_current == questions.length){
-                          Navigator.pop(context);
-                        }
-                        },
-                      child: _current < questions.length ? const Icon(Icons.arrow_forward)  : const Icon(Icons.check),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ));
+                });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return ResponsiveReport(
+      questionWidgets: chronoTypeQuestions, 
+      title: "Cronotipo", 
+      onSubmitted: () {Navigator.pop(context);}
+      );
   }
 
 }

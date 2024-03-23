@@ -1,3 +1,6 @@
+double widthConstraint = 1080;
+double halfWidthConstraint = widthConstraint / 2;
+
 class QA {
   final String question;
   final List<String> answers;
