@@ -1,7 +1,7 @@
-// from: https://api.flutter.dev/flutter/material/showDatePicker.html
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 
+// from: https://api.flutter.dev/flutter/material/showDatePicker.html
 class DatePickerButton extends StatefulWidget {
 
   const DatePickerButton({
@@ -46,6 +46,8 @@ class _DatePickerState extends State<DatePickerButton> with RestorationMixin {
           initialDate: DateTime.fromMillisecondsSinceEpoch(arguments! as int),
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
+          cancelText: "Cancella",
+          confirmText: "Conferma",
         );
       },
     );
@@ -123,6 +125,13 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton>
         return TimePickerDialog(
           restorationId: 'timeofday_picker_dialog',
           initialTime: TimeOfDay.now(),
+          cancelText: "Cancella",
+          confirmText: "Conferma",
+          initialEntryMode: TimePickerEntryMode.dial,
+          hourLabelText: "Ore",
+          minuteLabelText: "Minuti",
+          errorInvalidText: "Orario non valido",
+          helpText: "Seleziona un orario",
         );
       },
     );
@@ -173,13 +182,17 @@ class IntegerPickerButton extends StatefulWidget {
     super.key,
     this.restorationId,
     required this.text,
-    this.maxValue = 100,
+    this.minValue = 0,
+    this.maxValue = 120,
+    this.increment = 1,
     this.onSelectedInteger
     });
 
   final String? restorationId;
   final String text;
+  final int minValue;
   final int maxValue;
+  final int increment;
   final void Function(int)? onSelectedInteger;
 
   @override
@@ -187,187 +200,122 @@ class IntegerPickerButton extends StatefulWidget {
 }
 
 class _IntegerPickerButtonState extends State<IntegerPickerButton> {
-  int _selectedInt = 0;
 
-  // This shows a CupertinoModalPopup with a reasonable fixed height which hosts CupertinoPicker.
-  void _showDialog(Widget child) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 6.0),
-        // The Bottom margin is provided to align the popup above the system navigation bar.
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        // Provide a background color for the popup.
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        // Use a SafeArea widget to avoid system overlaps.
-        child: SafeArea(
-          top: false,
-          child: child,
-        ),
-      ),
-    );
+  late int selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedValue = widget.minValue;
   }
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: DefaultTextStyle(
-        style: TextStyle(
-          color: CupertinoColors.label.resolveFrom(context),
-          fontSize: 22.0,
-        ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              OutlinedButton(
-                child: Text("${widget.text} ${_selectedInt}"),
-                onPressed: () => _showDialog(
-                  CupertinoPicker(
-                    magnification: 1.22,
-                    squeeze: 1.2,
-                    useMagnifier: false,
-                    itemExtent: 32.0,
-                    // This sets the initial item.
-                    scrollController: FixedExtentScrollController(
-                      initialItem: _selectedInt,
-                    ),
-                    // This is called when selected item is changed.
-                    onSelectedItemChanged: (int selectedItem) {
-                      setState(() {
-                        _selectedInt = selectedItem;
-                        if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedItem);
-                      });
-                    },
-                    children: List<Widget>.generate(widget.maxValue+1, (int index) {
-                      return Center(child: Text("${index}"));
-                    }),
-                  ),
-                ),
+    return OutlinedButton(
+      onPressed: () {
+        Picker(
+              adapter: PickerDataAdapter<String>(
+                  pickerData: [
+                    List.generate((widget.maxValue - widget.minValue) ~/ widget.increment + 1, (index) => index*(widget.increment) + widget.minValue),
+                  ],
+                  isArray: true
               ),
-            ],
-          ),
-        ),
-      ),
+              changeToFirst: false,
+              hideHeader: true,
+              confirmText: 'Conferma',
+              cancelText: "Cancella",
+              title: Text("Minuti"),
+              backgroundColor: Color.fromARGB(255, 238, 232, 244),
+              onConfirm: (Picker picker, List value) {
+                setState(() {
+                  selectedValue = int.parse(picker.getSelectedValues()[0]);
+                  if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedValue);
+                });
+              },
+          ).showDialog(context);
+      },
+      child: Text(
+          '${widget.text}${selectedValue}'),
     );
   }
 }
 
-// from: https://stackoverflow.com/a/74700812
 class DoubleIntegerPickerButton extends StatefulWidget {
   const DoubleIntegerPickerButton({
     super.key,
     this.restorationId,
     required this.text1,
     required this.text2,
-    this.maxValue = 100,
+    this.minValue1 = 0,
+    this.maxValue1 = 100,
+    this.minValue2 = 0,
+    this.maxValue2 = 100,
+    this.increment1 = 1,
+    this.increment2 = 1,
     this.onIntegersSelected
     });
 
   final String? restorationId;
   final String text1;
   final String text2;
-  final int maxValue;
+  final int minValue1;
+  final int maxValue1;
+  final int minValue2;
+  final int maxValue2;
+  final int increment1;
+  final int increment2;
   final void Function(int, int)? onIntegersSelected;
 
   @override
   State<DoubleIntegerPickerButton> createState() => _DoubleIntegerPickerButtonState();
 }
 
-class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
-  int _selectedInt1 = 0;
-  int _selectedInt2 = 0;
 
-  // This shows a CupertinoModalPopup with a reasonable fixed height which hosts CupertinoPicker.
-  void _showDialog(Widget child) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 2.0),
-        // The Bottom margin is provided to align the popup above the system navigation bar.
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        // Provide a background color for the popup.
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        // Use a SafeArea widget to avoid system overlaps.
-        child: SafeArea(
-          top: false,
-          child: child,
-        ),
-      ),
-    );
+class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
+
+  late int selectedValue1;
+  late int selectedValue2;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedValue1 = widget.minValue1;
+    selectedValue2 = widget.minValue2;
   }
 
   @override
   Widget build(BuildContext context) {
-
-    Widget doublePicker = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: CupertinoPicker.builder(
-                    childCount: 10,
-                    itemExtent: 32.0,
-                    onSelectedItemChanged: (itemIndex) {
-                      setState(() {
-                        _selectedInt1 = itemIndex;
-                        if(widget.onIntegersSelected != null) widget.onIntegersSelected!(_selectedInt1, _selectedInt2);
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return Center(
-                        child: Text("${index}",textAlign: TextAlign.center),
-                      );
-                    },
-                  ),
+    // print(widget.increment);
+    return OutlinedButton(
+      onPressed: () {
+        Picker(
+              adapter: PickerDataAdapter<String>(
+                  pickerData: [
+                    List.generate((widget.maxValue1 - widget.minValue1) ~/ widget.increment1 + 1, (index) => index*(widget.increment1) + widget.minValue1),
+                    List.generate((widget.maxValue2 - widget.minValue2) ~/ widget.increment2 + 1, (index) => index*(widget.increment2) + widget.minValue2),
+                  ],
+                  isArray: true
               ),
-            Expanded(
-              child: CupertinoPicker.builder(
-                childCount: 20,
-                itemExtent: 32.0,
-                onSelectedItemChanged: (itemIndex) {
-                  setState(() {
-                    _selectedInt2 = itemIndex; 
-                    if(widget.onIntegersSelected != null) widget.onIntegersSelected!(_selectedInt1, _selectedInt2);
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return Center(
-                    child: Text(
-                      "${index}",
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                },
+              changeToFirst: false,
+              hideHeader: true,
+              confirmText: 'Conferma',
+              cancelText: "Cancella",
+              title: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [ Text('Ore'), Text(':'), Text('Minuti') ]
               ),
-            ),
-          ],
-        );
-
-
-    return CupertinoPageScaffold(
-      child: DefaultTextStyle(
-        style: TextStyle(
-          color: CupertinoColors.label.resolveFrom(context),
-          fontSize: 22.0,
-        ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              OutlinedButton(
-                child: Text("${_selectedInt1} ${widget.text1} e ${_selectedInt2} ${widget.text2}"),
-                onPressed: () => _showDialog(doublePicker),
-              ),
-            ],
-          ),
-        ),
-      ),
+              backgroundColor: Color.fromARGB(255, 238, 232, 244),
+              onConfirm: (Picker picker, List value) {
+                setState(() {
+                  selectedValue1 = int.parse(picker.getSelectedValues()[0]);
+                  selectedValue2 = int.parse(picker.getSelectedValues()[1]);
+                  if(widget.onIntegersSelected != null) widget.onIntegersSelected!(selectedValue1, selectedValue2);
+                });
+              },
+          ).showDialog(context);
+      },
+      child: Text(
+          '${selectedValue1} ${widget.text1} e ${selectedValue2} ${widget.text2}'),
     );
   }
 }

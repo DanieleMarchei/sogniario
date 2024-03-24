@@ -5,8 +5,8 @@ import 'package:frontend/pickers.dart';
 enum Gender {
   female(label: "Femmina"),
   male(label: "Maschio"),
-  NOT_SPECIFIED(label: "Non specificato"),
-  OTHER(label: "Altro");
+  notSpecified(label: "Non specificato"),
+  other(label: "Altro");
 
   const Gender({required this.label});
   final String label;
@@ -64,7 +64,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
               height: screenHeight * .075,
             ),
             FormButton(
-              text: 'Accetta',
+              text: 'Conferma',
               onPressed: submit,
             ),
             SizedBox(

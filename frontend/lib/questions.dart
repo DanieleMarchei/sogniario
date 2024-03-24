@@ -147,6 +147,7 @@ class _SelectHourQuestionState extends QuestionWithDirectionState<SelectHourQues
 class SelectIntQuestion extends QuestionWithDirection{
   
   final String question;
+  final String text;
   final int maxValue;
   final void Function(int)? onSelected;
   
@@ -154,6 +155,7 @@ class SelectIntQuestion extends QuestionWithDirection{
     {
       super.key,
       required this.question,
+      required this.text,
       this.maxValue = 120,
       super.direction,
       super.canChangeDirection,
@@ -180,7 +182,7 @@ class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuesti
         children: [
           Text(widget.question),
           widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
-          IntegerPickerButton(text: "Minuti: ", maxValue: widget.maxValue, onSelectedInteger: widget.onSelected)
+          IntegerPickerButton(text: widget.text, maxValue: widget.maxValue, onSelectedInteger: widget.onSelected)
         ],
       );
   }
@@ -191,14 +193,29 @@ class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuesti
 class SelectTwoIntsQuestion extends QuestionWithDirection{
   
   final String question;
-  final int maxValue1 = 120;
-  final int maxValue2 = 120;
+  final String text1;
+  final String text2;
+  final int minValue1;
+  final int maxValue1;
+  final int minValue2;
+  final int maxValue2;
+  final int increment1;
+  final int increment2;
+
   final void Function(int, int)? onSelected;
   
   SelectTwoIntsQuestion(
     {
       super.key,
       required this.question,
+      required this.text1,
+      required this.text2,
+      this.minValue1 = 0,
+      this.maxValue1 = 120,
+      this.minValue2 = 0,
+      this.maxValue2 = 120,
+      this.increment1 = 1,
+      this.increment2 = 1,
       super.direction,
       super.canChangeDirection,
       this.onSelected
@@ -225,9 +242,14 @@ class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIn
           Text(widget.question),
           widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
           DoubleIntegerPickerButton(
-            text1: "ore", 
-            text2: "minuti", 
-            maxValue: widget.maxValue1, 
+            text1: widget.text1, 
+            text2: widget.text2, 
+            minValue1: widget.minValue1, 
+            minValue2: widget.minValue2, 
+            maxValue1: widget.maxValue1, 
+            maxValue2: widget.maxValue2, 
+            increment1: widget.increment1,
+            increment2: widget.increment2,
             onIntegersSelected: widget.onSelected,),
         ],
       );
