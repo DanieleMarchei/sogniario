@@ -3,6 +3,7 @@ backend/node_modules/
 frontend/.dart_tool/
 backend/.vscode/
 frontend/.vscode/
+frontend/build/
 frontend/.idea/
 backend/.idea/
 backend/server.sh
