@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class HomeUser extends StatelessWidget {
+  const HomeUser({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -104,80 +104,3 @@ class Home extends StatelessWidget {
   }
 }
 
-class SimpleCircularIconButton extends StatelessWidget {
-  const SimpleCircularIconButton(
-      {this.fillColor = Colors.transparent,
-      required this.iconData,
-      this.text = "",
-      this.iconColor = Colors.blue,
-      this.outlineColor = Colors.transparent,
-      this.showAlert = false,
-      this.onPressed,
-      this.radius = 70.0,
-      super.key});
-
-  final IconData iconData;
-  final String text;
-  final Color fillColor;
-  final Color outlineColor;
-  final bool showAlert;
-  final Color iconColor;
-  final Function? onPressed;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Stack(
-          children: [
-            Ink(
-              width: radius,
-              height: radius,
-              decoration: ShapeDecoration(
-                color: fillColor,
-                shape: CircleBorder(side: BorderSide(color: outlineColor)),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                splashRadius: radius,
-                iconSize: radius,
-                icon: Icon(iconData, color: iconColor),
-                splashColor: iconColor.withOpacity(.4),
-                onPressed: onPressed as void Function()?,
-              ),
-            ),
-            if (showAlert) ...[
-              Positioned(
-                top: radius / 100,
-                right: radius / 100,
-                child: Container(
-                  width: radius / 3,
-                  height: radius / 3,
-                  decoration: const ShapeDecoration(
-                    color: Colors.red,
-                    shape: CircleBorder(),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "!",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: radius / 4,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        Text(
-          this.text,
-          textAlign: TextAlign.justify,
-        )
-      ],
-    );
-  }
-}

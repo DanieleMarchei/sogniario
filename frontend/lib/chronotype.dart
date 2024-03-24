@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/questions.dart';
-import 'package:frontend/responsiveReport.dart';
+import 'package:frontend/responsive_report.dart';
 import 'package:frontend/utils.dart';
 
 

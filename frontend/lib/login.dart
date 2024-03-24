@@ -54,7 +54,19 @@ class _LoginState extends State<Login> {
 
   void submit() {
     if (validate()) {
-      Navigator.pushNamed(context, "/home");
+      switch (username) {
+        case "admin":
+          Navigator.pushNamed(context, "/home_admin");
+          break;
+        
+        case "user":
+          Navigator.pushNamed(context, "/home_user");
+          break;
+
+        default:
+          Navigator.pushNamed(context, "/home_user");
+          break;
+      }
     }
   }
 

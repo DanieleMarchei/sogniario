@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/forms_and_buttons.dart';
-import 'package:frontend/home.dart';
+import 'package:frontend/home_user.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/utils.dart';
 

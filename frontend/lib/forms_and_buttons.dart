@@ -74,7 +74,7 @@ class IconTextButton extends StatelessWidget {
 
 
 
-class InputField extends StatelessWidget {
+class InputField extends StatefulWidget {
   final String? labelText;
   final Function(String)? onChanged;
   final Function(String)? onSubmitted;
@@ -83,7 +83,10 @@ class InputField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final bool autoFocus;
   final bool obscureText;
-  const InputField(
+  final bool clearable;
+  final Function? onCleared;
+
+  InputField(
       {this.labelText,
       this.onChanged,
       this.onSubmitted,
@@ -92,25 +95,41 @@ class InputField extends StatelessWidget {
       this.textInputAction,
       this.autoFocus = false,
       this.obscureText = false,
-      Key? key})
-      : super(key: key);
+      this.clearable = false,
+      this.onCleared,
+      super.key});
+
+  @override
+  State<InputField> createState() => _InputFieldState();
+}
+
+class _InputFieldState extends State<InputField> {
+  final TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      autofocus: autoFocus,
-      onChanged: onChanged,
-      onSubmitted: onSubmitted,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      obscureText: obscureText,
+      controller: controller,
+      autofocus: widget.autoFocus,
+      onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      obscureText: widget.obscureText,
       decoration: InputDecoration(
-        labelText: labelText,
-        errorText: errorText,
+        labelText: widget.labelText,
+        errorText: widget.errorText,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
+        suffixIcon: widget.onCleared != null ? IconButton(
+          onPressed: () {
+            controller.clear();
+            widget.onCleared!();
+          },
+          icon: const Icon(Icons.clear),
+        ) : null,
       ),
     );
   }
@@ -155,6 +174,84 @@ class MultilineInputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
+    );
+  }
+}
+
+class SimpleCircularIconButton extends StatelessWidget {
+  const SimpleCircularIconButton(
+      {this.fillColor = Colors.transparent,
+      required this.iconData,
+      this.text = "",
+      this.iconColor = Colors.blue,
+      this.outlineColor = Colors.transparent,
+      this.showAlert = false,
+      this.onPressed,
+      this.radius = 70.0,
+      super.key});
+
+  final IconData iconData;
+  final String text;
+  final Color fillColor;
+  final Color outlineColor;
+  final bool showAlert;
+  final Color iconColor;
+  final Function? onPressed;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Stack(
+          children: [
+            Ink(
+              width: radius,
+              height: radius,
+              decoration: ShapeDecoration(
+                color: fillColor,
+                shape: CircleBorder(side: BorderSide(color: outlineColor)),
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                splashRadius: radius,
+                iconSize: radius,
+                icon: Icon(iconData, color: iconColor),
+                splashColor: iconColor.withOpacity(.4),
+                onPressed: onPressed as void Function()?,
+              ),
+            ),
+            if (showAlert) ...[
+              Positioned(
+                top: radius / 100,
+                right: radius / 100,
+                child: Container(
+                  width: radius / 3,
+                  height: radius / 3,
+                  decoration: const ShapeDecoration(
+                    color: Colors.red,
+                    shape: CircleBorder(),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "!",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: radius / 4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        Text(
+          this.text,
+          textAlign: TextAlign.justify,
+        )
+      ],
     );
   }
 }

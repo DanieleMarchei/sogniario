@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:frontend/add_dream.dart';
 import 'package:frontend/chronotype.dart';
 import 'package:frontend/general_info.dart';
-import 'package:frontend/home.dart';
+import 'package:frontend/home_admin.dart';
+import 'package:frontend/home_user.dart';
 import 'package:frontend/login.dart';
+import 'package:frontend/manage_users.dart';
 import 'package:frontend/psqi.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -19,9 +21,19 @@ class Routes {
           child: const Login(),
           type: PageTransitionType.fade);
 
-      case "/home":
+      case "/home_user":
         return PageTransition(
-          child: const Home(),
+          child: const HomeUser(),
+          type: PageTransitionType.fade);
+      
+      case "/home_admin":
+        return PageTransition(
+          child: const HomeAdmin(),
+          type: PageTransitionType.fade);
+      
+      case "/manage_users":
+        return PageTransition(
+          child: const ManageUsers(),
           type: PageTransitionType.fade);
       
       case "/add_dream":
