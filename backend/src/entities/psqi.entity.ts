@@ -21,11 +21,19 @@ export class Psqi {
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 23 })
   @Column()
-  q4: number;
+  q4_h: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 59 })
+  @Column()
+  q4_m: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 24 })
   @Column()
-  q5: number;
+  q5_h: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 59 })
+  @Column()
+  q5_m: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
