@@ -44,21 +44,6 @@ class HomeAdmin extends StatelessWidget {
                             icon: const Icon(Icons.download),
                             text: "Scarica il database",
                             onPressed: () => {}),
-                        SizedBox(height: screenHeight * .01),
-                        IconTextButton(
-                            icon: const Icon(Icons.abc),
-                            text: "Test",
-                            onPressed: () async {
-                              // UserData user = UserData();
-                              // user.username = "Pluto";
-                              // user.password = "Hey569^";
-                              // // user.birthdate = DateTime(1995, 1, 1);
-                              // // user.gender = Gender.other;
-
-                              // addUser(user);
-                              print(await getAllUsers());
-
-                            }),
 
                       ],
                     )))),
