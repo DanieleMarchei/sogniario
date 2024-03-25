@@ -57,7 +57,7 @@ List<QA> questions = [
       scores: dec5),
   QA(
       question:
-          "Se di solito ti devi alzare ad una cera ora del mattino, hai proprio bisogno di sentire la sveglia per svegliarti?",
+          "Se di solito ti devi alzare ad una certa ora del mattino, hai proprio bisogno di sentire la sveglia per svegliarti?",
       answers: answersHowMuch,
       scores: dec4),
   QA(
@@ -80,7 +80,7 @@ List<QA> questions = [
       scores: inc4),
   QA(
       question:
-          "Rispetto allì orario in cui vai a letto di solito, a che ora andresti a letto se il giorno dopo non avessi impegni?",
+          "Rispetto all' orario in cui vai a letto di solito, a che ora andresti a letto se il giorno dopo non avessi impegni?",
       answers: answersHowEarlyLate,
       scores: dec4),
   QA(
@@ -136,7 +136,7 @@ List<QA> questions = [
       scores: dec4),
   QA(
       question:
-          "Questa notte dovrai stsare sveglio per lavoro dalle 4 alle 6 del mattino. Il giorno dopo non hai alcun impegno. Che cosa farai?",
+          "Questa notte dovrai stare sveglio per lavoro dalle 4 alle 6 del mattino. Il giorno dopo non hai alcun impegno. Che cosa farai?",
       answers: [
         "Non andrò a letto finchè non avrò finito di lavorare.",
         "Farò un pisolino prima e uno dopo.",
