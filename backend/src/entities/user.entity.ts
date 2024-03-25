@@ -19,11 +19,16 @@ export class User {
   password: string;
 
   @ApiProperty()
-  @Column({})
+  @Column({ nullable: true })
   birthdate: Date;
 
   @ApiProperty()
-  @Column({ type: "enum", enum: Gender, default: Gender.NOT_SPECIFIED })
+  @Column({
+    type: "enum",
+    enum: Gender,
+    default: Gender.NOT_SPECIFIED,
+    nullable: false,
+  })
   gender: Gender;
 
   @ApiProperty()
