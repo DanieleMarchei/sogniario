@@ -7,3 +7,4 @@ frontend/build/
 frontend/.idea/
 backend/.idea/
 backend/server.sh
+backend/dist/

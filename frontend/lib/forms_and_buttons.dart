@@ -85,6 +85,9 @@ class InputField extends StatefulWidget {
   final bool obscureText;
   final bool clearable;
   final Function? onCleared;
+  final String? text;
+  final bool enabled;
+  late final TextEditingController controller;
 
   InputField(
       {this.labelText,
@@ -97,19 +100,30 @@ class InputField extends StatefulWidget {
       this.obscureText = false,
       this.clearable = false,
       this.onCleared,
-      super.key});
+      this.text,
+      controller,
+      this.enabled = true,
+      super.key}){
+        if(controller == null){
+          this.controller = TextEditingController(text: this.text);
+        } 
+        else {
+          this.controller = controller;
+          this.controller.text = this.text ?? "";
+        }
+      }
 
   @override
   State<InputField> createState() => _InputFieldState();
 }
 
 class _InputFieldState extends State<InputField> {
-  final TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
+      controller: widget.controller,
+      readOnly: !widget.enabled,
       autofocus: widget.autoFocus,
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
@@ -125,7 +139,7 @@ class _InputFieldState extends State<InputField> {
         ),
         suffixIcon: widget.onCleared != null ? IconButton(
           onPressed: () {
-            controller.clear();
+            widget.controller.clear();
             widget.onCleared!();
           },
           icon: const Icon(Icons.clear),

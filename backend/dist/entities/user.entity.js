@@ -35,12 +35,17 @@ __decorate([
 ], User.prototype, "password", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({}),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Date)
 ], User.prototype, "birthdate", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ type: "enum", enum: gender_enum_1.Gender, default: gender_enum_1.Gender.NOT_SPECIFIED }),
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: gender_enum_1.Gender,
+        default: gender_enum_1.Gender.NOT_SPECIFIED,
+        nullable: false,
+    }),
     __metadata("design:type", Number)
 ], User.prototype, "gender", void 0);
 __decorate([

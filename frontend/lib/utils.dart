@@ -4,11 +4,19 @@ double halfWidthConstraint = widthConstraint / 2;
 class QA {
   final String question;
   final List<String> answers;
+  late final List<int> scores;
 
-  const QA({
+  QA({
     required this.question,
-    required this.answers
-    });
+    required this.answers,
+    List<int>? scores
+    }){
+      if(scores == null){
+        this.scores = List<int>.generate(answers.length, (index) => index + 1);
+      }else{
+        this.scores = scores;
+      }
+    }
 }
 
 class DreamData {
@@ -37,4 +45,27 @@ class ChronoTypeData {
   String toString() {
     return report.toString();
   }
+
+  int score(){
+    return report.reduce((value, element){
+      return value + element;});
+  }
+}
+
+enum Gender {
+  male(label: "Maschio", id: 0),
+  female(label: "Femmina", id: 1),
+  notSpecified(label: "Non specificato", id: 2),
+  other(label: "Altro", id: 3);
+
+  const Gender({required this.label, required this.id});
+  final String label;
+  final int id;
+}
+
+class UserData {
+  String username = "", password = "";
+  DateTime? birthdate = null;
+  Gender? gender = null;
+
 }

@@ -39,12 +39,22 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: "number", minimum: 0, maximum: 23 }),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Psqi.prototype, "q4", void 0);
+], Psqi.prototype, "q4_h", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: "number", minimum: 0, maximum: 59 }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Psqi.prototype, "q4_m", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: "number", minimum: 0, maximum: 24 }),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Psqi.prototype, "q5", void 0);
+], Psqi.prototype, "q5_h", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: "number", minimum: 0, maximum: 59 }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Psqi.prototype, "q5_m", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: "number", minimum: 0, maximum: 3 }),
     (0, typeorm_1.Column)(),

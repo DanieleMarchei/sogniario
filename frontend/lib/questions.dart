@@ -34,26 +34,25 @@ class QuestionWithDirectionState<T extends QuestionWithDirection> extends State<
 }
 
 
-class MultipleChoiceQuestion extends QuestionWithDirection{
+class MultipleChoiceQuestion extends QuestionWithDirection {
   
   final String question;
   final List<String> answers;
 
   final void Function(int)? onSelected;
-
   
   MultipleChoiceQuestion(
     {
       super.key,
       required this.question,
       required this.answers,
-      // super.direction,
-      // super.canChangeDirection,
       this.onSelected
     }) : super(direction: Axis.vertical, canChangeDirection : false);
     
   @override
   State<MultipleChoiceQuestion> createState() => _MultipleChoiceQuestionState();
+  
+
 }
 
 class _MultipleChoiceQuestionState extends QuestionWithDirectionState<MultipleChoiceQuestion>{
@@ -120,13 +119,6 @@ class SelectHourQuestion extends QuestionWithDirection{
 }
 
 class _SelectHourQuestionState extends QuestionWithDirectionState<SelectHourQuestion>{
-  late TimeOfDay answer;
-
-  @override
-  void initState() {
-    super.initState();
-    answer = TimeOfDay.now();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,13 +158,6 @@ class SelectIntQuestion extends QuestionWithDirection{
 }
 
 class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuestion>{
-  late int answer;
-
-  @override
-  void initState() {
-    super.initState();
-    answer = 0;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -225,13 +210,6 @@ class SelectTwoIntsQuestion extends QuestionWithDirection{
 }
 
 class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIntsQuestion>{
-  late TimeOfDay answer;
-
-  @override
-  void initState() {
-    super.initState();
-    answer = TimeOfDay.now();
-  }
 
   @override
   Widget build(BuildContext context) {

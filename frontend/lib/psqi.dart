@@ -35,7 +35,6 @@ class _PSQIState extends State<PSQI> {
   @override
   void initState() {
     super.initState();
-
     psqiQuestions = [
       SelectHourQuestion(
         question:

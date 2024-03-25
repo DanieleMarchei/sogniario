@@ -1,20 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
+import 'package:frontend/pickers.dart';
 import 'package:frontend/utils.dart';
-
-List<String> userList = [
-  "XYZK",
-  "XKCD",
-  "ABCD",
-  "ACDC",
-  "YYYY",
-  "XXXX",
-  "YRDFG",
-  "CVFFD",
-  "QWERTY"
-];
 
 class ManageUsers extends StatefulWidget {
   const ManageUsers({
@@ -28,8 +18,8 @@ class ManageUsers extends StatefulWidget {
 class _ManageUsersState extends State<ManageUsers> {
   String searchQuery = "";
 
-  bool matchUsername(String username){
-    if(searchQuery == "") return true;
+  bool matchUsername(String username) {
+    if (searchQuery == "") return true;
 
     return username.toLowerCase().contains(searchQuery.toLowerCase());
   }
@@ -38,62 +28,101 @@ class _ManageUsersState extends State<ManageUsers> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    print(searchQuery);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Gestisci utenti"),
-        backgroundColor: Colors.orange,
-        actions: [
-          Row(
-            children: [
-              SizedBox(
-                width: 250,
-                height: 40,
-                child: InputField(
-                  labelText: "Cerca",
-                  onCleared: () {
-                    setState(() {
-                      searchQuery = "";
-                    });
-                  },
-                  onChanged: (String query) {
-                    setState(() {
-                      searchQuery = query;
-                    });
-                  },
-                ),
-              ),
+    return FutureBuilder(
+      future: getAllUsers(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        List<dynamic> users = snapshot.data!;
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("Gestisci utenti"),
+            backgroundColor: Colors.orange,
+            actions: [
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ManageUserDialog(
+                              action: ManageUserDialogActions.create,
+                            );
+                          });
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.person_add_alt_1_rounded),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  SizedBox(
+                    width: 250,
+                    height: 40,
+                    child: InputField(
+                      labelText: "Cerca",
+                      onCleared: () {
+                        setState(() {
+                          searchQuery = "";
+                        });
+                      },
+                      onChanged: (String query) {
+                        setState(() {
+                          searchQuery = query;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                ],
+              )
             ],
-          )
-        ],
-      ),
-      body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
-          child: Center(
-              child: ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(
-                      width: min(screenWidth, halfWidthConstraint)),
-                  child: ListView(
-                    children: [
-                      SizedBox(height: screenHeight * .01),
-                      ...userList.where((element) => matchUsername(element)).map((e) => UserWidget(username: e,))
-                    ],
-                  )))),
+          ),
+          body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Center(
+                  child: ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                          width: min(screenWidth, halfWidthConstraint)),
+                      child: ListView(
+                        children: [
+                          SizedBox(height: screenHeight * .01),
+                          ...users
+                              .where((element) =>
+                                  matchUsername(element["username"]))
+                              .map((e) => UserCardWidget(
+                                    id: e["id"],
+                                    username: e["username"],
+                                  )),
+                        ],
+                      )))),
+        );
+      },
     );
   }
 }
 
-class UserWidget extends StatefulWidget {
+class UserCardWidget extends StatefulWidget {
   final String username;
+  final int id;
 
-  const UserWidget({super.key, required this.username});
+  const UserCardWidget({super.key, required this.id, required this.username});
 
   @override
-  State<StatefulWidget> createState() => _UserWidgetState();
+  State<StatefulWidget> createState() => _UserCardWidgetState();
 }
 
-class _UserWidgetState extends State<UserWidget> {
+class _UserCardWidgetState extends State<UserCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -106,12 +135,30 @@ class _UserWidgetState extends State<UserWidget> {
             Text(widget.username),
             Spacer(),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ManageUserDialog(
+                        action: ManageUserDialogActions.visualize,
+                        userId: widget.id,
+                      );
+                    });
+              },
               icon: Icon(Icons.visibility),
               tooltip: "Visualizza",
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ManageUserDialog(
+                        action: ManageUserDialogActions.edit,
+                        userId: widget.id,
+                      );
+                    });
+              },
               icon: Icon(Icons.edit),
               tooltip: "Modifica",
             ),
@@ -122,5 +169,193 @@ class _UserWidgetState extends State<UserWidget> {
             ),
           ],
         ));
+  }
+}
+
+enum ManageUserDialogActions { visualize, edit, create }
+
+class ManageUserDialog extends StatefulWidget {
+  final int? userId;
+  final ManageUserDialogActions action;
+
+  ManageUserDialog({super.key, this.userId, required this.action}) {
+    assert(
+        !(action == ManageUserDialogActions.edit ||
+                action == ManageUserDialogActions.visualize) ||
+            userId != null,
+        "userId can be null only during creation.");
+  }
+
+  @override
+  State<ManageUserDialog> createState() => _ManageUserDialogState();
+}
+
+class _ManageUserDialogState extends State<ManageUserDialog> {
+
+  UserData user = UserData();
+  TextEditingController controllerUsername = TextEditingController();
+  TextEditingController controllerPassword = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    controllerUsername.text = user.username;
+    controllerUsername.addListener(_onUsernameChanged);
+    controllerPassword.text = user.password;
+    controllerPassword.addListener(_onPasswordChanged);
+  }
+
+  void _onUsernameChanged(){
+    setState(() {
+      user.username = controllerUsername.text;
+    });
+  }
+  
+  void _onPasswordChanged(){
+    setState(() {
+      user.password = controllerPassword.text;
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.action == ManageUserDialogActions.create ? create(context) : visualizeOrEdit(context);
+  }
+
+  Widget create(BuildContext context){
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    Random rnd = Random.secure();
+
+    String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+        length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+
+    return SimpleDialog(
+            title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              Text("Aggiungi utente"),
+              Spacer(),
+              IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  tooltip: "Annulla",
+                  icon: Icon(Icons.close))
+            ]),
+            children: [
+              SimpleDialogOption(
+                child: InputField(
+                  controller: controllerUsername,
+                  labelText: "Username",
+                  text: user.username,
+                  onChanged: (String username) {
+                    setState(() {
+                      user.username = username;
+                    });
+                  },
+                ),
+              ),
+              SimpleDialogOption(
+                child: InputField(
+                  controller: controllerPassword,
+                  labelText: "Password",
+                  text: user.password,
+                  onChanged: (String password) {
+                    setState(() {
+                      user.password = password;
+                    });
+                  },
+                ),
+              ),
+              SimpleDialogOption(
+                child: FormButton(
+                  text: "Genera casuale",
+                  onPressed: () {
+                    controllerUsername.text = getRandomString(8);
+                    controllerPassword.text = getRandomString(8);
+                  },
+                  )
+              ),
+              SimpleDialogOption(
+                child: FormButton(
+                  text: "Aggiungi",
+                  onPressed: () async {
+                    await addUser(user);
+                    if(mounted) Navigator.pop(context);
+                  },
+                  )
+              ),
+            ],
+          );
+  }
+
+  Widget visualizeOrEdit(BuildContext context) {
+    return FutureBuilder(
+        future: getUser(widget.userId!),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Container(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          user = snapshot.data!;
+          
+          return SimpleDialog(
+            title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              Text(user.username),
+              Spacer(),
+              IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  tooltip: "Annulla",
+                  icon: Icon(Icons.close))
+            ]),
+            children: [
+              SimpleDialogOption(
+                child: InputField(
+                  labelText: "Password",
+                  text: user.password,
+                  enabled: widget.action == ManageUserDialogActions.edit,
+                ),
+              ),
+              SimpleDialogOption(
+                child: DatePickerButton(
+                  text: "Data di nascita: ",
+                ),
+              ),
+              SimpleDialogOption(
+                child: DropdownButtonFormField<Gender>(
+                  decoration: const InputDecoration(
+                    label: Text("Sesso"),
+                  ),
+                  value: user.gender,
+                  items: Gender.values
+                      .map<DropdownMenuItem<Gender>>((Gender gender) {
+                    return DropdownMenuItem<Gender>(
+                      value: gender,
+                      child: Text(gender.label),
+                    );
+                  }).toList(),
+                  onChanged: null,
+                ),
+              ),
+              if(widget.action == ManageUserDialogActions.edit)...{
+                SimpleDialogOption(
+                child: FormButton(
+                  text: "Modifica",
+                  onPressed: () async {
+                    await addUser(user);
+                    if(mounted) Navigator.pop(context);
+                  },
+                  )
+                )
+              }
+              
+            ],
+          );
+        });
   }
 }

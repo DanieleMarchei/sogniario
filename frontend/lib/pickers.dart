@@ -81,16 +81,25 @@ class _DatePickerState extends State<DatePickerButton> with RestorationMixin {
 }
 
 class TimeOfDayPickerButton extends StatefulWidget {
-  const TimeOfDayPickerButton({
+  TimeOfDayPickerButton({
     super.key,
     this.restorationId,
     required this.text,
     this.onSelectedTimeOfDay,
-    });
+    TimeOfDay? initialTime
+    }){
+      if(initialTime == null){
+        this.initialTime = TimeOfDay.now();
+      }
+      else{
+        this.initialTime = initialTime;
+      }
+    }
 
   final String? restorationId;
   final String text;
   final void Function(TimeOfDay)? onSelectedTimeOfDay;
+  late final TimeOfDay initialTime;
 
   @override
   State<TimeOfDayPickerButton> createState() => _TimeOfDayState();

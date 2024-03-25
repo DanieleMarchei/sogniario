@@ -4,27 +4,43 @@ import 'package:http/http.dart' as http;
 
 String server = "http://localhost:3000";
 
-Future<Map<String, dynamic>> getDreams(int userId) async {
-  var url = Uri.parse('${server}/dream/${userId}');
 
-  var response = await http.get(url);
-  var jsonResponse = convert.jsonDecode(response.body) as Map<String, dynamic>;
-  return jsonResponse;
-}
 
-Future<Map<String, dynamic>> addDream(int userId, DreamData dream) async {
-  var url = Uri.parse('http://localhost:3000/dream');
+Future<Map<String, dynamic>> addUser(UserData user) async {
+  var url = Uri.parse('${server}/user/');
 
   var body = {
-    "id": "0",
-    "text": "string",
-    "created_at": "2024-03-19T14:31:46.627Z",
-    "last_edit": "2024-03-19T14:31:46.627Z",
-    "deleted": "false"
+    "username": "${user.username}",
+    "password": "${user.password}",
   };
+
+  if(user.birthdate != null) body["birthday"] = "${user.birthdate}";
+  if(user.gender != null) body["gender"] = "${user.gender!.id}";
 
   var response = await http.post(url, body : body);
   var jsonResponse = convert.jsonDecode(response.body) as Map<String, dynamic>;
   return jsonResponse;
-  
+}
+
+
+Future<List<dynamic>> getAllUsers() async {
+  var url = Uri.parse('${server}/user/');
+
+  var response = await http.get(url);
+  var jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
+  return jsonResponse;
+}
+
+
+Future<UserData> getUser(int id) async {
+  var url = Uri.parse('${server}/user/${id}');
+
+  var response = await http.get(url);
+  var jsonResponse = convert.jsonDecode(response.body);
+  UserData user = UserData();
+  user.username = jsonResponse["username"];
+  user.password = jsonResponse["password"];
+  user.birthdate = jsonResponse["birthdate"] != null ? DateTime.parse(jsonResponse["birthdate"]) : null;
+  user.gender = jsonResponse["gender"] != null ? Gender.values[jsonResponse["gender"]] : null;
+  return user;
 }

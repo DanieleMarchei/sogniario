@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
+import 'package:frontend/utils.dart';
 
-enum Gender {
-  female(label: "Femmina"),
-  male(label: "Maschio"),
-  notSpecified(label: "Non specificato"),
-  other(label: "Altro");
 
-  const Gender({required this.label});
-  final String label;
-}
 
 class GeneralInfo extends StatefulWidget {
   const GeneralInfo({Key? key}) : super(key: key);

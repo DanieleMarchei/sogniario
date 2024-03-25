@@ -4,8 +4,10 @@ export declare class Psqi {
     q1: Date;
     q2: number;
     q3: Date;
-    q4: number;
-    q5: number;
+    q4_h: number;
+    q4_m: number;
+    q5_h: number;
+    q5_m: number;
     q6: number;
     q7: number;
     q8: number;
