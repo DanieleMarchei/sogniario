@@ -2,6 +2,7 @@ import { ApiProperty, ApiTags } from "@nestjs/swagger";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Gender } from "./gender.enum";
 import { Dream } from "./dream.entity";
+import { Chronotype } from "./chronotype.entity";
 import { Psqi } from "./psqi.entity";
 @Entity()
 export class User {
@@ -11,10 +12,14 @@ export class User {
 
   @ApiProperty()
   @Column({ nullable: false })
-  password: string;
+  username: string;
 
   @ApiProperty()
   @Column({ nullable: false })
+  password: string;
+
+  @ApiProperty()
+  @Column({})
   birthdate: Date;
 
   @ApiProperty()
@@ -22,23 +27,26 @@ export class User {
   gender: Gender;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({ default: new Date() })
   created_at: Date;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({ default: false })
   first_access: boolean;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({ default: new Date() })
   last_edit: Date;
 
   @ApiProperty()
-  @Column({ nullable: false, default: false })
+  @Column({ default: false })
   deleted: boolean;
 
   @OneToMany(() => Dream, (dream) => dream.user)
   dreams: Dream[];
+
+  @OneToMany(() => Chronotype, (chronotype) => chronotype.user)
+  chronotypes: Chronotype[];
 
   @OneToMany(() => Psqi, (psqi) => psqi.user)
   psqis: Psqi[];

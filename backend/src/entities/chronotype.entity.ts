@@ -2,28 +2,27 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 @Entity()
-export class Psqi {
+export class Chronotype {
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
-  q1: Date;
+  q1: number;
 
-  @ApiProperty({ type: "number" })
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
   q2: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
-  q3: Date;
+  q3: number;
 
-  @ApiProperty({ type: "number", minimum: 0, maximum: 23 })
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
   q4: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 24 })
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
   q5: number;
 
@@ -62,18 +61,9 @@ export class Psqi {
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
   q14: number;
-
-  @ApiProperty()
-  @Column()
-  q15: boolean;
-
-  @ApiProperty()
-  @Column()
-  q15_text: String;
-
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
-  q15_extended: number;
+  q15: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
@@ -96,6 +86,6 @@ export class Psqi {
   compiled_date: Date;
 
   @ApiProperty({ type: () => User })
-  @ManyToOne(() => User, (user) => user.psqis)
+  @ManyToOne(() => User, (user) => user.chronotypes)
   user: User;
 }

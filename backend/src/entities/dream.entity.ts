@@ -6,8 +6,8 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Report } from "./report.entity";
 import { User } from "./user.entity";
+import { defaultIfEmpty } from "rxjs";
 @Entity()
 export class Dream {
   @ApiProperty()
@@ -19,20 +19,46 @@ export class Dream {
   text: string;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({ default: new Date() })
   created_at: Date;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({ default: new Date() })
   last_edit: Date;
 
   @ApiProperty()
-  @Column({ nullable: false, default: false })
+  @Column({ default: false })
   deleted: boolean;
 
+  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @Column({ default: 0 })
+  emotional_content: number;
+
+  @ApiProperty()
+  @Column({ default: false })
+  concious: boolean;
+
+  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @Column({ default: 0 })
+  control: number;
+
+  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @Column({ default: 0 })
+  percived_elapsed_time: number;
+
+  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @Column({ default: 0 })
+  sleep_time: number;
+
+  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @Column({ default: 0 })
+  sleep_quality: number;
+
+  @ApiProperty()
+  @Column({ default: new Date() })
+  compiled_date: Date;
+
+  @ApiProperty({ type: () => User })
   @ManyToOne(() => User, (user) => user.dreams)
   user: User;
-
-  @OneToOne(() => Report, (report) => report.dream)
-  report: Report;
 }

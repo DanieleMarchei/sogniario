@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Dream = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const typeorm_1 = require("typeorm");
-const report_entity_1 = require("./report.entity");
 const user_entity_1 = require("./user.entity");
 let Dream = class Dream {
 };
@@ -28,27 +27,59 @@ __decorate([
 ], Dream.prototype, "text", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ default: new Date() }),
     __metadata("design:type", Date)
 ], Dream.prototype, "created_at", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ default: new Date() }),
     __metadata("design:type", Date)
 ], Dream.prototype, "last_edit", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false, default: false }),
+    (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], Dream.prototype, "deleted", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ minimum: 0, maximum: 4, default: 0 }),
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Dream.prototype, "emotional_content", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], Dream.prototype, "concious", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ minimum: 0, maximum: 4, default: 0 }),
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Dream.prototype, "control", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ minimum: 0, maximum: 4, default: 0 }),
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Dream.prototype, "percived_elapsed_time", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ minimum: 0, maximum: 4, default: 0 }),
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Dream.prototype, "sleep_time", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ minimum: 0, maximum: 4, default: 0 }),
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Dream.prototype, "sleep_quality", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, typeorm_1.Column)({ default: new Date() }),
+    __metadata("design:type", Date)
+], Dream.prototype, "compiled_date", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: () => user_entity_1.User }),
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.dreams),
     __metadata("design:type", user_entity_1.User)
 ], Dream.prototype, "user", void 0);
-__decorate([
-    (0, typeorm_1.OneToOne)(() => report_entity_1.Report, (report) => report.dream),
-    __metadata("design:type", report_entity_1.Report)
-], Dream.prototype, "report", void 0);
 Dream = __decorate([
     (0, typeorm_1.Entity)()
 ], Dream);

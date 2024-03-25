@@ -13,10 +13,10 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const user_module_1 = require("./User/user.module");
 const dream_entity_1 = require("./entities/dream.entity");
-const report_entity_1 = require("./entities/report.entity");
 const dream_module_1 = require("./Dream/dream.module");
-const report_module_1 = require("./Report/report.module");
 const psqi_module_1 = require("./Psqi/psqi.module");
+const chronotype_entity_1 = require("./entities/chronotype.entity");
+const chronotype_module_1 = require("./Chronotype/chronotype.module");
 const psqi_entity_1 = require("./entities/psqi.entity");
 let AppModule = class AppModule {
 };
@@ -33,13 +33,13 @@ AppModule = __decorate([
                 username: process.env.DATABASE_USER,
                 password: process.env.DATABASE_PASSWORD,
                 database: process.env.DATABASE_NAME,
-                entities: [user_entity_1.User, dream_entity_1.Dream, report_entity_1.Report, psqi_entity_1.Psqi],
+                entities: [user_entity_1.User, dream_entity_1.Dream, chronotype_entity_1.Chronotype, psqi_entity_1.Psqi],
                 synchronize: true,
             }),
             user_module_1.UserModule,
             dream_module_1.DreamModule,
-            report_module_1.ReportModule,
             psqi_module_1.PsqiModule,
+            chronotype_module_1.ChronotypeModule,
         ],
         controllers: [],
         providers: [],

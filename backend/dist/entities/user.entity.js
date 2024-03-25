@@ -14,6 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 const typeorm_1 = require("typeorm");
 const gender_enum_1 = require("./gender.enum");
 const dream_entity_1 = require("./dream.entity");
+const chronotype_entity_1 = require("./chronotype.entity");
 const psqi_entity_1 = require("./psqi.entity");
 let User = class User {
 };
@@ -26,10 +27,15 @@ __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
-], User.prototype, "password", void 0);
+], User.prototype, "username", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, typeorm_1.Column)({}),
     __metadata("design:type", Date)
 ], User.prototype, "birthdate", void 0);
 __decorate([
@@ -39,28 +45,32 @@ __decorate([
 ], User.prototype, "gender", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ default: new Date() }),
     __metadata("design:type", Date)
 ], User.prototype, "created_at", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "first_access", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ default: new Date() }),
     __metadata("design:type", Date)
 ], User.prototype, "last_edit", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.Column)({ nullable: false, default: false }),
+    (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "deleted", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => dream_entity_1.Dream, (dream) => dream.user),
     __metadata("design:type", Array)
 ], User.prototype, "dreams", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => chronotype_entity_1.Chronotype, (chronotype) => chronotype.user),
+    __metadata("design:type", Array)
+], User.prototype, "chronotypes", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => psqi_entity_1.Psqi, (psqi) => psqi.user),
     __metadata("design:type", Array)
