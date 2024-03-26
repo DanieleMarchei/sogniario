@@ -24,7 +24,7 @@ $ yarn install
 ```
 
 ```bash
-$ podman run --name sognario-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+$ podman run --name sogniario-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
 ```
 
 The command can only be executed via docker, but be a wise guy and use Podman, you will not regret it [link](https://developers.redhat.com/articles/2023/08/03/3-advantages-docker-podman#_2__podman_s_kubeify_feature).

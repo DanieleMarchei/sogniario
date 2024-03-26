@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
   
-  page_transition:
   carousel_slider:
 
 

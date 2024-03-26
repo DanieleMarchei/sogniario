@@ -55,8 +55,8 @@ class ChronoTypeData {
 enum Gender {
   male(label: "Maschio", id: 0),
   female(label: "Femmina", id: 1),
-  notSpecified(label: "Non specificato", id: 2),
-  other(label: "Altro", id: 3);
+  notSpecified(label: "Non specificato", id: 2);
+  // other(label: "Altro", id: 3);
 
   const Gender({required this.label, required this.id});
   final String label;
@@ -64,6 +64,7 @@ enum Gender {
 }
 
 class UserData {
+  int id = 0;
   String username = "", password = "";
   DateTime? birthdate = null;
   Gender? gender = null;

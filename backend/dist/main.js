@@ -17,6 +17,8 @@ async function bootstrap() {
     };
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup("api", app, document, options2);
+    app.enableCors({ origin: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS' });
     await app.listen(3000);
 }
 bootstrap();

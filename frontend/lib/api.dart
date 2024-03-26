@@ -1,9 +1,66 @@
 import 'dart:convert' as convert;
+import 'dart:io';
 import 'package:frontend/utils.dart';
 import 'package:http/http.dart' as http;
 
 String server = "http://localhost:3000";
 
+
+class QueryFields {
+  final List<String> fields;
+  Map<String, dynamic>? s;
+
+  QueryFields({
+    required this.fields,
+    this.s
+  });
+
+  Map<String, dynamic> toJson(){
+    Map<String, dynamic> f = {
+      "fields": fields.join(","),
+    };
+
+    if(s != null){
+      f["s"] = convert.jsonEncode(s);
+    }
+
+    return f;
+  }
+}
+
+
+// THIS IS JUST FOR TESTING PURPOSES! DO NOT USE IN PRODUCTION!
+Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
+
+  QueryFields f = QueryFields(
+    fields: ["id", "gender", "birthdate"],
+    s: {
+      "username": "$username",
+      "password": "$password"
+    }
+    );
+  var url = Uri.http("localhost:3000", "/user", f.toJson());
+  final headers = {
+    HttpHeaders.acceptHeader: 'application/json'
+  };
+  var response = await http.get(url, headers: headers);
+  bool isValid = response.body.isEmpty;
+  int? id;
+  bool redirectToGeneralInfo = false;
+  if(isValid){
+    var jsonResponse = convert.jsonDecode(response.body);
+    id = jsonResponse[0]["id"];
+    
+    Gender? gender = jsonResponse[0]["gender"] != null ? Gender.values[jsonResponse[0]["gender"]] : null;
+    DateTime? birthdate = DateTime.parse(jsonResponse[0]["birthdate"]);
+    redirectToGeneralInfo = gender == null || birthdate == null;
+  }
+    
+
+  return (isValid, id, redirectToGeneralInfo);
+
+
+}
 
 
 Future<Map<String, dynamic>> addUser(UserData user) async {
@@ -22,13 +79,47 @@ Future<Map<String, dynamic>> addUser(UserData user) async {
   return jsonResponse;
 }
 
+Future<bool> deleteUser(int id) async {
+  var url = Uri.parse('${server}/user/${id}');
 
-Future<List<dynamic>> getAllUsers() async {
+  var response = await http.delete(url);
+  return response.statusCode == 200;
+}
+
+Future<bool> updateUserGeneralInfo(int id, Gender gender, DateTime birthdate) async {
+  var url = Uri.parse('${server}/user/${id}');
+
+  var body = {
+    "birthdate": "$birthdate",
+    "gender": "${gender.id}"
+  };
+  final headers = {
+    HttpHeaders.acceptHeader: 'application/json',
+    // HttpHeaders.contentTypeHeader: 'application/json'
+  };
+  var response = await http.patch(url, body: body, headers: headers);
+  return response.statusCode == 200;
+}
+
+
+
+UserData _jsonToUser(Map<String, dynamic> json){
+  UserData user = UserData();
+  user.id = json["id"];
+  user.username = json["username"];
+  user.password = json["password"];
+  user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]) : null;
+  user.gender = json["gender"] != null ? Gender.values[json["gender"]] : null;
+
+  return user;
+}
+
+Future<List<UserData>> getAllUsers() async {
   var url = Uri.parse('${server}/user/');
 
   var response = await http.get(url);
   var jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
-  return jsonResponse;
+  return jsonResponse.map((json) => _jsonToUser(json)).toList();
 }
 
 
@@ -37,10 +128,5 @@ Future<UserData> getUser(int id) async {
 
   var response = await http.get(url);
   var jsonResponse = convert.jsonDecode(response.body);
-  UserData user = UserData();
-  user.username = jsonResponse["username"];
-  user.password = jsonResponse["password"];
-  user.birthdate = jsonResponse["birthdate"] != null ? DateTime.parse(jsonResponse["birthdate"]) : null;
-  user.gender = jsonResponse["gender"] != null ? Gender.values[jsonResponse["gender"]] : null;
-  return user;
+  return _jsonToUser(jsonResponse);
 }

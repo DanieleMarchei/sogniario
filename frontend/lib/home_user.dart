@@ -9,6 +9,9 @@ class HomeUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    int id = arguments["id"];
+
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -30,7 +33,7 @@ class HomeUser extends StatelessWidget {
                                 child: Material(
                                     type: MaterialType.transparency,
                                     child: Text(
-                                      'Sogniario',
+                                      "Sogniario",
                                       style: TextStyle(
                                         fontSize: 28,
                                         fontWeight: FontWeight.bold,
@@ -38,45 +41,45 @@ class HomeUser extends StatelessWidget {
                                     )))),
                         SizedBox(height: screenHeight * .025),
                         if (showMobileLayout)
-                          ...mobileWidgets(context)
+                          ...mobileWidgets(context, id)
                         else
-                          ...desktopWidgets(context)
+                          ...desktopWidgets(context, id)
                       ],
                     )))),
         floatingActionButton: showMobileLayout
             ? FloatingActionButton(
-                onPressed: () => {Navigator.pushNamed(context, "/add_dream")},
+                onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"id": id})},
                 tooltip: 'Racconta un sogno',
                 child: const Icon(Icons.insert_comment),
               )
             : null);
   }
 
-  List<Widget> desktopWidgets(BuildContext context) {
+  List<Widget> desktopWidgets(BuildContext context, int id) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
       IconTextButton(
         icon: const Icon(Icons.insert_comment),
         text: "Racconta un sogno",
-        onPressed: () => {Navigator.pushNamed(context, "/add_dream")}
+        onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"id": id})}
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.format_list_bulleted),
         text: "PSQI",
-        onPressed: () => {Navigator.pushNamed(context, "/psqi")}
+        onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"id": id})}
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.view_list),
         text: "Cronotipo",
-        onPressed: () => {Navigator.pushNamed(context, "/chronotype")}
+        onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
       ),
     ];
   }
 
-  List<Widget> mobileWidgets(BuildContext context) {
+  List<Widget> mobileWidgets(BuildContext context, int id) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
@@ -88,13 +91,13 @@ class HomeUser extends StatelessWidget {
       Row(
         children: [
           SimpleCircularIconButton(
-              onPressed: () => {Navigator.pushNamed(context, "/psqi")},
+              onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"id": id})},
               iconData: Icons.format_list_bulleted,
               showAlert: true,
               text: "PSQI"),
-          Spacer(),
+          const Spacer(),
           SimpleCircularIconButton(
-              onPressed: () => {Navigator.pushNamed(context, "/chronotype")},
+              onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})},
               showAlert: true,
               iconData: Icons.view_list,
               text: "Cronotipo")

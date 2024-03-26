@@ -7,78 +7,77 @@ import 'package:frontend/home_user.dart';
 import 'package:frontend/login.dart';
 import 'package:frontend/manage_users.dart';
 import 'package:frontend/psqi.dart';
-import 'package:page_transition/page_transition.dart';
 
+class PageTransition<T> extends MaterialPageRoute<T> {
+  PageTransition({
+    required super.builder,
+    required RouteSettings super.settings
+    });
+
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    return FadeTransition(opacity: animation, child: child);
+  }
+}
 
 class Routes {
-
   static Route<dynamic> routes(RouteSettings settings) {
-
     switch (settings.name) {
-
       case "/":
         return PageTransition(
-          child: const Login(),
-          type: PageTransitionType.fade);
+            settings: settings, 
+            builder: (context) => const Login());
 
       case "/home_user":
         return PageTransition(
-          child: const HomeUser(),
-          type: PageTransitionType.fade);
-      
+            settings: settings, 
+            builder: (context) => const HomeUser());
+
       case "/home_admin":
         return PageTransition(
-          child: const HomeAdmin(),
-          type: PageTransitionType.fade);
-      
+            settings: settings, 
+            builder: (context) => const HomeAdmin());
+
       case "/manage_users":
         return PageTransition(
-          child: const ManageUsers(),
-          type: PageTransitionType.fade);
-      
+            settings: settings, 
+            builder: (context) => const ManageUsers());
+
       case "/add_dream":
-      return PageTransition(
-        child: const AddDream(),
-        type: PageTransitionType.fade);
+        return PageTransition(
+            settings: settings, 
+            builder: (context) => const AddDream());
 
       case "/general_info":
-      return PageTransition(
-        child: const GeneralInfo(),
-        type: PageTransitionType.fade);
+        return PageTransition(
+            settings: settings, 
+            builder: (context) => const GeneralInfo());
 
       case "/psqi":
-      return PageTransition(
-        child: const PSQI(),
-        type: PageTransitionType.fade);
+        return PageTransition(
+            settings: settings, 
+            builder: (context) => const PSQI());
 
       case "/chronotype":
-      return PageTransition(
-        child: const ChronoType(),
-        type: PageTransitionType.fade);
+        return PageTransition(
+            settings: settings, 
+            builder: (context) => const ChronoType());
 
       default:
         return errorPage();
     }
   }
 
-
   static Route<dynamic> errorPage() {
     return MaterialPageRoute(
-        builder: (_) => Scaffold(
-          body: Container(
-            child: Center(
-                child: Text(
-                    'Page not found!',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    )
-                )
-            ),
-          ),
-        )
-    );
+        builder: (_) => const Scaffold(
+              body: Center(
+                  child: Text('Page not found!',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ))),
+            ));
   }
-
 }

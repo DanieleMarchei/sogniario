@@ -40,7 +40,7 @@ class _ManageUsersState extends State<ManageUsers> {
           );
         }
 
-        List<dynamic> users = snapshot.data!;
+        List<UserData> users = snapshot.data!;
         return Scaffold(
           appBar: AppBar(
             title: const Text("Gestisci utenti"),
@@ -98,12 +98,11 @@ class _ManageUsersState extends State<ManageUsers> {
                         children: [
                           SizedBox(height: screenHeight * .01),
                           ...users
-                              .where((element) =>
-                                  matchUsername(element["username"]))
-                              .map((e) => UserCardWidget(
-                                    id: e["id"],
-                                    username: e["username"],
-                                  )),
+                              .where((user) =>
+                                  matchUsername(user.username))
+                              .map((user) => UserCardWidget(user: user, onActionPerformed: () {
+                                setState(() {});
+                              },)),
                         ],
                       )))),
         );
@@ -113,10 +112,10 @@ class _ManageUsersState extends State<ManageUsers> {
 }
 
 class UserCardWidget extends StatefulWidget {
-  final String username;
-  final int id;
+  final UserData user;
+  final Function? onActionPerformed;
 
-  const UserCardWidget({super.key, required this.id, required this.username});
+  const UserCardWidget({super.key, required this.user, this.onActionPerformed});
 
   @override
   State<StatefulWidget> createState() => _UserCardWidgetState();
@@ -132,7 +131,7 @@ class _UserCardWidgetState extends State<UserCardWidget> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.username),
+            Text(widget.user.username),
             Spacer(),
             IconButton(
               onPressed: () {
@@ -141,7 +140,7 @@ class _UserCardWidgetState extends State<UserCardWidget> {
                     builder: (context) {
                       return ManageUserDialog(
                         action: ManageUserDialogActions.visualize,
-                        userId: widget.id,
+                        user: widget.user,
                       );
                     });
               },
@@ -155,7 +154,8 @@ class _UserCardWidgetState extends State<UserCardWidget> {
                     builder: (context) {
                       return ManageUserDialog(
                         action: ManageUserDialogActions.edit,
-                        userId: widget.id,
+                        user: widget.user,
+                        onSubmitted: widget.onActionPerformed,
                       );
                     });
               },
@@ -163,7 +163,17 @@ class _UserCardWidgetState extends State<UserCardWidget> {
               tooltip: "Modifica",
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ManageUserDialog(
+                        action: ManageUserDialogActions.delete,
+                        user: widget.user,
+                        onSubmitted: widget.onActionPerformed,
+                      );
+                    });
+              },
               icon: Icon(Icons.delete),
               tooltip: "Elimina",
             ),
@@ -172,17 +182,19 @@ class _UserCardWidgetState extends State<UserCardWidget> {
   }
 }
 
-enum ManageUserDialogActions { visualize, edit, create }
+enum ManageUserDialogActions { visualize, edit, create, delete }
 
 class ManageUserDialog extends StatefulWidget {
-  final int? userId;
+  final UserData? user;
   final ManageUserDialogActions action;
+  final Function? onSubmitted;
 
-  ManageUserDialog({super.key, this.userId, required this.action}) {
+  ManageUserDialog({super.key, this.user, required this.action, this.onSubmitted}) {
     assert(
         !(action == ManageUserDialogActions.edit ||
-                action == ManageUserDialogActions.visualize) ||
-            userId != null,
+          action == ManageUserDialogActions.visualize ||
+          action == ManageUserDialogActions.delete) ||
+            user != null,
         "userId can be null only during creation.");
   }
 
@@ -192,35 +204,68 @@ class ManageUserDialog extends StatefulWidget {
 
 class _ManageUserDialogState extends State<ManageUserDialog> {
 
-  UserData user = UserData();
+  late UserData? tmpUser;
   TextEditingController controllerUsername = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    controllerUsername.text = user.username;
+    if(widget.action == ManageUserDialogActions.edit ||
+          widget.action == ManageUserDialogActions.visualize ||
+          widget.action == ManageUserDialogActions.delete){
+      tmpUser = widget.user!;
+    }
+    else{
+      tmpUser = UserData();
+    }
+    controllerUsername.text = tmpUser!.username;
     controllerUsername.addListener(_onUsernameChanged);
-    controllerPassword.text = user.password;
+    controllerPassword.text = tmpUser!.password;
     controllerPassword.addListener(_onPasswordChanged);
   }
 
   void _onUsernameChanged(){
     setState(() {
-      user.username = controllerUsername.text;
+      tmpUser!.username = controllerUsername.text;
     });
   }
   
   void _onPasswordChanged(){
     setState(() {
-      user.password = controllerPassword.text;
+      tmpUser!.password = controllerPassword.text;
     });
   }
 
 
   @override
   Widget build(BuildContext context) {
-    return widget.action == ManageUserDialogActions.create ? create(context) : visualizeOrEdit(context);
+    switch (widget.action) {
+      case ManageUserDialogActions.create:
+        return create(context);
+      
+      case ManageUserDialogActions.edit:
+      case ManageUserDialogActions.visualize:
+      return visualizeOrEdit(context);
+
+      case ManageUserDialogActions.delete:
+      return delete(context);
+      
+    }
+
+  }
+
+  Widget delete(BuildContext context){
+    return AlertDialog(
+      content: Text("Confermi di voler eliminare l'utente ${widget.user!.username}?"),
+      actions: [
+        TextButton(onPressed: () async {
+          await deleteUser(widget.user!.id);
+          if(widget.onSubmitted != null) widget.onSubmitted!();
+          if(mounted) Navigator.pop(context);
+        }, child: Text("Cancella"))
+      ],
+    );
   }
 
   Widget create(BuildContext context){
@@ -246,10 +291,10 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 child: InputField(
                   controller: controllerUsername,
                   labelText: "Username",
-                  text: user.username,
+                  text: tmpUser!.username,
                   onChanged: (String username) {
                     setState(() {
-                      user.username = username;
+                      tmpUser!.username = username;
                     });
                   },
                 ),
@@ -258,10 +303,10 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 child: InputField(
                   controller: controllerPassword,
                   labelText: "Password",
-                  text: user.password,
+                  text: tmpUser!.password,
                   onChanged: (String password) {
                     setState(() {
-                      user.password = password;
+                      tmpUser!.password = password;
                     });
                   },
                 ),
@@ -279,7 +324,8 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 child: FormButton(
                   text: "Aggiungi",
                   onPressed: () async {
-                    await addUser(user);
+                    await addUser(tmpUser!);
+                    if(widget.onSubmitted != null) widget.onSubmitted!();
                     if(mounted) Navigator.pop(context);
                   },
                   )
@@ -289,22 +335,10 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   }
 
   Widget visualizeOrEdit(BuildContext context) {
-    return FutureBuilder(
-        future: getUser(widget.userId!),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Container(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-
-          user = snapshot.data!;
           
           return SimpleDialog(
             title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Text(user.username),
+              Text(tmpUser!.username),
               Spacer(),
               IconButton(
                   onPressed: () {
@@ -317,7 +351,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               SimpleDialogOption(
                 child: InputField(
                   labelText: "Password",
-                  text: user.password,
+                  text: tmpUser!.password,
                   enabled: widget.action == ManageUserDialogActions.edit,
                 ),
               ),
@@ -331,7 +365,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                   decoration: const InputDecoration(
                     label: Text("Sesso"),
                   ),
-                  value: user.gender,
+                  value: tmpUser!.gender,
                   items: Gender.values
                       .map<DropdownMenuItem<Gender>>((Gender gender) {
                     return DropdownMenuItem<Gender>(
@@ -347,7 +381,8 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 child: FormButton(
                   text: "Modifica",
                   onPressed: () async {
-                    await addUser(user);
+                    await addUser(tmpUser!);
+                    if(widget.onSubmitted != null) widget.onSubmitted!();
                     if(mounted) Navigator.pop(context);
                   },
                   )
@@ -356,6 +391,5 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               
             ],
           );
-        });
   }
 }

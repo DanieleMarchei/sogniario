@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'dart:math';
 
 import 'package:frontend/utils.dart';
+
+enum LoginType {
+  user,
+  admin
+}
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,7 +18,11 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   late String username, password;
+  int? id;
+  late bool redirectToGeneralInfo;
   String? usernameError, passwordError;
+  late LoginType loginType;
+  String? loginError;
 
   @override
   void initState() {
@@ -28,10 +38,11 @@ class _LoginState extends State<Login> {
     setState(() {
       usernameError = null;
       passwordError = null;
+      loginError = null;
     });
   }
 
-  bool validate() {
+  Future<bool> validate() async {
     resetErrorText();
 
     bool isValid = true;
@@ -49,22 +60,54 @@ class _LoginState extends State<Login> {
       isValid = false;
     }
 
+    if(username == "admin"){
+      loginType = LoginType.admin;
+      return true;
+    }
+
+    bool loginValid, redirect;
+    int? fetchedId; 
+    (loginValid, fetchedId, redirect) = await isValidLogin(username, password);
+
+    isValid &= loginValid;
+
+    if (isValid){
+      switch (username) {
+        case "admin":
+          loginType = LoginType.admin;
+          break;
+          
+        default:
+          setState(() {
+            id = fetchedId!;
+            redirectToGeneralInfo = redirect;
+          });
+          loginType = LoginType.user;
+          break;
+      }
+    } else{
+      setState(() {
+        loginError = "Credenziali errate";
+      });
+    }
+
+
     return isValid;
   }
 
-  void submit() {
-    if (validate()) {
-      switch (username) {
-        case "admin":
+  void submit() async {
+    if (await validate()) {
+      switch (loginType) {
+        case LoginType.admin:
           Navigator.pushNamed(context, "/home_admin");
           break;
         
-        case "user":
-          Navigator.pushNamed(context, "/home_user");
-          break;
-
-        default:
-          Navigator.pushNamed(context, "/home_user");
+        case LoginType.user:
+          if(redirectToGeneralInfo){
+            Navigator.pushNamed(context, "/general_info", arguments: {"id": id!});
+          }else{
+            Navigator.pushNamed(context, "/home_user", arguments: {"id": id!});
+          }
           break;
       }
     }
@@ -124,6 +167,7 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: screenHeight * .075,
                       ),
+                      if (loginError != null) Text(loginError!),
                       FormButton(
                         text: 'Entra',
                         onPressed: submit,

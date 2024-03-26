@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/home_user.dart';
-import 'package:frontend/login.dart';
 import 'package:frontend/routes.dart';
 
 void main() async {
