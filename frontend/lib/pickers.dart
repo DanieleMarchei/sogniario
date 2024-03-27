@@ -48,6 +48,8 @@ class _DatePickerState extends State<DatePickerButton> with RestorationMixin {
           lastDate: DateTime.now(),
           cancelText: "Cancella",
           confirmText: "Conferma",
+          helpText: "Seleziona data",
+          
         );
       },
     );

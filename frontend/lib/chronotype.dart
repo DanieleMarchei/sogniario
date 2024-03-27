@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
 import 'package:frontend/utils.dart';
@@ -227,7 +228,7 @@ class _ChronoTypeState extends State<ChronoType> {
         answers: a,
         onSelected: (value) {
           setState(() {
-            chronoType.report[index] = s[index];
+            chronoType.report[index] = s[value];
           });
         },
       );
@@ -236,12 +237,15 @@ class _ChronoTypeState extends State<ChronoType> {
 
   @override
   Widget build(BuildContext context) {
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    int id = arguments["id"];
     return !showScore
         ? ResponsiveReport(
             questionWidgets: chronoTypeQuestions,
             title: "Cronotipo",
-            onSubmitted: () {
-              setState(() {
+            onSubmitted: () async{
+              print(await addChronotype(id, chronoType));
+              setState(()  {
                 showScore = true;
               });
             })

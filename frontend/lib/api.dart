@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 
 String server = "http://localhost:3000";
 
-
 class QueryFields {
   final List<String> fields;
   Map<String, dynamic>? s;
@@ -26,6 +25,23 @@ class QueryFields {
 
     return f;
   }
+}
+
+extension ResponseSucceeded on http.Response {
+  bool get success {
+    return 200 <= statusCode && statusCode <= 299;
+  }
+}
+
+UserData _jsonToUser(Map<String, dynamic> json){
+  UserData user = UserData();
+  user.id = json["id"];
+  user.username = json["username"];
+  user.password = json["password"];
+  user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]) : null;
+  user.gender = json["gender"] != null ? Gender.values[json["gender"]] : null;
+
+  return user;
 }
 
 
@@ -59,12 +75,10 @@ Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
     
 
   return (isValid, id, redirectToGeneralInfo);
-
-
 }
 
 
-Future<Map<String, dynamic>> addUser(UserData user) async {
+Future<bool> addUser(UserData user) async {
   var url = Uri.parse('${server}/user/');
 
   var body = {
@@ -76,15 +90,14 @@ Future<Map<String, dynamic>> addUser(UserData user) async {
   if(user.gender != null) body["gender"] = "${user.gender!.id}";
 
   var response = await http.post(url, body : body);
-  var jsonResponse = convert.jsonDecode(response.body) as Map<String, dynamic>;
-  return jsonResponse;
+  return response.success;
 }
 
 Future<bool> deleteUser(int id) async {
   var url = Uri.parse('${server}/user/${id}');
 
   var response = await http.delete(url);
-  return response.statusCode == 200;
+  return response.success;
 }
 
 Future<bool> updateUserGeneralInfo(int id, Gender gender, DateTime birthdate) async {
@@ -99,20 +112,7 @@ Future<bool> updateUserGeneralInfo(int id, Gender gender, DateTime birthdate) as
     // HttpHeaders.contentTypeHeader: 'application/json'
   };
   var response = await http.patch(url, body: body, headers: headers);
-  return response.statusCode == 200;
-}
-
-
-
-UserData _jsonToUser(Map<String, dynamic> json){
-  UserData user = UserData();
-  user.id = json["id"];
-  user.username = json["username"];
-  user.password = json["password"];
-  user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]) : null;
-  user.gender = json["gender"] != null ? Gender.values[json["gender"]] : null;
-
-  return user;
+  return response.success;
 }
 
 Future<List<UserData>> getAllUsers() async {
@@ -130,4 +130,18 @@ Future<UserData> getUser(int id) async {
   var response = await http.get(url);
   var jsonResponse = convert.jsonDecode(response.body);
   return _jsonToUser(jsonResponse);
+}
+
+Future<bool> addChronotype(int userId, ChronoTypeData chronotype) async{
+  var url = Uri.parse('${server}/chronotype/');
+
+  Map<String, String> body = {};
+  for (var i = 1; i <= 19; i++) {
+    body["q$i"] = "${chronotype.report[i-1]}";
+  }
+  body["user"] = "$userId";
+
+  var response = await http.post(url, body : body);
+
+  return response.success;
 }
