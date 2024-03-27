@@ -357,6 +357,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               ),
               SimpleDialogOption(
                 child: DatePickerButton(
+                  initialValue: tmpUser!.birthdate!,
                   text: "Data di nascita: ",
                 ),
               ),

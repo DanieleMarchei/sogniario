@@ -222,8 +222,7 @@ class _ChronoTypeState extends State<ChronoType> {
       var q = questions[index].question;
       var a = questions[index].answers;
       List<int> s = questions[index].scores;
-      chronoType.report[index] = s[0];
-      return MultipleChoiceQuestion(
+      var mcq = MultipleChoiceQuestion(
         question: q,
         answers: a,
         onSelected: (value) {
@@ -232,6 +231,8 @@ class _ChronoTypeState extends State<ChronoType> {
           });
         },
       );
+      chronoType.report[index] = s[mcq.initialValue];
+      return mcq;
     });
   }
 

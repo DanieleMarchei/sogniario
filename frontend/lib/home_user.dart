@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
@@ -75,6 +76,15 @@ class HomeUser extends StatelessWidget {
         icon: const Icon(Icons.view_list),
         text: "Cronotipo",
         onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
+      ),
+      SizedBox(height: screenHeight * .01),
+      IconTextButton(
+        icon: const Icon(Icons.view_list),
+        text: "I miei sogni",
+        onPressed: () async {
+          print(await getAllDreams(id));
+        },
+        // onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
       ),
     ];
   }

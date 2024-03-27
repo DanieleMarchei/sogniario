@@ -1,167 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:flutter_picker/picker.dart';
 
-// from: https://api.flutter.dev/flutter/material/showDatePicker.html
-class DatePickerButton extends StatefulWidget {
+mixin WithInitialValue<T> {
+  abstract T initialValue;
+}
 
-  const DatePickerButton({
+class DatePickerButton extends StatefulWidget with WithInitialValue<DateTime> {
+
+  DatePickerButton({
     super.key,
-    this.restorationId,
     required this.text,
     this.onSelectedDate,
-    });
+    DateTime? initialValue,
+    }){
+      if(initialValue == null){
+        this.initialValue = DateTime.now();
+      }else{
+        this.initialValue = initialValue;
 
-  final String? restorationId;
+      }
+      
+    }
+
   final String text;
   final void Function(DateTime)? onSelectedDate;
 
   @override
   State<DatePickerButton> createState() => _DatePickerState();
+  
+  @override
+  late final DateTime initialValue;
 }
 
-class _DatePickerState extends State<DatePickerButton> with RestorationMixin {
-  @override
-  String? get restorationId => widget.restorationId;
+class _DatePickerState extends State<DatePickerButton> {
 
-  final RestorableDateTime _selectedDate = RestorableDateTime(DateTime.now());
-  late final RestorableRouteFuture<DateTime?> _restorableDatePickerRouteFuture =
-      RestorableRouteFuture<DateTime?>(
-    onComplete: _selectDate,
-    onPresent: (NavigatorState navigator, Object? arguments) {
-      return navigator.restorablePush(
-        _datePickerRoute,
-        arguments: _selectedDate.value.millisecondsSinceEpoch,
-      );
-    },
-  );
-
-  @pragma('vm:entry-point')
-  static Route<DateTime> _datePickerRoute(BuildContext context, Object? arguments) {
-    return DialogRoute<DateTime>(
-      context: context,
-      builder: (BuildContext context) {
-        return DatePickerDialog(
-          restorationId: 'date_picker_dialog',
-          initialEntryMode: DatePickerEntryMode.calendarOnly,
-          initialDate: DateTime.fromMillisecondsSinceEpoch(arguments! as int),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-          cancelText: "Cancella",
-          confirmText: "Conferma",
-          helpText: "Seleziona data",
-          
-        );
-      },
-    );
-  }
+  late DateTime selectedValue;
 
   @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_selectedDate, 'selected_date');
-    registerForRestoration(_restorableDatePickerRouteFuture, 'date_picker_route_future');
-  }
-
-  void _selectDate(DateTime? newSelectedDate) {
-    if (newSelectedDate != null) {
-      setState(() {
-        _selectedDate.value = newSelectedDate;
-        if(widget.onSelectedDate != null) widget.onSelectedDate!(newSelectedDate);
-      });
-    }
+  void initState() {
+    super.initState();
+    selectedValue = widget.initialValue;
   }
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () {
-        _restorableDatePickerRouteFuture.present();
+        Picker(
+              adapter: DateTimePickerAdapter(
+                months: ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"],
+                maxValue: DateTime.now(),
+                type: PickerDateTimeType.kDMY,
+                value: widget.initialValue
+              ),
+              changeToFirst: false,
+              hideHeader: true,
+              confirmText: 'Conferma',
+              cancelText: "Cancella",
+              title: Text("Data di nascita"),
+              backgroundColor: Color.fromARGB(255, 238, 232, 244),
+              onConfirm: (Picker picker, List value) {
+                int day = value[0] + 1;
+                int month = value[1] + 1;
+                int year = value[2] + (picker.adapter as DateTimePickerAdapter).yearBegin;
+                DateTime selected = DateTime(year, month, day);
+                setState(() {
+                  selectedValue = selected;
+                  if(widget.onSelectedDate != null) widget.onSelectedDate!(selectedValue);
+                });
+              },
+          ).showDialog(context);
       },
       child: Text(
-          '${widget.text}${_selectedDate.value.day}/${_selectedDate.value.month}/${_selectedDate.value.year}'),
+          '${widget.text}${selectedValue.day}/${selectedValue.month}/${selectedValue.year}'),
     );
   }
+
 }
 
-class TimeOfDayPickerButton extends StatefulWidget {
+class TimeOfDayPickerButton extends StatefulWidget with WithInitialValue<TimeOfDay> {
   TimeOfDayPickerButton({
     super.key,
-    this.restorationId,
     required this.text,
     this.onSelectedTimeOfDay,
-    TimeOfDay? initialTime
+    TimeOfDay? initialValue
     }){
-      if(initialTime == null){
-        this.initialTime = TimeOfDay.now();
+      if(initialValue == null){
+        this.initialValue = TimeOfDay.now();
       }
       else{
-        this.initialTime = initialTime;
+        this.initialValue = initialValue;
       }
     }
 
-  final String? restorationId;
   final String text;
   final void Function(TimeOfDay)? onSelectedTimeOfDay;
-  late final TimeOfDay initialTime;
+  
+  @override
+  late final TimeOfDay initialValue;
 
   @override
   State<TimeOfDayPickerButton> createState() => _TimeOfDayState();
 }
 
-class _TimeOfDayState extends State<TimeOfDayPickerButton>
-    with RestorationMixin {
-  @override
-  String? get restorationId => widget.restorationId;
+class _TimeOfDayState extends State<TimeOfDayPickerButton>{
 
-  final RestorableTimeOfDay _selectedTimeOfDay = RestorableTimeOfDay(TimeOfDay.now());
-
-  late final RestorableRouteFuture<TimeOfDay?> _restorableTimeOfDayRouteFuture =
-      RestorableRouteFuture<TimeOfDay?>(
-    onComplete: _selectTimeOfDay,
-    onPresent: (NavigatorState navigator, Object? arguments) {
-      return navigator.restorablePush(
-        _timeOfDayRoute,
-        arguments: _selectedTimeOfDay.value.hashCode,
-      );
-    },
-  );
-
-  @pragma('vm:entry-point')
-  static Route<TimeOfDay> _timeOfDayRoute(
-    BuildContext context,
-    Object? arguments,
-  ) {
-    return DialogRoute<TimeOfDay>(
-      context: context,
-      builder: (BuildContext context) {
-        return TimePickerDialog(
-          restorationId: 'timeofday_picker_dialog',
-          initialTime: TimeOfDay.now(),
-          cancelText: "Cancella",
-          confirmText: "Conferma",
-          initialEntryMode: TimePickerEntryMode.dial,
-          hourLabelText: "Ore",
-          minuteLabelText: "Minuti",
-          errorInvalidText: "Orario non valido",
-          helpText: "Seleziona un orario",
-        );
-      },
-    );
-  }
+  late TimeOfDay selectedValue;
 
   @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_selectedTimeOfDay, 'selected_timeofday');
-    registerForRestoration(_restorableTimeOfDayRouteFuture, 'timeofday_picker_route_future');
+  void initState() {
+    super.initState();
+    selectedValue = widget.initialValue;
   }
 
-  void _selectTimeOfDay(TimeOfDay? newSelectedTimeOfDay) {
-    if (newSelectedTimeOfDay != null) {
-      setState(() {
-        _selectedTimeOfDay.value = newSelectedTimeOfDay;
-        if(widget.onSelectedTimeOfDay != null) widget.onSelectedTimeOfDay!(newSelectedTimeOfDay);
-      });
-    }
-  }
 
   String timeOfDaytoString(TimeOfDay tod) {
     String addLeadingZeroIfNeeded(int value) {
@@ -180,26 +132,46 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton>
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: () {
-        _restorableTimeOfDayRouteFuture.present();
+      onPressed: () async {
+        TimeOfDay? selected = await showTimePicker(context: context, 
+          initialTime: widget.initialValue,
+          cancelText: "Cancella",
+          confirmText: "Conferma",
+          initialEntryMode: TimePickerEntryMode.dial,
+          hourLabelText: "Ore",
+          minuteLabelText: "Minuti",
+          errorInvalidText: "Orario non valido",
+          helpText: "Seleziona un orario",
+        );
+        if(selected != null){
+          setState(() {
+            selectedValue = selected;
+          });
+        }
       },
-      child: Text('${widget.text}${timeOfDaytoString(_selectedTimeOfDay.value)}'),
+      child: Text('${widget.text}${timeOfDaytoString(selectedValue)}'),
     );
   }
 }
 
-class IntegerPickerButton extends StatefulWidget {
-  const IntegerPickerButton({
+class IntegerPickerButton extends StatefulWidget with WithInitialValue<int> {
+  IntegerPickerButton({
     super.key,
-    this.restorationId,
     required this.text,
     this.minValue = 0,
     this.maxValue = 120,
     this.increment = 1,
-    this.onSelectedInteger
-    });
+    this.onSelectedInteger,
+    int? initialValue
+    }){
+      if(initialValue == null){
+        this.initialValue = minValue;
+      }else{
+        this.initialValue = initialValue;
+      }
+      assert(minValue <= this.initialValue && this.initialValue <= maxValue, "initialValue must be between minValue and maxValue.");
+    }
 
-  final String? restorationId;
   final String text;
   final int minValue;
   final int maxValue;
@@ -208,6 +180,9 @@ class IntegerPickerButton extends StatefulWidget {
 
   @override
   State<IntegerPickerButton> createState() => _IntegerPickerButtonState();
+  
+  @override
+  late final int initialValue;
 }
 
 class _IntegerPickerButtonState extends State<IntegerPickerButton> {
@@ -217,7 +192,7 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
   @override
   void initState() {
     super.initState();
-    selectedValue = widget.minValue;
+    selectedValue = widget.initialValue;
   }
 
   @override
@@ -251,10 +226,9 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
   }
 }
 
-class DoubleIntegerPickerButton extends StatefulWidget {
-  const DoubleIntegerPickerButton({
+class DoubleIntegerPickerButton extends StatefulWidget with WithInitialValue<(int, int)> {
+  DoubleIntegerPickerButton({
     super.key,
-    this.restorationId,
     required this.text1,
     required this.text2,
     this.minValue1 = 0,
@@ -263,10 +237,17 @@ class DoubleIntegerPickerButton extends StatefulWidget {
     this.maxValue2 = 100,
     this.increment1 = 1,
     this.increment2 = 1,
-    this.onIntegersSelected
-    });
-
-  final String? restorationId;
+    this.onIntegersSelected,
+    (int, int)? initialValue
+    }){
+      if(initialValue == null){
+        this.initialValue = (minValue1, minValue2);
+      }else{
+        this.initialValue = initialValue;
+      }
+      assert(minValue1 <= this.initialValue.$1 && this.initialValue.$1 <= maxValue1, "initialValue.\$1 must be between minValue1 and maxValue1.");
+      assert(minValue2 <= this.initialValue.$2 && this.initialValue.$2 <= maxValue2, "initialValue.\$2 must be between minValue2 and maxValue2.");
+    }
   final String text1;
   final String text2;
   final int minValue1;
@@ -279,6 +260,9 @@ class DoubleIntegerPickerButton extends StatefulWidget {
 
   @override
   State<DoubleIntegerPickerButton> createState() => _DoubleIntegerPickerButtonState();
+  
+  @override
+  late final (int, int) initialValue;
 }
 
 
@@ -290,8 +274,8 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
   @override
   void initState() {
     super.initState();
-    selectedValue1 = widget.minValue1;
-    selectedValue2 = widget.minValue2;
+    selectedValue1 = widget.initialValue.$1;
+    selectedValue2 = widget.initialValue.$2;
   }
 
   @override

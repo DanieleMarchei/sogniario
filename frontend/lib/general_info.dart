@@ -66,6 +66,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
             SizedBox(height: screenHeight * .025),
             DatePickerButton(
               text : "Data di nascita: ",
+              initialValue: DateTime(2020, 6, 17),
               onSelectedDate: (DateTime newDate) {
                 selectedDate = newDate;
               },  

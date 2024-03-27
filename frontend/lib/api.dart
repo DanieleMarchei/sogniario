@@ -6,17 +6,18 @@ import 'package:http/http.dart' as http;
 String server = "http://localhost:3000";
 
 class QueryFields {
-  final List<String> fields;
+  List<String>? fields;
   Map<String, dynamic>? s;
 
   QueryFields({
-    required this.fields,
+    this.fields,
     this.s
   });
 
   Map<String, dynamic> toJson(){
-    Map<String, dynamic> f = {
-      "fields": fields.join(","),
+    Map<String, dynamic> f = {};
+    if(fields != null){
+      f["fields"] = fields!.join(",");
     };
 
     if(s != null){
@@ -44,6 +45,19 @@ UserData _jsonToUser(Map<String, dynamic> json){
   return user;
 }
 
+DreamData _jsonToDream(Map<String, dynamic> json){
+  DreamData dream = DreamData();
+  dream.dreamText = json["text"];
+  dream.report[0] = json["emotional_content"];
+  dream.report[1] = json["concious"] ? 1 : 2;
+  dream.report[2] = json["control"];
+  dream.report[3] = json["percived_elapsed_time"];
+  dream.report[4] = json["sleep_time"];
+  dream.report[5] = json["sleep_quality"];
+
+  return dream;
+}
+
 
 // THIS IS JUST FOR TESTING PURPOSES! DO NOT USE IN PRODUCTION!
 Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
@@ -54,7 +68,7 @@ Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
       "username": "$username",
       "password": "$password"
     }
-    );
+  );
   var url = Uri.http("localhost:3000", "/user", f.toJson());
   final headers = {
     HttpHeaders.acceptHeader: 'application/json'
@@ -152,17 +166,34 @@ Future<bool> addDream(int userId, DreamData dream) async {
 
   var body = {
     "text": dream.dreamText,
-    "emotional_content": "${dream.report[0]}",
-    "concious": "${dream.report[1] == 1}",
-    "control": "${dream.report[2]}",
-    "percived_elapsed_time": "${dream.report[3]}",
-    "sleep_time": "${dream.report[4]}",
-    "sleep_quality": "${dream.report[5]}",
-    "compiled_date": DateTime.now().toString(),
-    "user": "$userId"
+    "emotional_content": dream.report[0],
+    "concious": dream.report[1] == 1,
+    "control": dream.report[2],
+    "percived_elapsed_time": dream.report[3],
+    "sleep_time": dream.report[4],
+    "sleep_quality": dream.report[5],
+    "user": userId
   };
 
-  var response = await http.post(url, body : body);
+  final headers = {
+    HttpHeaders.acceptHeader: 'application/json',
+    HttpHeaders.contentTypeHeader: 'application/json'
+  };
+
+  var json = convert.jsonEncode(body);
+
+  var response = await http.post(url, body : json, headers: headers);
 
   return response.success;
 } 
+
+Future<List<DreamData>> getAllDreams(int userId) async {
+  var url = Uri.parse('${server}/user/${userId}?fields=dreams&join=dreams');
+
+
+  var response = await http.get(url);
+  var jsonResponse = convert.jsonDecode(response.body)["dreams"] as List<dynamic>;
+
+  List<DreamData> dreams = jsonResponse.map((e) => _jsonToDream(e)).toList();
+  return dreams;
+}

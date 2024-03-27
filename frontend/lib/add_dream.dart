@@ -62,7 +62,7 @@ class _AddDreamState extends State<AddDream> {
         var q = questions[index].question;
         var a = questions[index].answers;
         var s = questions[index].scores;
-        return MultipleChoiceQuestion(
+        var mcq = MultipleChoiceQuestion(
           question: q,
           answers: a,
           onSelected: (value) {
@@ -71,6 +71,8 @@ class _AddDreamState extends State<AddDream> {
             });
           },
         );
+        dream.report[index] = s[mcq.initialValue];
+        return mcq;
       }),
     ];
   }
