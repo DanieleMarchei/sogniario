@@ -43,8 +43,9 @@ Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
   final headers = {
     HttpHeaders.acceptHeader: 'application/json'
   };
+
   var response = await http.get(url, headers: headers);
-  bool isValid = response.body.isEmpty;
+  bool isValid = response.body.isNotEmpty;
   int? id;
   bool redirectToGeneralInfo = false;
   if(isValid){
@@ -52,7 +53,7 @@ Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
     id = jsonResponse[0]["id"];
     
     Gender? gender = jsonResponse[0]["gender"] != null ? Gender.values[jsonResponse[0]["gender"]] : null;
-    DateTime? birthdate = DateTime.parse(jsonResponse[0]["birthdate"]);
+    DateTime? birthdate = jsonResponse[0]["birthdate"] != null ? DateTime.parse(jsonResponse[0]["birthdate"]) : null;
     redirectToGeneralInfo = gender == null || birthdate == null;
   }
     
