@@ -145,3 +145,24 @@ Future<bool> addChronotype(int userId, ChronoTypeData chronotype) async{
 
   return response.success;
 }
+
+
+Future<bool> addDream(int userId, DreamData dream) async {
+  var url = Uri.parse('${server}/dream/');
+
+  var body = {
+    "text": dream.dreamText,
+    "emotional_content": "${dream.report[0]}",
+    "concious": "${dream.report[1] == 1}",
+    "control": "${dream.report[2]}",
+    "percived_elapsed_time": "${dream.report[3]}",
+    "sleep_time": "${dream.report[4]}",
+    "sleep_quality": "${dream.report[5]}",
+    "compiled_date": DateTime.now().toString(),
+    "user": "$userId"
+  };
+
+  var response = await http.post(url, body : body);
+
+  return response.success;
+} 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
@@ -36,102 +37,6 @@ List<QA> questions = [
       answers: ["Molto scarsa.", "Scarsa.", "Buona.", "Molto buona."]),
 ];
 
-// class AddDream extends StatefulWidget {
-//   const AddDream({super.key});
-//   @override
-//   State<AddDream> createState() => _AddDreamState();
-// }
-
-// class _AddDreamState extends State<AddDream> {
-//   int _current = 1;
-//   final CarouselController _controller = CarouselController();
-//   DreamData dream = DreamData();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     double screenHeight = MediaQuery.of(context).size.height;
-//     var items = [
-//         AddDreamText(
-//           onTextChanged: (value) {
-//             setState(() {
-//               dream.dreamText = value;
-//             });
-//           },
-//         ),
-//       ...List<MultipleChoiceQuestion>.generate(questions.length, (index) {
-//         var q = questions[index].question;
-//         var a = questions[index].answers;
-//         return MultipleChoiceQuestion(
-//           question: q,
-//           answers: a,
-//           onSelected: (value) {
-//             setState(() {
-//               dream.report[index] = value;
-//             });
-//           },
-//         );
-//       }),
-//     ];
-
-//     return Scaffold(
-//         appBar: AppBar(
-//           backgroundColor: Colors.blue,
-//           title: const Text("Racconta un sogno"),
-//         ),
-//         body: SingleChildScrollView(
-//           child: Column(
-//             children: <Widget>[
-//                 CarouselSlider(
-//                   items: items,
-//                   options: CarouselOptions(
-//                     viewportFraction: 1,
-//                     enlargeCenterPage: false,
-//                     height: screenHeight / 1.5,
-//                     enableInfiniteScroll: false,
-//                     autoPlay: false,
-//                     onPageChanged: (index, reason) {
-//                       _current = index + 1;
-//                       setState(() {});
-//                     },
-//                   ),
-//                   carouselController: _controller,
-//                 ),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                 children: <Widget>[
-//                   Flexible(
-//                     child: ElevatedButton(
-//                       onPressed: _current > 1
-//                           ? () {
-//                               _controller.previousPage();
-//                             }
-//                           : null,
-//                       child: const Icon(Icons.arrow_back),
-//                     ),
-//                   ),
-//                   Flexible(child: Text("${_current}/${questions.length + 1}")),
-//                   Flexible(
-//                     child: ElevatedButton(
-//                       onPressed: () {
-//                         if (_current == questions.length + 1) {
-//                           print(dream);
-//                         }
-//                         _controller.nextPage();
-//                       },
-//                       child: _current < questions.length + 1
-//                           ? const Icon(Icons.arrow_forward)
-//                           : const Icon(Icons.check),
-//                     ),
-//                   ),
-//                 ],
-//               )
-//             ],
-//           ),
-//         ));
-//   }
-// }
-
-
 class AddDream extends StatefulWidget {
   const AddDream({super.key});
   @override
@@ -156,12 +61,13 @@ class _AddDreamState extends State<AddDream> {
       ...List<MultipleChoiceQuestion>.generate(questions.length, (index) {
         var q = questions[index].question;
         var a = questions[index].answers;
+        var s = questions[index].scores;
         return MultipleChoiceQuestion(
           question: q,
           answers: a,
           onSelected: (value) {
             setState(() {
-              dream.report[index] = value;
+              dream.report[index] = s[value];
             });
           },
         );
@@ -171,12 +77,16 @@ class _AddDreamState extends State<AddDream> {
 
   @override
   Widget build(BuildContext context) {
-    
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    int id = arguments["id"];
 
     return ResponsiveReport(
       questionWidgets: dreamQuestions,
       title: "Racconta un sognio",
-      onSubmitted: () {Navigator.pop(context);}
+      onSubmitted: () async {
+        await addDream(id, dream);
+        Navigator.pop(context);
+      }
     );
   }
 }
