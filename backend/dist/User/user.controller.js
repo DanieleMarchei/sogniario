@@ -25,6 +25,13 @@ UserController = __decorate([
         model: {
             type: user_entity_1.User,
         },
+        query: {
+            join: {
+                dreams: {},
+                psqis: {},
+                chronotypes: {},
+            },
+        },
     }),
     (0, swagger_1.ApiTags)("User"),
     (0, common_1.Controller)("user"),

@@ -8,6 +8,13 @@ import { UserService } from "./user.service";
   model: {
     type: User,
   },
+  query: {
+    join: {
+      dreams: {},
+      psqis: {},
+      chronotypes: {},
+    },
+  },
 })
 @ApiTags("User")
 @Controller("user")
