@@ -47,7 +47,9 @@ class DreamData {
 }
 
 class PSQIData {
-  List<dynamic> report = List<dynamic>.generate(19, (index) => null);
+  // 23 values because there are 19 questions and 3 of them have multiple values
+  // which are spanned through different columns in the database
+  List<dynamic> report = List<dynamic>.generate(23, (index) => null);
 
   @override
   String toString() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/pickers.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
 import 'package:frontend/utils.dart';
@@ -231,6 +232,36 @@ class _PSQIState extends State<PSQI> {
             });
           })
     ];
+
+    psqi.report[0] = (psqiQuestions[0] as WithInitialValue).initialValue;
+    psqi.report[1] = (psqiQuestions[1] as WithInitialValue).initialValue;
+    psqi.report[2] = (psqiQuestions[2] as WithInitialValue).initialValue;
+
+    psqi.report[3] = ((psqiQuestions[3] as WithInitialValue).initialValue as (int, int)).$1;
+    psqi.report[4] = ((psqiQuestions[3] as WithInitialValue).initialValue as (int, int)).$2;
+    
+    psqi.report[5] = ((psqiQuestions[4] as WithInitialValue).initialValue as (int, int)).$1;
+    psqi.report[6] = ((psqiQuestions[4] as WithInitialValue).initialValue as (int, int)).$2;
+    
+    psqi.report[7] = (psqiQuestions[5] as WithInitialValue).initialValue;
+    psqi.report[8] = (psqiQuestions[6] as WithInitialValue).initialValue;
+    psqi.report[9] = (psqiQuestions[7] as WithInitialValue).initialValue;
+    psqi.report[10] = (psqiQuestions[8] as WithInitialValue).initialValue;
+    psqi.report[11] = (psqiQuestions[9] as WithInitialValue).initialValue;
+    psqi.report[12] = (psqiQuestions[10] as WithInitialValue).initialValue;
+    psqi.report[13] = (psqiQuestions[11] as WithInitialValue).initialValue;
+    psqi.report[14] = (psqiQuestions[12] as WithInitialValue).initialValue;
+    psqi.report[15] = (psqiQuestions[13] as WithInitialValue).initialValue;
+
+    psqi.report[16] = ((psqiQuestions[14] as WithInitialValue).initialValue as (int, String?, int?)).$1;
+    psqi.report[17] = ((psqiQuestions[14] as WithInitialValue).initialValue as (int, String?, int?)).$2;
+    psqi.report[18] = ((psqiQuestions[14] as WithInitialValue).initialValue as (int, String?, int?)).$3;
+    
+    psqi.report[19] = (psqiQuestions[15] as WithInitialValue).initialValue;
+    psqi.report[20] = (psqiQuestions[16] as WithInitialValue).initialValue;
+    psqi.report[21] = (psqiQuestions[17] as WithInitialValue).initialValue;
+    psqi.report[22] = (psqiQuestions[18] as WithInitialValue).initialValue;
+
   }
 
   @override

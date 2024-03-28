@@ -338,7 +338,7 @@ class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(
       }
 
       assert(this.initialValue.$1 == 0 || this.initialValue.$1 == 1, "initialValue.\$1 must be 0 or 1.");
-      assert(!(this.initialValue.$1 == 0) || (this.initialValue.$2 != null && this.initialValue.$3 != null), "if initialValue.\$1 is 1, then the other two values must be non-null.");
+      assert(!(this.initialValue.$1 == 1) || (this.initialValue.$2 != null && this.initialValue.$3 != null), "if initialValue.\$1 is 1, then the other two values must be non-null.");
 
     }
 
