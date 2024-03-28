@@ -54,6 +54,7 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   dream.report[3] = json["percived_elapsed_time"];
   dream.report[4] = json["sleep_time"];
   dream.report[5] = json["sleep_quality"];
+  dream.createdAt = json["created_at"] != null ? DateTime.parse(json["created_at"]) : null;
 
   return dream;
 }

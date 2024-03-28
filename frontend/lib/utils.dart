@@ -38,6 +38,7 @@ class QA {
 class DreamData {
   String dreamText = "";
   List<int> report = List<int>.generate(6, (index) => 0);
+  DateTime? createdAt;
 
   @override
   String toString() {

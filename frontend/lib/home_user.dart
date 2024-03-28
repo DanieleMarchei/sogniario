@@ -51,7 +51,7 @@ class HomeUser extends StatelessWidget {
             ? FloatingActionButton(
                 onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"id": id})},
                 tooltip: 'Racconta un sogno',
-                child: const Icon(Icons.insert_comment),
+                child: const Icon(Icons.cloud_upload),
               )
             : null);
   }
@@ -61,7 +61,7 @@ class HomeUser extends StatelessWidget {
 
     return [
       IconTextButton(
-        icon: const Icon(Icons.insert_comment),
+        icon: const Icon(Icons.cloud_upload),
         text: "Racconta un sogno",
         onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"id": id})}
       ),
@@ -71,19 +71,17 @@ class HomeUser extends StatelessWidget {
         text: "PSQI",
         onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"id": id})}
       ),
+      // SizedBox(height: screenHeight * .01),
+      // IconTextButton(
+      //   icon: const Icon(Icons.view_list),
+      //   text: "Cronotipo",
+      //   onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
+      // ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
-        icon: const Icon(Icons.view_list),
-        text: "Cronotipo",
-        onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
-      ),
-      SizedBox(height: screenHeight * .01),
-      IconTextButton(
-        icon: const Icon(Icons.view_list),
+        icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
-        onPressed: () async {
-          print(await getAllDreams(id));
-        },
+        onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"id":id}),
         // onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
       ),
     ];
@@ -93,9 +91,12 @@ class HomeUser extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
-      const Center(
+      Center(
         child: SimpleCircularIconButton(
-            iconData: Icons.cloud_done, text: "I miei sogni"),
+            iconData: Icons.rocket_launch, 
+            text: "I miei sogni",
+            onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"id":id})
+        ),
       ),
       SizedBox(height: screenHeight * .025),
       Row(
@@ -105,12 +106,12 @@ class HomeUser extends StatelessWidget {
               iconData: Icons.format_list_bulleted,
               showAlert: true,
               text: "PSQI"),
-          const Spacer(),
-          SimpleCircularIconButton(
-              onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})},
-              showAlert: true,
-              iconData: Icons.view_list,
-              text: "Cronotipo")
+          // const Spacer(),
+          // SimpleCircularIconButton(
+          //     onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})},
+          //     showAlert: true,
+          //     iconData: Icons.view_list,
+          //     text: "Cronotipo")
         ],
       )
     ];

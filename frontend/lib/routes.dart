@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/add_dream.dart';
 import 'package:frontend/chronotype.dart';
+import 'package:frontend/dreams_list.dart';
 import 'package:frontend/general_info.dart';
 import 'package:frontend/home_admin.dart';
 import 'package:frontend/home_user.dart';
@@ -47,6 +48,11 @@ class Routes {
         return PageTransition(
             settings: settings, 
             builder: (context) => const AddDream());
+
+      case "/dreams_list":
+        return PageTransition(
+            settings: settings, 
+            builder: (context) => DreamsList());
 
       case "/general_info":
         return PageTransition(
