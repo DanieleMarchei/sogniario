@@ -65,9 +65,9 @@ class _LoginState extends State<Login> {
       return true;
     }
 
-    bool loginValid, redirect;
+    bool loginValid;
     int? fetchedId; 
-    (loginValid, fetchedId, redirect) = await isValidLogin(username, password);
+    (loginValid, fetchedId) = await isValidLogin(username, password);
 
     isValid &= loginValid;
 
@@ -80,7 +80,13 @@ class _LoginState extends State<Login> {
         default:
           setState(() {
             id = fetchedId!;
-            redirectToGeneralInfo = redirect;
+          });
+
+          DateTime? birthdate;
+          Gender? gender;
+          (birthdate, gender) = await getGeneralInfo(id!);
+          setState(() {
+            redirectToGeneralInfo = birthdate == null || gender == null;
           });
           loginType = LoginType.user;
           break;
@@ -106,7 +112,12 @@ class _LoginState extends State<Login> {
           if(redirectToGeneralInfo){
             Navigator.pushNamed(context, "/general_info", arguments: {"id": id!});
           }else{
-            Navigator.pushNamed(context, "/home_user", arguments: {"id": id!});
+            ChronoTypeData? chronotype = await getChronotype(id!);
+            if (chronotype == null){
+              Navigator.pushNamed(context, "/chronotype", arguments: {"id": id!});
+            }else{
+              Navigator.pushNamed(context, "/home_user", arguments: {"id": id!});
+            }
           }
           break;
       }

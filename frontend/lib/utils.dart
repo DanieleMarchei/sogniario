@@ -1,5 +1,21 @@
+import 'package:flutter/material.dart';
+
 double widthConstraint = 1080;
 double halfWidthConstraint = widthConstraint / 2;
+
+String timeOfDaytoString(TimeOfDay tod) {
+  String addLeadingZeroIfNeeded(int value) {
+    if (value < 10) {
+      return '0$value';
+    }
+    return value.toString();
+  }
+
+  final String hourLabel = addLeadingZeroIfNeeded(tod.hour);
+  final String minuteLabel = addLeadingZeroIfNeeded(tod.minute);
+
+  return "${hourLabel}:${minuteLabel}";
+}
 
 class QA {
   final String question;

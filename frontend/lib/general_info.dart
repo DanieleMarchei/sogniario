@@ -19,7 +19,12 @@ class _GeneralInfoState extends State<GeneralInfo> {
   void submit(int id) async {
     bool updateDone = await updateUserGeneralInfo(id, gender, selectedDate);
     if(updateDone){
-      Navigator.pushNamed(context, "/home_user", arguments: {"id": id});
+      ChronoTypeData? chronotype = await getChronotype(id);
+      if (chronotype == null){
+        Navigator.pushNamed(context, "/chronotype", arguments: {"id": id});
+      }else{
+        Navigator.pushNamed(context, "/home_user", arguments: {"id": id});
+      }
     }
   }
 
@@ -66,7 +71,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
             SizedBox(height: screenHeight * .025),
             DatePickerButton(
               text : "Data di nascita: ",
-              initialValue: DateTime(2020, 6, 17),
+              initialValue: selectedDate,
               onSelectedDate: (DateTime newDate) {
                 selectedDate = newDate;
               },  

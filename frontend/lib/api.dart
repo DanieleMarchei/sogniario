@@ -58,12 +58,19 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   return dream;
 }
 
+ChronoTypeData _jsonToChronotype(Map<String, dynamic> json){
+  ChronoTypeData chronotype = ChronoTypeData();
+  for (var i = 1; i <= 19; i++) {
+    chronotype.report[i-1] = json["q$i"]; 
+  }
+  return chronotype;
+}
 
 // THIS IS JUST FOR TESTING PURPOSES! DO NOT USE IN PRODUCTION!
-Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
+Future<(bool, int?)> isValidLogin(String username, String password) async{
 
   QueryFields f = QueryFields(
-    fields: ["id", "gender", "birthdate"],
+    fields: ["id"],
     s: {
       "username": "$username",
       "password": "$password"
@@ -76,19 +83,25 @@ Future<(bool, int?, bool)> isValidLogin(String username, String password) async{
 
   var response = await http.get(url, headers: headers);
   bool isValid = response.body.isNotEmpty;
-  int? id;
-  bool redirectToGeneralInfo = false;
-  if(isValid){
-    var jsonResponse = convert.jsonDecode(response.body);
-    id = jsonResponse[0]["id"];
-    
-    Gender? gender = jsonResponse[0]["gender"] != null ? Gender.values[jsonResponse[0]["gender"]] : null;
-    DateTime? birthdate = jsonResponse[0]["birthdate"] != null ? DateTime.parse(jsonResponse[0]["birthdate"]) : null;
-    redirectToGeneralInfo = gender == null || birthdate == null;
-  }
+  var jsonResponse = convert.jsonDecode(response.body)[0];
+  int? id = jsonResponse["id"];
     
 
-  return (isValid, id, redirectToGeneralInfo);
+  return (isValid, id);
+}
+
+Future<(DateTime?, Gender?)> getGeneralInfo(int userId) async {
+  var url = Uri.parse('${server}/user/${userId}');
+  var response = await http.get(url);
+  if(!response.success) throw Exception("User $userId not found.");
+
+  var jsonResponse = convert.jsonDecode(response.body);
+
+  DateTime? birthdate = jsonResponse["birthdate"] != null ? DateTime.parse(jsonResponse["birthdate"]) : null;
+  Gender? gender = jsonResponse["gender"] != null ? Gender.values[jsonResponse["gender"]] : null;
+
+  return (birthdate, gender);
+
 }
 
 
@@ -158,6 +171,17 @@ Future<bool> addChronotype(int userId, ChronoTypeData chronotype) async{
   var response = await http.post(url, body : body);
 
   return response.success;
+}
+
+Future<ChronoTypeData?> getChronotype(int userId) async {
+  var url = Uri.parse('${server}/user/${userId}?fields=chronotypes&join=chronotypes');
+
+
+  var response = await http.get(url);
+  var jsonResponse = convert.jsonDecode(response.body)["chronotypes"] as List<dynamic>;
+  if(jsonResponse.isEmpty) return null;
+
+  return _jsonToChronotype(jsonResponse[0]);
 }
 
 

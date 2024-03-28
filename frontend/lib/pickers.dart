@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_picker/picker.dart';
+import 'package:frontend/utils.dart';
 
 mixin WithInitialValue<T> {
   abstract T initialValue;
@@ -112,21 +113,6 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton>{
   void initState() {
     super.initState();
     selectedValue = widget.initialValue;
-  }
-
-
-  String timeOfDaytoString(TimeOfDay tod) {
-    String addLeadingZeroIfNeeded(int value) {
-      if (value < 10) {
-        return '0$value';
-      }
-      return value.toString();
-    }
-
-    final String hourLabel = addLeadingZeroIfNeeded(tod.hour);
-    final String minuteLabel = addLeadingZeroIfNeeded(tod.minute);
-
-    return "${hourLabel}:${minuteLabel}";
   }
 
   @override

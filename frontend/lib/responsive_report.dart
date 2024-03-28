@@ -12,7 +12,7 @@ class ResponsiveReport extends StatefulWidget {
     super.key,
     required this.questionWidgets,
     required this.title,
-    required this.onSubmitted
+    required this.onSubmitted,
   });
 
   final List<QuestionWithDirection> questionWidgets;
@@ -46,6 +46,7 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(widget.title),
+        
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: padding),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
 import 'package:frontend/utils.dart';
@@ -203,6 +204,17 @@ List<QA> questions = [
       ])
 ];
 
+(String, (String, String)) getChronotypeFromScore(int score){
+  if(16 <= score && score <= 30) return ("Decisamente serotino", ("2:00-3:00","10:00-11:30"));
+  if(31 <= score && score <= 41) return ("Moderatamente serotino",("00:45-2:00","8:30-10:00"));
+  if(42 <= score && score <= 58) return ("Intermedio", ("22:45-00:45","6:30-8:30"));
+  if(59 <= score && score <= 69) return ("Moderatamente mattutino",("21:30-22:45","5:00-6:30"));
+  if(70 <= score && score <= 86) return ("Decisamente mattutino", ("21:00-21:30","4:00-5:00"));
+
+  throw Exception("Error during the calcualtion of the chronotype.");
+}
+
+
 class ChronoType extends StatefulWidget {
   const ChronoType({super.key});
   @override
@@ -240,25 +252,89 @@ class _ChronoTypeState extends State<ChronoType> {
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
     int id = arguments["id"];
+
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return !showScore
         ? ResponsiveReport(
             questionWidgets: chronoTypeQuestions,
             title: "Cronotipo",
             onSubmitted: () async{
-              print(await addChronotype(id, chronoType));
+              await addChronotype(id, chronoType);
               setState(()  {
                 showScore = true;
               });
             })
         : Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.blue,
-              title: Text("Cronotipo"),
-            ),
             body: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Center(child: Text("${chronoType.score()}")),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      "Il tuo cronotipo",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      "Punteggio",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text("${chronoType.score()}"),
+                    SizedBox(height: screenHeight * 0.01,),
+                    const Text(
+                      "Il tuo risultato è",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text("${getChronotypeFromScore(chronoType.score()).$1}"),
+                    SizedBox(height: screenHeight * 0.01,),
+                    Container(
+                      width: 500,
+                      child: const Text(
+                        "Per verificare l'attendibilità del risulato, confronta se gli orari qui riportati rispecchiano approssimativamente l'orario di risveglio e addormentamento",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          children: [
+                            Text("Addormentamento", style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("${getChronotypeFromScore(chronoType.score()).$2.$1}"),
+                          ],
+                        ),
+                        SizedBox(width: 10,),
+                        Column(
+                          children: [
+                            Text("Risveglio", style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("${getChronotypeFromScore(chronoType.score()).$2.$2}"),
+                          ],
+                        )
+                      ],
+                    ),
+                    SizedBox(height: screenHeight * 0.01,),
+                    FormButton(
+                      text: "Iniziamo!",
+                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"id": id}),
+                    ),
+                  ],
+                ),
+              )
+              
             ),
           );
   }
 }
+
