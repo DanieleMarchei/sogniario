@@ -313,12 +313,12 @@ class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIn
 }
 
 
-class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(int, String?, int?)>{
+class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(bool, String?, int?)>{
   
   final String question1;
   final String question2;
   final List<String> answers;
-  final void Function(int, String?, int?)? onSelected;
+  final void Function(bool, String?, int?)? onSelected;
   
   SpecifyIfYesQuestion(
     {
@@ -329,16 +329,15 @@ class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(
       super.direction,
       super.canChangeDirection = false,
       this.onSelected,
-      (int, String?, int?)? initialValue
+      (bool, String?, int?)? initialValue
     }){
       if(initialValue == null){
-        this.initialValue = (0, null, null);
+        this.initialValue = (false, null, null);
       }else{
         this.initialValue = initialValue;
       }
 
-      assert(this.initialValue.$1 == 0 || this.initialValue.$1 == 1, "initialValue.\$1 must be 0 or 1.");
-      assert(!(this.initialValue.$1 == 1) || (this.initialValue.$2 != null && this.initialValue.$3 != null), "if initialValue.\$1 is 1, then the other two values must be non-null.");
+      assert(!(this.initialValue.$1) || (this.initialValue.$2 != null && this.initialValue.$3 != null), "if initialValue.\$1 is true, then the other two values must be non-null.");
 
     }
 
@@ -346,7 +345,7 @@ class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(
   State<SpecifyIfYesQuestion> createState() => _SpecifyIfYesQuestionState();
   
   @override
-  late final (int, String?, int?) initialValue;
+  late final (bool, String?, int?) initialValue;
 }
 
 class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYesQuestion>{
@@ -362,7 +361,7 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
   @override
   void initState() {
     super.initState();
-    idxFirstQuestion = widget.initialValue.$1;
+    idxFirstQuestion = widget.initialValue.$1 ? 1 : 0;
     _firstQuestionAnswer = no_yes[idxFirstQuestion];
 
     _optionalAnswer1 = widget.initialValue.$2;
@@ -396,7 +395,8 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
                           _firstQuestionAnswer = value!;
                           idxFirstQuestion = idx;
                           if (_firstQuestionAnswer == no_yes[1]){
-                            _optionalAnswer2 = widget.answers[0];
+                            idxOptionalAnswer2 = 0;
+                            _optionalAnswer2 = widget.answers[idxOptionalAnswer2!];
                           }
                           else{
                             _optionalAnswer2 = null;
@@ -405,10 +405,11 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
 
                           _optionalAnswer1 = null;
 
-                          if(widget.onSelected != null){
-                            widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
-                          } 
                         });
+
+                        if(widget.onSelected != null){
+                          widget.onSelected!(idxFirstQuestion == 1, _optionalAnswer1, idxOptionalAnswer2);
+                        } 
                       }
                     ),
                   ),)
@@ -421,7 +422,7 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
               setState(() {
                 _optionalAnswer1 = newText;
                 if(widget.onSelected != null){
-                  widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
+                  widget.onSelected!(idxFirstQuestion == 1, _optionalAnswer1, idxOptionalAnswer2);
                 } 
               });
             },),),
@@ -436,7 +437,7 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
                                       _optionalAnswer2 = value!;
                                       idxOptionalAnswer2 = idx;
                                       if(widget.onSelected != null){
-                                        widget.onSelected!(idxFirstQuestion, _optionalAnswer1, idxOptionalAnswer2);
+                                        widget.onSelected!(idxFirstQuestion == 1, _optionalAnswer1, idxOptionalAnswer2);
                                       } 
                                     });
                                   }

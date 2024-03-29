@@ -1,5 +1,6 @@
 import 'dart:convert' as convert;
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:frontend/utils.dart';
 import 'package:http/http.dart' as http;
 
@@ -173,6 +174,63 @@ Future<bool> addChronotype(int userId, ChronoTypeData chronotype) async{
 
   return response.success;
 }
+
+
+Future<bool> addPSQI(int userId, PSQIData psqi) async{
+  var url = Uri.parse('${server}/psqi/');
+
+  List<String> columns = [
+    "q1",
+    "q2",
+    "q3",
+    "q4_h",
+    "q4_m",
+    "q5_h",
+    "q5_m",
+    "q6",
+    "q7",
+    "q8",
+    "q9",
+    "q10",
+    "q11",
+    "q12",
+    "q13",
+    "q14",
+    "q15",
+    "q15_text",
+    "q15_extended",
+    "q16",
+    "q17",
+    "q18",
+    "q19",
+  ];
+
+  Map<String, dynamic> body = {};
+  for (var i = 0; i < columns.length; i++) {
+    var value = psqi.report[i];
+    if(value is TimeOfDay){
+      var value2 = DateTime.utc(2024, 3, 3, value.hour- 1 , value.minute);
+      body[columns[i]] = value2.toIso8601String();
+    }else{
+      body[columns[i]] = value;
+
+    }
+  }
+
+  body["user"] = userId;
+
+  var json = convert.jsonEncode(body);
+  
+  final headers = {
+    // HttpHeaders.acceptHeader: 'application/json',
+    HttpHeaders.contentTypeHeader: 'application/json'
+  };
+
+  var response = await http.post(url, body : json, headers: headers);
+
+  return response.success;
+}
+
 
 Future<ChronoTypeData?> getChronotype(int userId) async {
   var url = Uri.parse('${server}/user/${userId}?fields=chronotypes&join=chronotypes');

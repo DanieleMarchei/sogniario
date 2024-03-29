@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
+import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
@@ -32,6 +34,8 @@ class PSQI extends StatefulWidget {
 class _PSQIState extends State<PSQI> {
   PSQIData psqi = PSQIData();
   late List<QuestionWithDirection> psqiQuestions;
+
+  bool showScore = false;
 
   @override
   void initState() {
@@ -76,7 +80,8 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[3] = (i1, i2);
+            psqi.report[3] = i1;
+            psqi.report[4] = i2;
           });
         },
       ),
@@ -90,7 +95,8 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[4] = (i1, i2);
+            psqi.report[5] = i1;
+            psqi.report[6] = i2;
           });
         },
       ),
@@ -100,7 +106,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[5] = i;
+            psqi.report[7] = i;
           });
         },
       ),
@@ -110,7 +116,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[6] = i;
+            psqi.report[8] = i;
           });
         },
       ),
@@ -120,7 +126,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[7] = i;
+            psqi.report[9] = i;
           });
         },
       ),
@@ -130,7 +136,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[8] = i;
+            psqi.report[10] = i;
           });
         },
       ),
@@ -140,7 +146,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[9] = i;
+            psqi.report[11] = i;
           });
         },
       ),
@@ -150,7 +156,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[10] = i;
+            psqi.report[12] = i;
           });
         },
       ),
@@ -160,7 +166,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[11] = i;
+            psqi.report[13] = i;
           });
         },
       ),
@@ -170,7 +176,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[12] = i;
+            psqi.report[14] = i;
           });
         },
       ),
@@ -180,7 +186,7 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[13] = i;
+            psqi.report[15] = i;
           });
         },
       ),
@@ -189,9 +195,11 @@ class _PSQIState extends State<PSQI> {
         question2:
             "Quanto spesso hai avuto problemi a dormire per questo motivo?",
         answers: answersHowMany.sublist(1),
-        onSelected: (int i1, String? s, int? i2) {
+        onSelected: (bool b, String? s, int? i2) {
           setState(() {
-            psqi.report[14] = (i1, s, i2);
+            psqi.report[16] = b;
+            psqi.report[17] = s;
+            psqi.report[18] = i2;
           });
         },
       ),
@@ -201,7 +209,7 @@ class _PSQIState extends State<PSQI> {
           answers: answersQuality,
           onSelected: (int i) {
             setState(() {
-              psqi.report[15] = i;
+              psqi.report[19] = i;
             });
           }),
       MultipleChoiceQuestion(
@@ -210,7 +218,7 @@ class _PSQIState extends State<PSQI> {
           answers: answersHowMany,
           onSelected: (int i) {
             setState(() {
-              psqi.report[16] = i;
+              psqi.report[20] = i;
             });
           }),
       MultipleChoiceQuestion(
@@ -219,7 +227,7 @@ class _PSQIState extends State<PSQI> {
           answers: answersHowMany,
           onSelected: (int i) {
             setState(() {
-              psqi.report[17] = i;
+              psqi.report[21] = i;
             });
           }),
       MultipleChoiceQuestion(
@@ -228,7 +236,7 @@ class _PSQIState extends State<PSQI> {
           answers: answersHowMuch,
           onSelected: (int i) {
             setState(() {
-              psqi.report[18] = i;
+              psqi.report[22] = i;
             });
           })
     ];
@@ -253,9 +261,9 @@ class _PSQIState extends State<PSQI> {
     psqi.report[14] = (psqiQuestions[12] as WithInitialValue).initialValue;
     psqi.report[15] = (psqiQuestions[13] as WithInitialValue).initialValue;
 
-    psqi.report[16] = ((psqiQuestions[14] as WithInitialValue).initialValue as (int, String?, int?)).$1;
-    psqi.report[17] = ((psqiQuestions[14] as WithInitialValue).initialValue as (int, String?, int?)).$2;
-    psqi.report[18] = ((psqiQuestions[14] as WithInitialValue).initialValue as (int, String?, int?)).$3;
+    psqi.report[16] = ((psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?)).$1;
+    psqi.report[17] = ((psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?)).$2;
+    psqi.report[18] = ((psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?)).$3;
     
     psqi.report[19] = (psqiQuestions[15] as WithInitialValue).initialValue;
     psqi.report[20] = (psqiQuestions[16] as WithInitialValue).initialValue;
@@ -266,12 +274,50 @@ class _PSQIState extends State<PSQI> {
 
   @override
   Widget build(BuildContext context) {
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    int id = arguments["id"];
 
-
-    return ResponsiveReport(
+    double screenHeight = MediaQuery.of(context).size.height;
+    
+    return !showScore ? ResponsiveReport(
       questionWidgets: psqiQuestions, 
       title: "PSQI", 
-      onSubmitted: () {Navigator.pop(context);}
+      onSubmitted: () async {
+        await addPSQI(id, psqi);
+        setState(() {
+          showScore = true;
+        });
+      }
+    ) : Scaffold(
+            body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      "Il tuo PSQI",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      "Punteggio",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text("${psqi.score()}"),
+                    SizedBox(height: screenHeight * 0.01,),
+                    FormButton(
+                      text: "Torna alla home",
+                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"id": id}),
+                    ),
+                  ]
+                )
+              )
+            )
     );
   }
 

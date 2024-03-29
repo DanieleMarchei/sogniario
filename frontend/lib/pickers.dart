@@ -68,8 +68,8 @@ class _DatePickerState extends State<DatePickerButton> {
                 DateTime selected = DateTime(year, month, day);
                 setState(() {
                   selectedValue = selected;
-                  if(widget.onSelectedDate != null) widget.onSelectedDate!(selectedValue);
                 });
+                if(widget.onSelectedDate != null) widget.onSelectedDate!(selectedValue);
               },
           ).showDialog(context);
       },
@@ -133,6 +133,7 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton>{
           setState(() {
             selectedValue = selected;
           });
+          if(widget.onSelectedTimeOfDay != null) widget.onSelectedTimeOfDay!(selectedValue);
         }
       },
       child: Text('${widget.text}${timeOfDaytoString(selectedValue)}'),
@@ -201,8 +202,8 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
               onConfirm: (Picker picker, List value) {
                 setState(() {
                   selectedValue = int.parse(picker.getSelectedValues()[0]);
-                  if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedValue);
                 });
+                if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedValue);
               },
           ).showDialog(context);
       },
@@ -290,8 +291,8 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                 setState(() {
                   selectedValue1 = int.parse(picker.getSelectedValues()[0]);
                   selectedValue2 = int.parse(picker.getSelectedValues()[1]);
-                  if(widget.onIntegersSelected != null) widget.onIntegersSelected!(selectedValue1, selectedValue2);
                 });
+                if(widget.onIntegersSelected != null) widget.onIntegersSelected!(selectedValue1, selectedValue2);
               },
           ).showDialog(context);
       },
