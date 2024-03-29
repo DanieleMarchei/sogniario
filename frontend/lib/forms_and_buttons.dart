@@ -87,6 +87,7 @@ class InputField extends StatefulWidget {
   final Function? onCleared;
   final String? text;
   final bool enabled;
+  final bool toggleObscure;
   final TextEditingController? controller;
 
   InputField(
@@ -100,6 +101,7 @@ class InputField extends StatefulWidget {
       this.obscureText = false,
       this.clearable = false,
       this.onCleared,
+      this.toggleObscure = false,
       this.text,
       this.controller,
       this.enabled = true,
@@ -111,10 +113,24 @@ class InputField extends StatefulWidget {
 
 class _InputFieldState extends State<InputField> {
   late TextEditingController controller;
+  bool showText = true;
+  IconButton? iconButton = null;
 
   @override
   void initState() {
     super.initState();
+    showText = widget.obscureText;
+    if(widget.onCleared != null){
+      iconButton = IconButton(
+          onPressed: () {
+            controller.clear();
+            widget.onCleared!();
+          },
+          icon: const Icon(Icons.clear),
+          tooltip: "Cancella",
+        );
+    }
+
     if(widget.controller == null){
       controller = TextEditingController(text: widget.text);
     } 
@@ -127,6 +143,17 @@ class _InputFieldState extends State<InputField> {
 
   @override
   Widget build(BuildContext context) {
+    if(widget.toggleObscure){
+      iconButton = IconButton(
+          onPressed: () {
+            setState(() {
+              showText = !showText;
+            });
+          },
+          icon: Icon(showText ? Icons.visibility_off : Icons.visibility),
+          tooltip: showText ? "Visualizza" : "Nascondi",
+        );
+    }
     return TextField(
       controller: controller,
       readOnly: !widget.enabled,
@@ -135,7 +162,7 @@ class _InputFieldState extends State<InputField> {
       onSubmitted: widget.onSubmitted,
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
-      obscureText: widget.obscureText,
+      obscureText: showText,
       decoration: InputDecoration(
         labelText: widget.labelText,
         errorText: widget.errorText,
@@ -143,13 +170,7 @@ class _InputFieldState extends State<InputField> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        suffixIcon: widget.onCleared != null ? IconButton(
-          onPressed: () {
-            controller.clear();
-            widget.onCleared!();
-          },
-          icon: const Icon(Icons.clear),
-        ) : null,
+        suffixIcon: iconButton,
       ),
     );
   }

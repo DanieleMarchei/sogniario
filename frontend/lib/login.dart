@@ -172,6 +172,7 @@ class _LoginState extends State<Login> {
                         onSubmitted: (val) => submit(),
                         labelText: 'Password',
                         errorText: passwordError,
+                        toggleObscure: true,
                         obscureText: true,
                         textInputAction: TextInputAction.next,
                       ),

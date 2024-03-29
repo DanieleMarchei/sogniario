@@ -60,6 +60,7 @@ class _ManageUsersState extends State<ManageUsers> {
                       setState(() {});
                     },
                     icon: Icon(Icons.person_add_alt_1_rounded),
+                    tooltip: "Aggiungi utente",
                   ),
                   SizedBox(
                     width: 10,
