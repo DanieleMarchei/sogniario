@@ -84,9 +84,9 @@ class _AddDreamState extends State<AddDream> {
 
     return ResponsiveReport(
       questionWidgets: dreamQuestions,
-      title: "Racconta un sognio",
+      title: "Racconta un sogno",
       onSubmitted: () async {
-        await addDream(id, dream);
+        // await addDream(id, dream);
         Navigator.pop(context);
       }
     );
@@ -154,21 +154,40 @@ class _AddDreamTextState extends QuestionWithDirectionState<AddDreamText> {
     super.build(context);
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return MultilineInputField(
-            labelText: "Racconta il tuo sogno",
-            maxLines: 10,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            errorText: textError,
-            onChanged: (value) {
-              setState(() {
-                text = value;
-                resetErrorText();
-                if (widget.onTextChanged != null) widget.onTextChanged!(value);
-              });
-            },
-            autoFocus: false,
-          );
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isMobile = screenWidth < widthConstraint;
+
+    return Column(
+      children: [
+        SizedBox(height: screenHeight * 0.01,),
+        MultilineInputField(
+          labelText: "Racconta il tuo sogno",
+          maxLines: 10,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          errorText: textError,
+          onChanged: (value) {
+            setState(() {
+              text = value;
+              resetErrorText();
+              if (widget.onTextChanged != null) widget.onTextChanged!(value);
+            });
+          },
+          autoFocus: false,
+        ),
+        if(isMobile)...{
+          SizedBox(height: screenHeight * 0.01,),
+          Text(
+            "💡 Suggerimento: puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
+            style: TextStyle(
+              color: Colors.grey.shade700,
+              fontSize: 12
+            ),
+          ),
+        }
+
+      ],
+    );
   }
   
 

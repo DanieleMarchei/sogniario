@@ -177,7 +177,7 @@ class _InputFieldState extends State<InputField> {
 }
 
 
-class MultilineInputField extends StatelessWidget {
+class MultilineInputField extends StatefulWidget {
   final String? labelText;
   final int maxLines;
   final Function(String)? onChanged;
@@ -186,7 +186,9 @@ class MultilineInputField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final bool autoFocus;
-  const MultilineInputField(
+  late final TextEditingController controller;
+
+  MultilineInputField(
       {this.labelText,
       this.maxLines = 5,
       this.onChanged,
@@ -195,21 +197,33 @@ class MultilineInputField extends StatelessWidget {
       this.keyboardType,
       this.textInputAction,
       this.autoFocus = false,
-      Key? key})
-      : super(key: key);
+      controller,
+      super.key}){
+        if(controller == null){
+          this.controller = TextEditingController();
+        }else{
+          this.controller = controller;
+        }
+      }
 
+  @override
+  State<MultilineInputField> createState() => _MultilineInputFieldState();
+}
+
+class _MultilineInputFieldState extends State<MultilineInputField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      autofocus: autoFocus,
-      onChanged: onChanged,
-      maxLines: maxLines,
-      onSubmitted: onSubmitted,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
+      controller: widget.controller,
+      autofocus: widget.autoFocus,
+      onChanged: widget.onChanged,
+      maxLines: widget.maxLines,
+      onSubmitted: widget.onSubmitted,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
       decoration: InputDecoration(
-        labelText: labelText,
-        errorText: errorText,
+        labelText: widget.labelText,
+        errorText: widget.errorText,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
