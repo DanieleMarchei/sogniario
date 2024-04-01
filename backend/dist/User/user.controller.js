@@ -19,24 +19,26 @@ const crud_1 = require("@nestjsx/crud");
 const user_entity_1 = require("../entities/user.entity");
 const user_service_1 = require("./user.service");
 const auth_decorator_1 = require("../Auth/auth.decorator");
+const download_dto_1 = require("./DTO/download.dto");
 let UserController = class UserController {
     constructor(service) {
         this.service = service;
     }
-    async downloadDreams(res) {
+    async downloadDreams(downloadDTO, res) {
         res.set({
             "Content-Type": "application/zip",
             "Content-Disposition": 'attachment; filename="dreamsdump.zip"',
         });
-        return new common_1.StreamableFile(await this.service.downloadDreams(1));
+        return new common_1.StreamableFile(await this.service.downloadDreams(downloadDTO.organizationId));
     }
 };
 __decorate([
     (0, auth_decorator_1.Public)(),
-    (0, common_1.Get)("/download"),
-    __param(0, (0, common_1.Response)({ passthrough: true })),
+    (0, common_1.Post)("/download"),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Response)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [download_dto_1.DownloadDto, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "downloadDreams", null);
 UserController = __decorate([
