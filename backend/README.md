@@ -41,6 +41,7 @@ DATABASE_USER=user
 DATABASE_PASSWORD=password
 DATABASE_NAME=name
 DATABASE_PORT=0000
+JWT_SECRET = DONOTUSETHISVALUE.INSTEAD,CREATEACOMPLEXSECRETANDKEEPITSAFEOUTSIDEOFTHESOURCECODE
 ```
 
 In the DATABASE_HOST you need to insert the public ip of the AWS instance (provided in private), in DATABASE_USER and DATABASE_PASSWORD your credential (provided in private), the actual test database name in 'simba', and the port for mysql is '3306'. You DO NOT have to inset any apostrophs or quotation marks to indicate the string.
