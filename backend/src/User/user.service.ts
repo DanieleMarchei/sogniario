@@ -11,12 +11,14 @@ export class UserService extends TypeOrmCrudService<User> {
   }
 
   async createHashedUser(user: User) {
+    const bcrypt = require("bcrypt");
     const existingUser = await this.repo.findOne({
       where: { username: user.username },
     });
     if (existingUser) {
       throw new HttpException("Mail already used", HttpStatus.CONFLICT);
     }
+    user.password = await bcrypt.hash(user.password, 10);
     return this.repo.save(user);
   }
 

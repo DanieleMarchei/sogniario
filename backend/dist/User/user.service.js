@@ -22,12 +22,14 @@ let UserService = class UserService extends crud_typeorm_1.TypeOrmCrudService {
         super(repo);
     }
     async createHashedUser(user) {
+        const bcrypt = require("bcrypt");
         const existingUser = await this.repo.findOne({
             where: { username: user.username },
         });
         if (existingUser) {
             throw new common_1.HttpException("Mail already used", common_1.HttpStatus.CONFLICT);
         }
+        user.password = await bcrypt.hash(user.password, 10);
         return this.repo.save(user);
     }
     async downloadDreams(organizationId) {
