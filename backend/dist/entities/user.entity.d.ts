@@ -2,10 +2,12 @@ import { Gender } from "./gender.enum";
 import { Dream } from "./dream.entity";
 import { Chronotype } from "./chronotype.entity";
 import { Psqi } from "./psqi.entity";
+import { Organization } from "./organization.entity";
 export declare class User {
     id: number;
     username: string;
     password: string;
+    type: string;
     birthdate: Date;
     gender: Gender;
     created_at: Date;
@@ -15,4 +17,5 @@ export declare class User {
     dreams: Dream[];
     chronotypes: Chronotype[];
     psqis: Psqi[];
+    organization: Organization;
 }

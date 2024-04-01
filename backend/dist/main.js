@@ -9,6 +9,7 @@ async function bootstrap() {
         .setTitle("Sognario API description")
         .setDescription("Documentation provided by @micrus and @DanieleMarchei for the Sogniario API, this will serve as a central point for the frontend depelopers to retrive all the required information in order to continue the work.")
         .setVersion("1.0")
+        .addBearerAuth()
         .build();
     const options2 = {
         customCss: `
@@ -17,8 +18,10 @@ async function bootstrap() {
     };
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup("api", app, document, options2);
-    app.enableCors({ origin: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS' });
+    app.enableCors({
+        origin: true,
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    });
     await app.listen(3000);
 }
 bootstrap();

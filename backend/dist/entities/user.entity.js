@@ -16,6 +16,7 @@ const gender_enum_1 = require("./gender.enum");
 const dream_entity_1 = require("./dream.entity");
 const chronotype_entity_1 = require("./chronotype.entity");
 const psqi_entity_1 = require("./psqi.entity");
+const organization_entity_1 = require("./organization.entity");
 let User = class User {
 };
 __decorate([
@@ -33,6 +34,11 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], User.prototype, "type", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, typeorm_1.Column)({ nullable: true }),
@@ -80,6 +86,11 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => psqi_entity_1.Psqi, (psqi) => psqi.user),
     __metadata("design:type", Array)
 ], User.prototype, "psqis", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: () => organization_entity_1.Organization }),
+    (0, typeorm_1.ManyToOne)(() => organization_entity_1.Organization, (organization) => organization.users),
+    __metadata("design:type", organization_entity_1.Organization)
+], User.prototype, "organization", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

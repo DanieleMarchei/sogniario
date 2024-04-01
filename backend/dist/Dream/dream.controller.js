@@ -27,6 +27,7 @@ DreamController = __decorate([
         },
     }),
     (0, swagger_1.ApiTags)("Dream"),
+    (0, swagger_1.ApiSecurity)("bearer"),
     (0, common_1.Controller)("dream"),
     __metadata("design:paramtypes", [dream_service_1.DreamService])
 ], DreamController);

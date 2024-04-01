@@ -1,9 +1,16 @@
 import { ApiProperty, ApiTags } from "@nestjs/swagger";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Gender } from "./gender.enum";
 import { Dream } from "./dream.entity";
 import { Chronotype } from "./chronotype.entity";
 import { Psqi } from "./psqi.entity";
+import { Organization } from "./organization.entity";
 @Entity()
 export class User {
   @ApiProperty()
@@ -17,6 +24,10 @@ export class User {
   @ApiProperty()
   @Column({ nullable: false })
   password: string;
+
+  @ApiProperty()
+  @Column({ nullable: false })
+  type: string;
 
   @ApiProperty()
   @Column({ nullable: true })
@@ -55,4 +66,8 @@ export class User {
 
   @OneToMany(() => Psqi, (psqi) => psqi.user)
   psqis: Psqi[];
+
+  @ApiProperty({ type: () => Organization })
+  @ManyToOne(() => Organization, (organization) => organization.users)
+  organization: Organization;
 }

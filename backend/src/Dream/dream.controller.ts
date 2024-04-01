@@ -1,5 +1,5 @@
 import { Controller } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiSecurity, ApiTags } from "@nestjs/swagger";
 import { Crud, CrudController } from "@nestjsx/crud";
 import { DreamService } from "./dream.service";
 import { Dream } from "src/entities/dream.entity";
@@ -10,6 +10,7 @@ import { Dream } from "src/entities/dream.entity";
   },
 })
 @ApiTags("Dream")
+@ApiSecurity("bearer")
 @Controller("dream")
 export class DreamController implements CrudController<Dream> {
   constructor(public service: DreamService) {}

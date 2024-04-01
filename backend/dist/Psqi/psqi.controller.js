@@ -27,6 +27,7 @@ PsqiController = __decorate([
         },
     }),
     (0, swagger_1.ApiTags)("Psqi"),
+    (0, swagger_1.ApiSecurity)("bearer"),
     (0, common_1.Controller)("Psqi"),
     __metadata("design:paramtypes", [psqi_service_1.PsqiService])
 ], PsqiController);

@@ -13,11 +13,15 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const user_module_1 = require("./User/user.module");
 const dream_entity_1 = require("./entities/dream.entity");
+const jwt_1 = require("@nestjs/jwt");
 const dream_module_1 = require("./Dream/dream.module");
 const psqi_module_1 = require("./Psqi/psqi.module");
 const chronotype_entity_1 = require("./entities/chronotype.entity");
 const chronotype_module_1 = require("./Chronotype/chronotype.module");
 const psqi_entity_1 = require("./entities/psqi.entity");
+const auth_module_1 = require("./Auth/auth.module");
+const organization_entity_1 = require("./entities/organization.entity");
+const organization_module_1 = require("./Organization/organization.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -33,13 +37,20 @@ AppModule = __decorate([
                 username: process.env.DATABASE_USER,
                 password: process.env.DATABASE_PASSWORD,
                 database: process.env.DATABASE_NAME,
-                entities: [user_entity_1.User, dream_entity_1.Dream, chronotype_entity_1.Chronotype, psqi_entity_1.Psqi],
+                entities: [user_entity_1.User, dream_entity_1.Dream, chronotype_entity_1.Chronotype, psqi_entity_1.Psqi, organization_entity_1.Organization],
                 synchronize: true,
+            }),
+            jwt_1.JwtModule.register({
+                global: true,
+                secret: process.env.JWT_SECRET,
+                signOptions: { expiresIn: "60d" },
             }),
             user_module_1.UserModule,
             dream_module_1.DreamModule,
             psqi_module_1.PsqiModule,
             chronotype_module_1.ChronotypeModule,
+            auth_module_1.AuthModule,
+            organization_module_1.OrganizationModule,
         ],
         controllers: [],
         providers: [],
