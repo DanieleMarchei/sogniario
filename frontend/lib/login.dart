@@ -4,6 +4,8 @@ import 'package:frontend/forms_and_buttons.dart';
 import 'dart:math';
 
 import 'package:frontend/utils.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+
 
 enum LoginType {
   user,
@@ -18,7 +20,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   late String username, password;
-  int? id;
+  String? jwt;
   late bool redirectToGeneralInfo;
   String? usernameError, passwordError;
   late LoginType loginType;
@@ -60,33 +62,26 @@ class _LoginState extends State<Login> {
       isValid = false;
     }
 
-    if(username == "admin"){
-      loginType = LoginType.admin;
-      return true;
-    }
-
     bool loginValid;
-    int? fetchedId; 
-    (loginValid, fetchedId) = await isValidLogin(username, password);
-
+    String? fetchedAccessToken; 
+    (loginValid, fetchedAccessToken) = await isValidLogin(username, password);
     isValid &= loginValid;
+    jwt = fetchedAccessToken!;
 
     if (isValid){
-      switch (username) {
-        case "admin":
+      String userType = JwtDecoder.decode(jwt!)["type"];
+      switch (userType) {
+        case "ADMIN":
           loginType = LoginType.admin;
           break;
           
-        default:
-          setState(() {
-            id = fetchedId!;
-          });
-
+        case "USER":
           DateTime? birthdate;
-          Gender? gender;
-          (birthdate, gender) = await getGeneralInfo(id!);
+          Sex? sex;
+
+          (birthdate, sex) = await getGeneralInfo(jwt!);
           setState(() {
-            redirectToGeneralInfo = birthdate == null || gender == null;
+            redirectToGeneralInfo = birthdate == null || sex == null;
           });
           loginType = LoginType.user;
           break;
@@ -105,18 +100,18 @@ class _LoginState extends State<Login> {
     if (await validate()) {
       switch (loginType) {
         case LoginType.admin:
-          Navigator.pushNamed(context, "/home_admin");
+          Navigator.pushNamed(context, "/home_admin", arguments: {"jwt": jwt!});
           break;
         
         case LoginType.user:
           if(redirectToGeneralInfo){
-            Navigator.pushNamed(context, "/general_info", arguments: {"id": id!});
+            Navigator.pushNamed(context, "/general_info", arguments: {"jwt": jwt!});
           }else{
-            ChronoTypeData? chronotype = await getChronotype(id!);
+            ChronoTypeData? chronotype = await getChronotype(jwt!);
             if (chronotype == null){
-              Navigator.pushNamed(context, "/chronotype", arguments: {"id": id!});
+              Navigator.pushNamed(context, "/chronotype", arguments: {"jwt": jwt!});
             }else{
-              Navigator.pushNamed(context, "/home_user", arguments: {"id": id!});
+              Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt!});
             }
           }
           break;

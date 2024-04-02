@@ -10,6 +10,10 @@ class HomeAdmin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    String jwt = arguments["jwt"];
+
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -38,12 +42,12 @@ class HomeAdmin extends StatelessWidget {
                         IconTextButton(
                             icon: const Icon(Icons.groups),
                             text: "Gestisci utenti",
-                            onPressed: () => {Navigator.pushNamed(context, "/manage_users")}),
+                            onPressed: () => {Navigator.pushNamed(context, "/manage_users", arguments: {"jwt": jwt})}),
                         SizedBox(height: screenHeight * .01),
                         IconTextButton(
                             icon: const Icon(Icons.download),
                             text: "Scarica il database",
-                            onPressed: () => {}),
+                            onPressed: () => {getDatabase(jwt)}),
 
                       ],
                     )))),

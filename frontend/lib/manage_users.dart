@@ -26,6 +26,10 @@ class _ManageUsersState extends State<ManageUsers> {
 
   @override
   Widget build(BuildContext context) {
+
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    String jwt = arguments["jwt"];
+
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -363,14 +367,14 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 ),
               ),
               SimpleDialogOption(
-                child: DropdownButtonFormField<Gender>(
+                child: DropdownButtonFormField<Sex>(
                   decoration: const InputDecoration(
                     label: Text("Sesso"),
                   ),
-                  value: tmpUser!.gender,
-                  items: Gender.values
-                      .map<DropdownMenuItem<Gender>>((Gender gender) {
-                    return DropdownMenuItem<Gender>(
+                  value: tmpUser!.sex,
+                  items: Sex.values
+                      .map<DropdownMenuItem<Sex>>((Sex gender) {
+                    return DropdownMenuItem<Sex>(
                       value: gender,
                       child: Text(gender.label),
                     );

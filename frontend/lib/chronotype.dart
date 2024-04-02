@@ -251,7 +251,7 @@ class _ChronoTypeState extends State<ChronoType> {
   @override
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    int id = arguments["id"];
+    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -260,7 +260,7 @@ class _ChronoTypeState extends State<ChronoType> {
             questionWidgets: chronoTypeQuestions,
             title: "Cronotipo",
             onSubmitted: () async{
-              await addChronotype(id, chronoType);
+              await addChronotype(jwt, chronoType);
               setState(()  {
                 showScore = true;
               });
@@ -327,7 +327,7 @@ class _ChronoTypeState extends State<ChronoType> {
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
                       text: "Iniziamo!",
-                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"id": id}),
+                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt}),
                     ),
                   ],
                 ),

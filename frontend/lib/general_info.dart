@@ -14,16 +14,16 @@ class GeneralInfo extends StatefulWidget {
 
 class _GeneralInfoState extends State<GeneralInfo> {
   DateTime selectedDate = DateTime.now();
-  Gender gender = Gender.notSpecified;
+  Sex sex = Sex.notSpecified;
 
-  void submit(int id) async {
-    bool updateDone = await updateUserGeneralInfo(id, gender, selectedDate);
+  void submit(String jwt) async {
+    bool updateDone = await updateUserGeneralInfo(sex, selectedDate, jwt);
     if(updateDone){
-      ChronoTypeData? chronotype = await getChronotype(id);
+      ChronoTypeData? chronotype = await getChronotype(jwt);
       if (chronotype == null){
-        Navigator.pushNamed(context, "/chronotype", arguments: {"id": id});
+        Navigator.pushNamed(context, "/chronotype", arguments: {"jwt": jwt});
       }else{
-        Navigator.pushNamed(context, "/home_user", arguments: {"id": id});
+        Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt});
       }
     }
   }
@@ -32,7 +32,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
   Widget build(BuildContext context) {
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    int id = arguments["id"];
+    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -50,21 +50,21 @@ class _GeneralInfoState extends State<GeneralInfo> {
               ),
             ),
             SizedBox(height: screenHeight * .12),
-            DropdownButtonFormField<Gender>(
+            DropdownButtonFormField<Sex>(
               decoration: const InputDecoration(
                 label: Text("Sesso"),
               ),
-              value: gender,
+              value: sex,
               items:
-                  Gender.values.map<DropdownMenuItem<Gender>>((Gender gender) {
-                return DropdownMenuItem<Gender>(
-                  value: gender,
-                  child: Text(gender.label),
+                  Sex.values.map<DropdownMenuItem<Sex>>((Sex sex) {
+                return DropdownMenuItem<Sex>(
+                  value: sex,
+                  child: Text(sex.label),
                 );
               }).toList(),
-              onChanged: (Gender? value) {
+              onChanged: (Sex? value) {
                 setState(() {
-                  gender = value!;
+                  sex = value!;
                 });
               },
             ),
@@ -81,7 +81,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
             ),
             FormButton(
               text: 'Conferma',
-              onPressed: () => submit(id),
+              onPressed: () => submit(jwt),
             ),
             SizedBox(
               height: screenHeight * .15,

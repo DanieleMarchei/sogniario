@@ -41,6 +41,7 @@ class _PSQIState extends State<PSQI> {
   void initState() {
     super.initState();
     psqiQuestions = [
+      // 1
       SelectHourQuestion(
         question:
             "Nell' ultimo mese, di solito, a che ora sei andato a dormire la sera?",
@@ -50,6 +51,8 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 2
       SelectIntQuestion(
         question:
             "Nell' ultimo mese, di solito, quanto tempo (in minuti) hai impiegato ad addormentarti?",
@@ -61,6 +64,8 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 3
       SelectHourQuestion(
         question:
             "Nell' ultimo mese, di solito, a che ora ti sei alzato al mattino?",
@@ -70,6 +75,8 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 4A
       SelectTwoIntsQuestion(
         question: "Nell' ultimo mese, quante ore hai dormito effettivamente per notte?",
         text1: "ore",
@@ -80,11 +87,12 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[3] = i1;
-            psqi.report[4] = i2;
+            psqi.report[3] = i1 + i2 / 10;
           });
         },
       ),
+
+      // 4B
       SelectTwoIntsQuestion(
         question: "Quante ore hai passato nel letto?",
         text1: "ore",
@@ -95,14 +103,39 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[5] = i1;
-            psqi.report[6] = i2;
+            psqi.report[4] = i1 + i2 / 10;
           });
         },
       ),
+
+      // 5A
       MultipleChoiceQuestion(
         question:
             "Nell' ultimo mese quanto frequentemente ti capita di non riuscire ad addormentarti entro 30 minuti?",
+        answers: answersHowMany,
+        onSelected: (int i) {
+          setState(() {
+            psqi.report[5] = i;
+          });
+        },
+      ),
+
+      // 5B
+      MultipleChoiceQuestion(
+        question:
+            "Nell' ultimo mese quanto frequentemente ti capita di svegliarti nel mezzo della notte o al mettino presto senza riaddormentarsi?",
+        answers: answersHowMany,
+        onSelected: (int i) {
+          setState(() {
+            psqi.report[6] = i;
+          });
+        },
+      ),
+      
+      // 5C
+      MultipleChoiceQuestion(
+        question:
+            "Nell' ultimo mese quanto frequentemente ti capita di alzarti nel mezzo della notte per andare in bagno?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -110,9 +143,11 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 5D
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di svegliarti nel mezzo della notte o al mettino presto senza riaddormentarsi?",
+            "Nell' ultimo mese quanto frequentemente ti capita di non riuscire a respirare bene?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -120,9 +155,11 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 5E
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di alzarti nel mezzo della notte per andare in bagno?",
+            "Nell' ultimo mese quanto frequentemente ti capita di tossire o russare forte?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -130,9 +167,11 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 5F
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di non riuscire a respirare bene?",
+            "Nell' ultimo mese quanto frequentemente ti capita di sentire troppo freddo?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -140,9 +179,11 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 5G
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di tossire o russare forte?",
+            "Nell' ultimo mese quanto frequentemente ti capita di sentire troppo caldo?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -150,9 +191,11 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 5H
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di sentire troppo freddo?",
+            "Nell' ultimo mese quanto frequentemente ti capita di fare brutti sogni?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -160,9 +203,11 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
+
+      // 5I
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di sentire troppo caldo?",
+            "Nell' ultimo mese quanto frequentemente ti capita di avere dolori?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
@@ -170,26 +215,8 @@ class _PSQIState extends State<PSQI> {
           });
         },
       ),
-      MultipleChoiceQuestion(
-        question:
-            "Nell' ultimo mese quanto frequentemente ti capita di fare brutti sogni?",
-        answers: answersHowMany,
-        onSelected: (int i) {
-          setState(() {
-            psqi.report[14] = i;
-          });
-        },
-      ),
-      MultipleChoiceQuestion(
-        question:
-            "Nell' ultimo mese quanto frequentemente ti capita di avere dolori?",
-        answers: answersHowMany,
-        onSelected: (int i) {
-          setState(() {
-            psqi.report[15] = i;
-          });
-        },
-      ),
+
+      // 5J
       SpecifyIfYesQuestion(
         question1: "Qualche altro problema può aver disturbato il tuo sonno?",
         question2:
@@ -197,85 +224,96 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMany.sublist(1),
         onSelected: (bool b, String? s, int? i2) {
           setState(() {
-            psqi.report[16] = b;
-            psqi.report[17] = s;
-            psqi.report[18] = i2;
+            psqi.report[14] = [null, 0, 1, 2].indexOf(i2);
+            psqi.optionalText = s;
           });
         },
       ),
+
+      // 6
       MultipleChoiceQuestion(
-          question:
-              "Nell' ultimo mese, come valuti complessivamente la qualità del tuo sonno?",
-          answers: answersQuality,
-          onSelected: (int i) {
-            setState(() {
-              psqi.report[19] = i;
-            });
-          }),
+        question:
+            "Nell' ultimo mese, quanto spesso hai preso farmaci (prescritti dal medico o meno) per facilitare il sonno?",
+        answers: answersHowMany,
+        onSelected: (int i) {
+          setState(() {
+            psqi.report[15] = i;
+          });
+        }
+      ),
+
+      // 7
       MultipleChoiceQuestion(
-          question:
-              "Nell' ultimo mese, quanto spesso hai preso farmaci (prescritti dal medico o meno) per facilitare il sonno?",
-          answers: answersHowMany,
-          onSelected: (int i) {
-            setState(() {
-              psqi.report[20] = i;
-            });
-          }),
+        question:
+            "Nell' ultimo mese, quanto spesso hai avuto difficoltà a rimanere sveglio alla guida, durante i pasti, o nel corso di attività sociali?",
+        answers: answersHowMany,
+        onSelected: (int i) {
+          setState(() {
+            psqi.report[16] = i;
+          });
+        }
+      ),
+      
+      // 8
       MultipleChoiceQuestion(
-          question:
-              "Nell' ultimo mese, quanto spesso hai avuto difficoltà a rimanere sveglio alla guida o nel corso di attività sociali?",
-          answers: answersHowMany,
-          onSelected: (int i) {
-            setState(() {
-              psqi.report[21] = i;
-            });
-          }),
+        question:
+            "Nell' ultimo mese, hai avuto problemi ad avere energie sufficienti per concludere le tue normali attività?",
+        answers: answersHowMuch,
+        onSelected: (int i) {
+          setState(() {
+            psqi.report[17] = i;
+          });
+        }
+      ),
+
+      // 9
       MultipleChoiceQuestion(
-          question:
-              "Nell' ultimo mese, hai avuto problemi ad avere energie sufficienti per concludere le tue normali attività?",
-          answers: answersHowMuch,
-          onSelected: (int i) {
-            setState(() {
-              psqi.report[22] = i;
-            });
-          })
+        question:
+            "Nell' ultimo mese, come valuti complessivamente la qualità del tuo sonno?",
+        answers: answersQuality,
+        onSelected: (int i) {
+          setState(() {
+            psqi.report[18] = i;
+          });
+        }
+      ),
     ];
 
     psqi.report[0] = (psqiQuestions[0] as WithInitialValue).initialValue;
     psqi.report[1] = (psqiQuestions[1] as WithInitialValue).initialValue;
     psqi.report[2] = (psqiQuestions[2] as WithInitialValue).initialValue;
 
-    psqi.report[3] = ((psqiQuestions[3] as WithInitialValue).initialValue as (int, int)).$1;
-    psqi.report[4] = ((psqiQuestions[3] as WithInitialValue).initialValue as (int, int)).$2;
-    
-    psqi.report[5] = ((psqiQuestions[4] as WithInitialValue).initialValue as (int, int)).$1;
-    psqi.report[6] = ((psqiQuestions[4] as WithInitialValue).initialValue as (int, int)).$2;
-    
-    psqi.report[7] = (psqiQuestions[5] as WithInitialValue).initialValue;
-    psqi.report[8] = (psqiQuestions[6] as WithInitialValue).initialValue;
-    psqi.report[9] = (psqiQuestions[7] as WithInitialValue).initialValue;
-    psqi.report[10] = (psqiQuestions[8] as WithInitialValue).initialValue;
-    psqi.report[11] = (psqiQuestions[9] as WithInitialValue).initialValue;
-    psqi.report[12] = (psqiQuestions[10] as WithInitialValue).initialValue;
-    psqi.report[13] = (psqiQuestions[11] as WithInitialValue).initialValue;
-    psqi.report[14] = (psqiQuestions[12] as WithInitialValue).initialValue;
-    psqi.report[15] = (psqiQuestions[13] as WithInitialValue).initialValue;
+    (int, int) r3 = (psqiQuestions[3] as WithInitialValue).initialValue;
+    psqi.report[3] = r3.$1 + r3.$2 / 10;
 
-    psqi.report[16] = ((psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?)).$1;
-    psqi.report[17] = ((psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?)).$2;
-    psqi.report[18] = ((psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?)).$3;
+    (int, int) r4 = (psqiQuestions[4] as WithInitialValue).initialValue;
+    psqi.report[4] = r4.$1 + r4.$2 / 10;
     
-    psqi.report[19] = (psqiQuestions[15] as WithInitialValue).initialValue;
-    psqi.report[20] = (psqiQuestions[16] as WithInitialValue).initialValue;
-    psqi.report[21] = (psqiQuestions[17] as WithInitialValue).initialValue;
-    psqi.report[22] = (psqiQuestions[18] as WithInitialValue).initialValue;
+    psqi.report[5] = (psqiQuestions[5] as WithInitialValue).initialValue;
+    psqi.report[6] = (psqiQuestions[6] as WithInitialValue).initialValue;
+    psqi.report[7] = (psqiQuestions[7] as WithInitialValue).initialValue;
+    psqi.report[8] = (psqiQuestions[8] as WithInitialValue).initialValue;
+    psqi.report[9] = (psqiQuestions[9] as WithInitialValue).initialValue;
+    psqi.report[10] = (psqiQuestions[10] as WithInitialValue).initialValue;
+    psqi.report[11] = (psqiQuestions[11] as WithInitialValue).initialValue;
+    psqi.report[12] = (psqiQuestions[12] as WithInitialValue).initialValue;
+    psqi.report[13] = (psqiQuestions[13] as WithInitialValue).initialValue;
+
+    (bool, String?, int?) r14 = (psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?);
+    psqi.report[14] = [null, 0, 1, 2].indexOf(r14.$3);
+    psqi.optionalText = r14.$2;
+    
+    psqi.report[15] = (psqiQuestions[15] as WithInitialValue).initialValue;
+    psqi.report[16] = (psqiQuestions[16] as WithInitialValue).initialValue;
+    psqi.report[17] = (psqiQuestions[17] as WithInitialValue).initialValue;
+    psqi.report[18] = (psqiQuestions[18] as WithInitialValue).initialValue;
 
   }
 
   @override
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    int id = arguments["id"];
+    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
     
@@ -283,7 +321,7 @@ class _PSQIState extends State<PSQI> {
       questionWidgets: psqiQuestions, 
       title: "PSQI", 
       onSubmitted: () async {
-        await addPSQI(id, psqi);
+        await addPSQI(jwt, psqi);
         setState(() {
           showScore = true;
         });
@@ -312,7 +350,7 @@ class _PSQIState extends State<PSQI> {
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
                       text: "Torna alla home",
-                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"id": id}),
+                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt}),
                     ),
                   ]
                 )

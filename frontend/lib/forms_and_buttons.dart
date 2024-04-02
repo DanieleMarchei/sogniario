@@ -211,10 +211,19 @@ class MultilineInputField extends StatefulWidget {
 }
 
 class _MultilineInputFieldState extends State<MultilineInputField> {
+
+  late TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = widget.controller;
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: widget.controller,
+      controller: controller,
       autofocus: widget.autoFocus,
       onChanged: widget.onChanged,
       maxLines: widget.maxLines,

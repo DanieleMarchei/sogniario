@@ -17,10 +17,10 @@ class _DreamsListState extends State<DreamsList> {
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
-    int id = arguments["id"];
+    String jwt = arguments["jwt"];
 
     return FutureBuilder(
-      future: getAllDreams(id),
+      future: getAllDreams(jwt),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Container(

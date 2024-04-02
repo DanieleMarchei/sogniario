@@ -11,7 +11,7 @@ class HomeUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    int id = arguments["id"];
+    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -42,52 +42,45 @@ class HomeUser extends StatelessWidget {
                                     )))),
                         SizedBox(height: screenHeight * .025),
                         if (showMobileLayout)
-                          ...mobileWidgets(context, id)
+                          ...mobileWidgets(context, jwt)
                         else
-                          ...desktopWidgets(context, id)
+                          ...desktopWidgets(context, jwt)
                       ],
                     )))),
         floatingActionButton: showMobileLayout
             ? FloatingActionButton(
-                onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"id": id})},
+                onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"jwt": jwt})},
                 tooltip: 'Racconta un sogno',
                 child: const Icon(Icons.cloud_upload),
               )
             : null);
   }
 
-  List<Widget> desktopWidgets(BuildContext context, int id) {
+  List<Widget> desktopWidgets(BuildContext context, String jwt) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
       IconTextButton(
         icon: const Icon(Icons.cloud_upload),
         text: "Racconta un sogno",
-        onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"id": id})}
+        onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"jwt": jwt})}
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.format_list_bulleted),
         text: "PSQI",
-        onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"id": id})}
+        onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"jwt": jwt})}
       ),
-      // SizedBox(height: screenHeight * .01),
-      // IconTextButton(
-      //   icon: const Icon(Icons.view_list),
-      //   text: "Cronotipo",
-      //   onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
-      // ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
-        onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"id":id}),
-        // onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})}
+        onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"jwt":jwt}),
       ),
     ];
   }
 
-  List<Widget> mobileWidgets(BuildContext context, int id) {
+  List<Widget> mobileWidgets(BuildContext context, String jwt) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
@@ -95,23 +88,17 @@ class HomeUser extends StatelessWidget {
         child: SimpleCircularIconButton(
             iconData: Icons.rocket_launch, 
             text: "I miei sogni",
-            onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"id":id})
+            onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"jwt":jwt})
         ),
       ),
       SizedBox(height: screenHeight * .025),
       Row(
         children: [
           SimpleCircularIconButton(
-              onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"id": id})},
+              onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"jwt": jwt})},
               iconData: Icons.format_list_bulleted,
               showAlert: true,
               text: "PSQI"),
-          // const Spacer(),
-          // SimpleCircularIconButton(
-          //     onPressed: () => {Navigator.pushNamed(context, "/chronotype", arguments: {"id": id})},
-          //     showAlert: true,
-          //     iconData: Icons.view_list,
-          //     text: "Cronotipo")
         ],
       )
     ];

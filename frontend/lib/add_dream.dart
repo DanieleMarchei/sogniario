@@ -80,13 +80,13 @@ class _AddDreamState extends State<AddDream> {
   @override
   Widget build(BuildContext context) {
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    int id = arguments["id"];
+    String jwt = arguments["jwt"];
 
     return ResponsiveReport(
       questionWidgets: dreamQuestions,
       title: "Racconta un sogno",
       onSubmitted: () async {
-        // await addDream(id, dream);
+        await addDream(jwt, dream);
         Navigator.pop(context);
       }
     );

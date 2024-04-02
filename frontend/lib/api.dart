@@ -3,29 +3,101 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/utils.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
-String server = "http://localhost:3000";
+// String server = "http://localhost:3000";
+String authority = "localhost:3000";
+// String authority = "10.0.0.2:3000";
+String server = "http://$authority";
 
-class QueryFields {
+enum RequestType {
+  delete(func: http.delete, needBody: false),
+  get(func: http.get, needBody: false),
+  patch(func: http.patch, needBody: true),
+  post(func: http.post, needBody: true),
+  put(func: http.put, needBody: true);
+
+  const RequestType({required this.func, required this.needBody});
+  final Function func;
+  final bool needBody;
+}
+
+enum TableName {
+  authLogin(label: "auth/login"),
+  authRegister(label: "auth/register"),
+  chronotype(label: "chronotype"),
+  dream(label: "dream"),
+  psqi(label: "psqi"),
+  user(label: "user"),
+  userDownload(label: "user/download");
+
+  const TableName({required this.label});
+  final String label;
+}
+
+class HttpRequest {
   List<String>? fields;
-  Map<String, dynamic>? s;
+  Map<String, dynamic>? search;
+  String? jwt;
+  RequestType requestType;
+  bool useId;
+  TableName tableName;
+  TableName? joinWith;
+  Map<String, dynamic>? body;
 
-  QueryFields({
+  HttpRequest({
+    required this.tableName,
     this.fields,
-    this.s
+    this.jwt,
+    this.search,
+    required this.requestType,
+    this.useId = false,
+    this.joinWith,
+    this.body
   });
 
-  Map<String, dynamic> toJson(){
-    Map<String, dynamic> f = {};
+  Future<http.Response> exec() async {
+
+    String idQuery = "";
+    if(useId){
+      int id = JwtDecoder.decode(jwt!)["sub"];
+      idQuery = "/$id";
+    }
+    List<String> queries = [];
     if(fields != null){
-      f["fields"] = fields!.join(",");
+      String fieldsQuery = "fields=${fields!.join(',')}";
+      queries.add(fieldsQuery);
     };
 
-    if(s != null){
-      f["s"] = convert.jsonEncode(s);
+    if(search != null){
+      String searchQuery = "s=${convert.jsonEncode(search)}";
+      queries.add(searchQuery);
     }
 
-    return f;
+    if(joinWith != null){
+      String joinQuery = "join=${joinWith!.label}s";
+      queries.add(joinQuery);
+    }
+
+    String queryUrl = queries.isEmpty ? "" : "?${queries.join("&")}";
+
+    var url = Uri.parse('${server}/${tableName.label}$idQuery$queryUrl');
+
+    Map<String, String> headers = {};
+    if(jwt != null) {
+      headers[HttpHeaders.authorizationHeader] = jwtHeader(jwt!);
+    }
+
+    if(requestType.needBody){
+      headers[HttpHeaders.contentTypeHeader] = 'application/json';
+      String jsonbody = convert.jsonEncode(body);
+      return requestType.func(url, headers: headers, body: jsonbody);
+    }
+    else{
+      return requestType.func(url, headers: headers);
+
+    }
+
   }
 }
 
@@ -35,13 +107,18 @@ extension ResponseSucceeded on http.Response {
   }
 }
 
+String jwtHeader(String jwt){
+  return "Bearer $jwt";
+}
+
 UserData _jsonToUser(Map<String, dynamic> json){
   UserData user = UserData();
   user.id = json["id"];
   user.username = json["username"];
   user.password = json["password"];
   user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]) : null;
-  user.gender = json["gender"] != null ? Gender.values[json["gender"]] : null;
+  user.sex = json["sex"] != null ? Sex.values[json["sex"]] : null;
+  user.organizationId = json["organizationId"] != null ? json["organizationId"]: null;
 
   return user;
 }
@@ -50,7 +127,7 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   DreamData dream = DreamData();
   dream.dreamText = json["text"];
   dream.report[0] = json["emotional_content"];
-  dream.report[1] = json["concious"] ? 1 : 2;
+  dream.report[1] = json["conscious"] ? 1 : 2;
   dream.report[2] = json["control"];
   dream.report[3] = json["percived_elapsed_time"];
   dream.report[4] = json["sleep_time"];
@@ -68,41 +145,46 @@ ChronoTypeData _jsonToChronotype(Map<String, dynamic> json){
   return chronotype;
 }
 
-// THIS IS JUST FOR TESTING PURPOSES! DO NOT USE IN PRODUCTION!
-Future<(bool, int?)> isValidLogin(String username, String password) async{
+Future<(bool, String?)> isValidLogin(String username, String password) async{
 
-  QueryFields f = QueryFields(
-    fields: ["id"],
-    s: {
-      "username": "$username",
-      "password": "$password"
-    }
-  );
-  var url = Uri.http("localhost:3000", "/user", f.toJson());
-  final headers = {
-    HttpHeaders.acceptHeader: 'application/json'
+  var response = await HttpRequest(
+    tableName: TableName.authLogin,
+    requestType: RequestType.post,
+    body: {
+      "username" : username,
+      "password" : password
+    })
+    .exec();
+
+  bool isValid = response.success;
+  if(!isValid) return (false, null);
+
+  var jsonResponse = convert.jsonDecode(response.body);
+  String? token = jsonResponse["access_token"];
+    
+
+  return (true, token);
+}
+
+Future<(DateTime?, Sex?)> getGeneralInfo(String jwt) async {
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+  int id = decodedToken["sub"];
+
+  var url = Uri.parse('${server}/user/${id}');
+
+  var headers = {
+    HttpHeaders.authorizationHeader: jwtHeader(jwt)
   };
 
   var response = await http.get(url, headers: headers);
-  bool isValid = response.body.isNotEmpty;
-  var jsonResponse = convert.jsonDecode(response.body)[0];
-  int? id = jsonResponse["id"];
-    
-
-  return (isValid, id);
-}
-
-Future<(DateTime?, Gender?)> getGeneralInfo(int userId) async {
-  var url = Uri.parse('${server}/user/${userId}');
-  var response = await http.get(url);
-  if(!response.success) throw Exception("User $userId not found.");
+  if(!response.success) throw Exception("User $id not found.");
 
   var jsonResponse = convert.jsonDecode(response.body);
 
   DateTime? birthdate = jsonResponse["birthdate"] != null ? DateTime.parse(jsonResponse["birthdate"]) : null;
-  Gender? gender = jsonResponse["gender"] != null ? Gender.values[jsonResponse["gender"]] : null;
+  Sex? sex = jsonResponse["sex"] != null ? Sex.values[jsonResponse["sex"]] : null;
 
-  return (birthdate, gender);
+  return (birthdate, sex);
 
 }
 
@@ -116,7 +198,7 @@ Future<bool> addUser(UserData user) async {
   };
 
   if(user.birthdate != null) body["birthday"] = "${user.birthdate}";
-  if(user.gender != null) body["gender"] = "${user.gender!.id}";
+  if(user.sex != null) body["sex"] = "${user.sex!.id}";
 
   var response = await http.post(url, body : body);
   return response.success;
@@ -129,18 +211,20 @@ Future<bool> deleteUser(int id) async {
   return response.success;
 }
 
-Future<bool> updateUserGeneralInfo(int id, Gender gender, DateTime birthdate) async {
-  var url = Uri.parse('${server}/user/${id}');
+Future<bool> updateUserGeneralInfo(Sex sex, DateTime birthdate, String jwt) async {
 
-  var body = {
-    "birthdate": "$birthdate",
-    "gender": "${gender.id}"
-  };
-  final headers = {
-    HttpHeaders.acceptHeader: 'application/json',
-    // HttpHeaders.contentTypeHeader: 'application/json'
-  };
-  var response = await http.patch(url, body: body, headers: headers);
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    useId: true, 
+    requestType: RequestType.patch,
+    body: {
+      "birthdate": "$birthdate",
+      "sex": "${sex.id}"
+    },
+    jwt: jwt
+    ).exec();
+
+
   return response.success;
 }
 
@@ -161,82 +245,91 @@ Future<UserData> getUser(int id) async {
   return _jsonToUser(jsonResponse);
 }
 
-Future<bool> addChronotype(int userId, ChronoTypeData chronotype) async{
-  var url = Uri.parse('${server}/chronotype/');
+Future<UserData> getMyUser(String jwt) async {
+  // var url = Uri.parse('${server}/user/${id}');
 
-  Map<String, String> body = {};
+  // var response = await http.get(url);
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    requestType: RequestType.get,
+    jwt: jwt,
+    useId: true).exec();
+
+  var jsonResponse = convert.jsonDecode(response.body);
+  return _jsonToUser(jsonResponse);
+}
+
+Future<bool> addChronotype(String jwt, ChronoTypeData chronotype) async{
+
+  Map<String, dynamic> body = {};
   for (var i = 1; i <= 19; i++) {
     body["q$i"] = "${chronotype.report[i-1]}";
   }
-  body["user"] = "$userId";
 
-  var response = await http.post(url, body : body);
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+  int id = decodedToken["sub"];
+  body["user"] = id;
+
+
+  var response = await HttpRequest(
+    tableName: TableName.chronotype,
+    requestType: RequestType.post,
+    jwt: jwt,
+    body: body
+    ).exec();
 
   return response.success;
 }
 
 
-Future<bool> addPSQI(int userId, PSQIData psqi) async{
-  var url = Uri.parse('${server}/psqi/');
-
-  List<String> columns = [
-    "q1",
-    "q2",
-    "q3",
-    "q4_h",
-    "q4_m",
-    "q5_h",
-    "q5_m",
-    "q6",
-    "q7",
-    "q8",
-    "q9",
-    "q10",
-    "q11",
-    "q12",
-    "q13",
-    "q14",
-    "q15",
-    "q15_text",
-    "q15_extended",
-    "q16",
-    "q17",
-    "q18",
-    "q19",
-  ];
-
+Future<bool> addPSQI(String jwt, PSQIData psqi) async{
   Map<String, dynamic> body = {};
-  for (var i = 0; i < columns.length; i++) {
-    var value = psqi.report[i];
-    if(value is TimeOfDay){
-      var value2 = DateTime.utc(2024, 3, 3, value.hour- 1 , value.minute);
-      body[columns[i]] = value2.toIso8601String();
+  for (var i = 0; i < 19; i++) {
+    late var value;
+    if(psqi.report[i] is TimeOfDay){
+      TimeOfDay tod = psqi.report[i] as TimeOfDay;
+      DateTime date = DateTime.utc(1, 1, 1, tod.hour, tod.minute);
+      value = date.toIso8601String();
     }else{
-      body[columns[i]] = value;
-
+      value = psqi.report[i];
     }
+    
+    body["q${i+1}"] = value;
   }
 
-  body["user"] = userId;
+  body["q15_text"] = psqi.optionalText;
 
-  var json = convert.jsonEncode(body);
-  
-  final headers = {
-    // HttpHeaders.acceptHeader: 'application/json',
-    HttpHeaders.contentTypeHeader: 'application/json'
-  };
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+  int id = decodedToken["sub"];
+  body["user"] = id;
 
-  var response = await http.post(url, body : json, headers: headers);
+  var response = await HttpRequest(
+    tableName: TableName.psqi,
+    requestType: RequestType.post,
+    jwt: jwt,
+    body: body
+  ).exec();
 
   return response.success;
 }
 
 
-Future<ChronoTypeData?> getChronotype(int userId) async {
-  var url = Uri.parse('${server}/user/${userId}?fields=chronotypes&join=chronotypes');
+Future<ChronoTypeData?> getChronotype(String jwt) async {
+  // var url = Uri.parse('${server}/user/${userId}?fields=chronotypes&join=chronotypes');
 
 
-  var response = await http.get(url);
+  // var response = await http.get(url);
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    requestType: RequestType.get,
+    joinWith: TableName.chronotype,
+    jwt: jwt,
+    useId: true
+    ).exec();
+
+
   var jsonResponse = convert.jsonDecode(response.body)["chronotypes"] as List<dynamic>;
   if(jsonResponse.isEmpty) return null;
 
@@ -244,9 +337,10 @@ Future<ChronoTypeData?> getChronotype(int userId) async {
 }
 
 
-Future<bool> addDream(int userId, DreamData dream) async {
-  var url = Uri.parse('${server}/dream/');
-
+Future<bool> addDream(String jwt, DreamData dream) async {
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+  int id = decodedToken["sub"];
+  
   var body = {
     "text": dream.dreamText,
     "emotional_content": dream.report[0],
@@ -255,28 +349,48 @@ Future<bool> addDream(int userId, DreamData dream) async {
     "percived_elapsed_time": dream.report[3],
     "sleep_time": dream.report[4],
     "sleep_quality": dream.report[5],
-    "user": userId
+    "user": id
   };
 
-  final headers = {
-    HttpHeaders.acceptHeader: 'application/json',
-    HttpHeaders.contentTypeHeader: 'application/json'
-  };
 
-  var json = convert.jsonEncode(body);
-
-  var response = await http.post(url, body : json, headers: headers);
+  var response = await HttpRequest(
+    tableName: TableName.dream,
+    requestType: RequestType.post,
+    body: body,
+    jwt: jwt
+  ).exec();
 
   return response.success;
 } 
 
-Future<List<DreamData>> getAllDreams(int userId) async {
-  var url = Uri.parse('${server}/user/${userId}?fields=dreams&join=dreams');
+Future<List<DreamData>> getAllDreams(String jwt) async {
 
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    requestType: RequestType.get,
+    jwt: jwt,
+    useId: true,
+    fields: ["dreams"],
+    joinWith: TableName.dream
+  ).exec();
 
-  var response = await http.get(url);
   var jsonResponse = convert.jsonDecode(response.body)["dreams"] as List<dynamic>;
 
   List<DreamData> dreams = jsonResponse.map((e) => _jsonToDream(e)).toList();
   return dreams;
+}
+
+Future<bool> getDatabase(String jwt) async {
+  int id = JwtDecoder.decode(jwt)["sub"];
+  UserData user = await getMyUser(jwt);
+  var response = await HttpRequest(
+    tableName: TableName.userDownload,
+    requestType: RequestType.post,
+    body: {
+      "organizationId": user.organizationId
+    },
+    jwt: jwt
+    ).exec();
+
+  return response.success;
 }
