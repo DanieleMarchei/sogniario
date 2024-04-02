@@ -32,12 +32,18 @@ export class UserService extends TypeOrmCrudService<User> {
     });
 
     for (let user of users) {
-      let dreamsCSV = this.convertToCSV(user.dreams);
-      let chronotypesCSV = this.convertToCSV(user.chronotypes);
-      let psqisCSV = this.convertToCSV(user.psqis);
-      zip.folder(user.username).file("dreams.csv", dreamsCSV);
-      zip.folder(user.username).file("chronotypes.csv", chronotypesCSV);
-      zip.folder(user.username).file("psqis.csv", psqisCSV);
+      if (user.dreams) {
+        let dreamsCSV = this.convertToCSV(user.dreams);
+        zip.folder(user.username).file("dreams.csv", dreamsCSV);
+      }
+      if (user.chronotypes) {
+        let chronotypesCSV = this.convertToCSV(user.chronotypes);
+        zip.folder(user.username).file("chronotypes.csv", chronotypesCSV);
+      }
+      if (user.psqis) {
+        let psqisCSV = this.convertToCSV(user.psqis);
+        zip.folder(user.username).file("psqis.csv", psqisCSV);
+      }
     }
     let data = await zip.generateAsync({ type: "uint8array" });
     return data;

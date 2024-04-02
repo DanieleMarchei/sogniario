@@ -40,7 +40,7 @@ export class User {
     default: Gender.NOT_SPECIFIED,
     nullable: false,
   })
-  gender: Gender;
+  sex: Gender;
 
   @ApiProperty()
   @Column({ default: new Date() })

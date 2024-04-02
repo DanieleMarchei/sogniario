@@ -21,7 +21,7 @@ export class AuthService {
   ): Promise<{ access_token: string }> {
     const bcrypt = require("bcrypt");
     const user = await this.usersService.findOne({
-      where: { username: username },
+      where: { username: username, deleted: false },
     });
     if (!(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException();

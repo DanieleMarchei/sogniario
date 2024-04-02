@@ -36,7 +36,7 @@ export class Dream {
 
   @ApiProperty()
   @Column({ default: false })
-  concious: boolean;
+  conscious: boolean;
 
   @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
   @Column({ default: 0 })

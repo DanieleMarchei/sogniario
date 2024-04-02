@@ -19,21 +19,13 @@ export class Psqi {
   @Column()
   q3: Date;
 
-  @ApiProperty({ type: "number", minimum: 0, maximum: 23 })
+  @ApiProperty({ type: "float" })
   @Column()
-  q4_h: number;
+  q4: number;
 
-  @ApiProperty({ type: "number", minimum: 0, maximum: 59 })
+  @ApiProperty({ type: "float" })
   @Column()
-  q4_m: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 24 })
-  @Column()
-  q5_h: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 59 })
-  @Column()
-  q5_m: number;
+  q5: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
@@ -71,17 +63,13 @@ export class Psqi {
   @Column()
   q14: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
-  q15: boolean;
+  q15: number;
 
   @ApiProperty()
   @Column()
   q15_text: String;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q15_extended: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
