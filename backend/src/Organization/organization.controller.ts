@@ -7,6 +7,11 @@ import { Organization } from "src/entities/organization.entity";
   model: {
     type: Organization,
   },
+  query: {
+    join: {
+      users: {},
+    },
+  },
 })
 @ApiTags("Organization")
 @ApiSecurity("bearer")
