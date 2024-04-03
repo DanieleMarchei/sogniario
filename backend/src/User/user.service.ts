@@ -32,15 +32,16 @@ export class UserService extends TypeOrmCrudService<User> {
     });
 
     for (let user of users) {
-      if (user.dreams) {
+      console.log(user)
+      if (user.dreams.length>0) {
         let dreamsCSV = this.convertToCSV(user.dreams);
         zip.folder(user.username).file("dreams.csv", dreamsCSV);
       }
-      if (user.chronotypes) {
+      if (user.chronotypes.length>0) {
         let chronotypesCSV = this.convertToCSV(user.chronotypes);
         zip.folder(user.username).file("chronotypes.csv", chronotypesCSV);
       }
-      if (user.psqis) {
+      if (user.psqis.length>0) {
         let psqisCSV = this.convertToCSV(user.psqis);
         zip.folder(user.username).file("psqis.csv", psqisCSV);
       }

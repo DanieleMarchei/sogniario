@@ -68,6 +68,6 @@ export class User {
   psqis: Psqi[];
 
   @ApiProperty({ type: () => Organization })
-  @ManyToOne(() => Organization, (organization) => organization.users)
+  @ManyToOne(() => Organization, (organization) => organization.users, {eager: true})
   organization: Organization;
 }

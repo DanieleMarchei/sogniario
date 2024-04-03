@@ -22,6 +22,7 @@ import { DownloadDto } from "./DTO/download.dto";
       dreams: {},
       psqis: {},
       chronotypes: {},
+      organization: {eager:true}
     },
   },
 })
