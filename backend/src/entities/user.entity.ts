@@ -33,7 +33,7 @@ export class User {
     default: UserType.USER,
     nullable: false,
   })
-  type: string;
+  type: UserType;
 
   @ApiProperty()
   @Column({ nullable: true })
