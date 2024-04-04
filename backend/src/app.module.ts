@@ -14,6 +14,8 @@ import { Psqi } from "./entities/psqi.entity";
 import { AuthModule } from "./Auth/auth.module";
 import { Organization } from "./entities/organization.entity";
 import { OrganizationModule } from "./Organization/organization.module";
+import { Researcher } from "./entities/researcher.entity";
+import { ResearcherModule } from "./Researcher/researcher.module";
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { OrganizationModule } from "./Organization/organization.module";
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Dream, Chronotype, Psqi, Organization],
+      entities: [User, Dream, Chronotype, Psqi, Organization, Researcher],
       synchronize: true,
     }),
     JwtModule.register({
@@ -41,6 +43,7 @@ import { OrganizationModule } from "./Organization/organization.module";
     ChronotypeModule,
     AuthModule,
     OrganizationModule,
+    ResearcherModule,
   ],
   controllers: [],
   providers: [],

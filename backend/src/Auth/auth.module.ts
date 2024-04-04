@@ -4,9 +4,10 @@ import { AuthController } from "./auth.controller";
 import { UserModule } from "src/User/user.module";
 import { AuthGuard } from "./auth.guard";
 import { APP_GUARD } from "@nestjs/core";
+import { ResearcherModule } from "src/Researcher/researcher.module";
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, ResearcherModule],
   providers: [
     AuthService,
     {

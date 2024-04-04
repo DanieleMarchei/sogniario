@@ -1,4 +1,4 @@
-import { ApiProperty, ApiTags } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import {
   Column,
   Entity,
@@ -11,6 +11,7 @@ import { Dream } from "./dream.entity";
 import { Chronotype } from "./chronotype.entity";
 import { Psqi } from "./psqi.entity";
 import { Organization } from "./organization.entity";
+import { UserType } from "./user_type.enum";
 @Entity()
 export class User {
   @ApiProperty()
@@ -26,7 +27,12 @@ export class User {
   password: string;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({
+    type: "enum",
+    enum: UserType,
+    default: UserType.USER,
+    nullable: false,
+  })
   type: string;
 
   @ApiProperty()
@@ -68,6 +74,8 @@ export class User {
   psqis: Psqi[];
 
   @ApiProperty({ type: () => Organization })
-  @ManyToOne(() => Organization, (organization) => organization.users, {eager: true})
+  @ManyToOne(() => Organization, (organization) => organization.users, {
+    eager: true,
+  })
   organization: Organization;
 }

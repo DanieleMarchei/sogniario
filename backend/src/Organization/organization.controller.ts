@@ -10,6 +10,7 @@ import { Organization } from "src/entities/organization.entity";
   query: {
     join: {
       users: {},
+      researchers: {},
     },
   },
 })
