@@ -97,6 +97,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
 
     return Scaffold(
       body: Padding(
@@ -105,50 +106,50 @@ class _LoginState extends State<Login> {
               child: ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
                       width: min(screenWidth, halfWidthConstraint)),
-                  child: ListView(
-                    children: [
-                      SizedBox(height: screenHeight * .12),
-                      const Hero(
-                          tag: "SogniarioLogo",
-                          child: Material(
-                              type: MaterialType.transparency,
-                              child: Text(
-                                'Sogniario',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ))),
-                      SizedBox(height: screenHeight * .12),
-                      InputField(
-                        onChanged: (value) {
-                          setState(() {
-                            username = value;
-                          });
-                        },
-                        labelText: 'Username',
-                        errorText: usernameError,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        autoFocus: true,
-                      ),
-                      SizedBox(height: screenHeight * .025),
-                      InputField(
-                        onChanged: (value) {
-                          setState(() {
-                            password = value;
-                          });
-                        },
-                        labelText: 'Password',
-                        errorText: passwordError,
-                        toggleObscure: true,
-                        obscureText: true,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      SizedBox(
-                        height: screenHeight * .075,
-                      ),
-                      if (loginError != null) Text(loginError!),
+                  child: ListView(children: [
+                    SizedBox(height: screenHeight * .12),
+                    const Hero(
+                        tag: "SogniarioLogo",
+                        child: Material(
+                            type: MaterialType.transparency,
+                            child: Text(
+                              'Sogniario',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ))),
+                    SizedBox(height: screenHeight * .12),
+                    InputField(
+                      onChanged: (value) {
+                        setState(() {
+                          username = value;
+                        });
+                      },
+                      labelText: 'Username',
+                      errorText: usernameError,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      autoFocus: true,
+                    ),
+                    SizedBox(height: screenHeight * .025),
+                    InputField(
+                      onChanged: (value) {
+                        setState(() {
+                          password = value;
+                        });
+                      },
+                      labelText: 'Password',
+                      errorText: passwordError,
+                      toggleObscure: true,
+                      obscureText: true,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(
+                      height: screenHeight * .075,
+                    ),
+                    if (loginError != null) Text(loginError!),
+                    if (isScreenWide) ...{
                       Row(
                         children: [
                           Expanded(
@@ -170,11 +171,24 @@ class _LoginState extends State<Login> {
                           ),
                         ],
                       ),
+                    } else ...{
+                      IconTextButton(
+                          icon: const Icon(Icons.person),
+                          text: 'Entra come utente',
+                          onPressed: submitUser,
+                        ),
+                      
                       SizedBox(
-                        height: screenHeight * .15,
-                      )
-                    ],
-                  )))),
+                        height: 10,
+                      ),
+                      IconTextButton(
+                          icon: const Icon(Icons.person_search_rounded),
+                          text: 'Entra come ricercatore',
+                          onPressed: submitResearcher,
+                        ),
+                      
+                    }
+                  ])))),
     );
   }
 }

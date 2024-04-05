@@ -4,3 +4,5 @@ path_provider_android=/home/daniele/.pub-cache/hosted/pub.dev/path_provider_andr
 path_provider_foundation=/home/daniele/.pub-cache/hosted/pub.dev/path_provider_foundation-2.3.2/
 path_provider_linux=/home/daniele/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
 path_provider_windows=/home/daniele/.pub-cache/hosted/pub.dev/path_provider_windows-2.2.1/
+speech_to_text=/home/daniele/.pub-cache/hosted/pub.dev/speech_to_text-6.6.1/
+speech_to_text_macos=/home/daniele/.pub-cache/hosted/pub.dev/speech_to_text_macos-1.1.0/

@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/add_dream.dart';
+import 'package:frontend/add_dream_with_s2t.dart';
+import 'package:frontend/add_dream_without_s2t.dart';
 import 'package:frontend/chronotype.dart';
 import 'package:frontend/dreams_list.dart';
 import 'package:frontend/general_info.dart';
@@ -8,6 +12,7 @@ import 'package:frontend/home_user.dart';
 import 'package:frontend/login.dart';
 import 'package:frontend/manage_users.dart';
 import 'package:frontend/psqi.dart';
+import 'package:frontend/utils.dart';
 
 class PageTransition<T> extends MaterialPageRoute<T> {
   PageTransition({
@@ -47,7 +52,13 @@ class Routes {
       case "/add_dream":
         return PageTransition(
             settings: settings, 
-            builder: (context) => const AddDream());
+            builder: (context) {
+              if(!kIsWeb){
+                return AddDreamWithS2T();
+              }else{
+                return AddDreamWithoutS2T();
+              }
+            });
 
       case "/dreams_list":
         return PageTransition(

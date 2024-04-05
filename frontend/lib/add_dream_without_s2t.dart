@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
@@ -37,13 +40,13 @@ List<QA> questions = [
       answers: ["Molto scarsa.", "Scarsa.", "Buona.", "Molto buona."]),
 ];
 
-class AddDream extends StatefulWidget {
-  const AddDream({super.key});
+class AddDreamWithoutS2T extends StatefulWidget {
+  const AddDreamWithoutS2T({super.key});
   @override
-  State<AddDream> createState() => _AddDreamState();
+  State<AddDreamWithoutS2T> createState() => _AddDreamWithoutS2TState();
 }
 
-class _AddDreamState extends State<AddDream> {
+class _AddDreamWithoutS2TState extends State<AddDreamWithoutS2T> {
   DreamData dream = DreamData();
   late List<QuestionWithDirection> dreamQuestions;
 
@@ -51,7 +54,7 @@ class _AddDreamState extends State<AddDream> {
   void initState() {
     super.initState();
     dreamQuestions = [
-        AddDreamText(
+        AddDreamWithoutS2TText(
           onTextChanged: (value) {
             setState(() {
               dream.dreamText = value;
@@ -89,31 +92,37 @@ class _AddDreamState extends State<AddDream> {
       }
     );
   }
+  
 }
 
 
-
-
-
-
-class AddDreamText extends QuestionWithDirection {
+class AddDreamWithoutS2TText extends QuestionWithDirection {
   final Function? onTextChanged;
 
-  AddDreamText({
+  AddDreamWithoutS2TText({
     super.key, this.onTextChanged
   }) : super(canChangeDirection: false, direction: Axis.vertical);
 
   @override
-  State<AddDreamText> createState() => _AddDreamTextState();
+  State<AddDreamWithoutS2TText> createState() => _AddDreamWithoutS2TTextState();
 }
 
 
-class _AddDreamTextState extends QuestionWithDirectionState<AddDreamText> {
+class _AddDreamWithoutS2TTextState extends QuestionWithDirectionState<AddDreamWithoutS2TText> {
   late String text;
   String? textError;
 
   @override
   bool get wantKeepAlive => true;
+
+  bool _hasSpeech = false;
+  double level = 0.0;
+  double minSoundLevel = 50000;
+  double maxSoundLevel = -50000;
+  String _currentLocaleId = '';
+  int resultListened = 0;
+
+  TextEditingController dreamController = TextEditingController();
 
   @override
   void initState() {
@@ -151,42 +160,29 @@ class _AddDreamTextState extends QuestionWithDirectionState<AddDreamText> {
   Widget build(BuildContext context) {
     super.build(context);
     double screenHeight = MediaQuery.of(context).size.height;
-
     double screenWidth = MediaQuery.of(context).size.width;
-    bool isMobile = screenWidth < widthConstraint;
 
     return Column(
-      children: [
-        SizedBox(height: screenHeight * 0.01,),
-        MultilineInputField(
-          labelText: "Racconta il tuo sogno",
-          maxLines: 10,
-          keyboardType: TextInputType.multiline,
-          textInputAction: TextInputAction.newline,
-          errorText: textError,
-          onChanged: (value) {
-            setState(() {
-              text = value;
-              resetErrorText();
-              if (widget.onTextChanged != null) widget.onTextChanged!(value);
-            });
-          },
-          autoFocus: false,
-        ),
-        if(isMobile)...{
-          SizedBox(height: screenHeight * 0.01,),
-          Text(
-            "💡 Suggerimento: puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 12
+          children: [
+            SizedBox(height: screenHeight * 0.01,),
+            MultilineInputField(
+              controller: dreamController,
+              labelText: "Racconta il tuo sogno",
+              maxLines: 10,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
+              errorText: textError,
+              onChanged: (value) {
+                setState(() {
+                  text = value;
+                  resetErrorText();
+                  if (widget.onTextChanged != null) widget.onTextChanged!(value);
+                });
+              },
+              autoFocus: false,
             ),
-          ),
-        }
-
-      ],
-    );
-  }
-  
+          ],
+        );
+  }  
 
 }
