@@ -4,13 +4,8 @@ import 'package:frontend/forms_and_buttons.dart';
 import 'dart:math';
 
 import 'package:frontend/utils.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
-
-enum LoginType {
-  user,
-  admin
-}
+enum LoginType { user, admin }
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -20,10 +15,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   late String username, password;
-  String? jwt;
-  late bool redirectToGeneralInfo;
   String? usernameError, passwordError;
-  late LoginType loginType;
   String? loginError;
 
   @override
@@ -44,7 +36,8 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future<bool> validate() async {
+  Future<bool> validate(
+      Future<bool> Function(String, String) validateFunc) async {
     resetErrorText();
 
     bool isValid = true;
@@ -63,59 +56,40 @@ class _LoginState extends State<Login> {
     }
 
     bool loginValid;
-    String? fetchedAccessToken; 
-    (loginValid, fetchedAccessToken) = await isValidLogin(username, password);
+    loginValid = await validateFunc(username, password);
     isValid &= loginValid;
-    jwt = fetchedAccessToken!;
 
-    if (isValid){
-      String userType = JwtDecoder.decode(jwt!)["type"];
-      switch (userType) {
-        case "ADMIN":
-          loginType = LoginType.admin;
-          break;
-          
-        case "USER":
-          DateTime? birthdate;
-          Sex? sex;
-
-          (birthdate, sex) = await getGeneralInfo(jwt!);
-          setState(() {
-            redirectToGeneralInfo = birthdate == null || sex == null;
-          });
-          loginType = LoginType.user;
-          break;
-      }
-    } else{
+    if (!isValid) {
       setState(() {
         loginError = "Credenziali errate";
       });
     }
 
-
     return isValid;
   }
 
-  void submit() async {
-    if (await validate()) {
-      switch (loginType) {
-        case LoginType.admin:
-          Navigator.pushNamed(context, "/home_admin", arguments: {"jwt": jwt!});
-          break;
-        
-        case LoginType.user:
-          if(redirectToGeneralInfo){
-            Navigator.pushNamed(context, "/general_info", arguments: {"jwt": jwt!});
-          }else{
-            ChronoTypeData? chronotype = await getChronotype(jwt!);
-            if (chronotype == null){
-              Navigator.pushNamed(context, "/chronotype", arguments: {"jwt": jwt!});
-            }else{
-              Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt!});
-            }
-          }
-          break;
+  void submitUser() async {
+    if (await validate(isValidLoginUser)) {
+      DateTime? birthdate;
+      Sex? sex;
+      (birthdate, sex) = await getMyGeneralInfo();
+      bool redirectToGeneralInfo = birthdate == null || sex == null;
+      if (redirectToGeneralInfo) {
+        Navigator.pushNamed(context, "/general_info");
+      } else {
+        ChronoTypeData? chronotype = await getMyChronotype();
+        if (chronotype == null) {
+          Navigator.pushNamed(context, "/chronotype");
+        } else {
+          Navigator.pushNamed(context, "/home_user");
+        }
       }
+    }
+  }
+
+  void submitResearcher() async {
+    if (await validate(isValidLoginResearcher)) {
+      Navigator.pushNamed(context, "/home_admin");
     }
   }
 
@@ -129,7 +103,8 @@ class _LoginState extends State<Login> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Center(
               child: ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(width: min(screenWidth, halfWidthConstraint)),
+                  constraints: BoxConstraints.tightFor(
+                      width: min(screenWidth, halfWidthConstraint)),
                   child: ListView(
                     children: [
                       SizedBox(height: screenHeight * .12),
@@ -164,7 +139,6 @@ class _LoginState extends State<Login> {
                             password = value;
                           });
                         },
-                        onSubmitted: (val) => submit(),
                         labelText: 'Password',
                         errorText: passwordError,
                         toggleObscure: true,
@@ -175,9 +149,26 @@ class _LoginState extends State<Login> {
                         height: screenHeight * .075,
                       ),
                       if (loginError != null) Text(loginError!),
-                      FormButton(
-                        text: 'Entra',
-                        onPressed: submit,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: IconTextButton(
+                              icon: const Icon(Icons.person),
+                              text: 'Entra come utente',
+                              onPressed: submitUser,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: IconTextButton(
+                              icon: const Icon(Icons.person_search_rounded),
+                              text: 'Entra come ricercatore',
+                              onPressed: submitResearcher,
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: screenHeight * .15,

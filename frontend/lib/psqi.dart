@@ -312,8 +312,6 @@ class _PSQIState extends State<PSQI> {
 
   @override
   Widget build(BuildContext context) {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
     
@@ -321,7 +319,7 @@ class _PSQIState extends State<PSQI> {
       questionWidgets: psqiQuestions, 
       title: "PSQI", 
       onSubmitted: () async {
-        await addPSQI(jwt, psqi);
+        await addMyPSQI(psqi);
         setState(() {
           showScore = true;
         });
@@ -350,7 +348,7 @@ class _PSQIState extends State<PSQI> {
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
                       text: "Torna alla home",
-                      onPressed: () => Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt}),
+                      onPressed: () => Navigator.pushNamed(context, "/home_user"),
                     ),
                   ]
                 )

@@ -16,23 +16,20 @@ class _GeneralInfoState extends State<GeneralInfo> {
   DateTime selectedDate = DateTime.now();
   Sex sex = Sex.notSpecified;
 
-  void submit(String jwt) async {
-    bool updateDone = await updateUserGeneralInfo(sex, selectedDate, jwt);
+  void submit() async {
+    bool updateDone = await updateMyGeneralInfo(sex, selectedDate);
     if(updateDone){
-      ChronoTypeData? chronotype = await getChronotype(jwt);
+      ChronoTypeData? chronotype = await getMyChronotype();
       if (chronotype == null){
-        Navigator.pushNamed(context, "/chronotype", arguments: {"jwt": jwt});
+        Navigator.pushNamed(context, "/chronotype");
       }else{
-        Navigator.pushNamed(context, "/home_user", arguments: {"jwt": jwt});
+        Navigator.pushNamed(context, "/home_user");
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -81,7 +78,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
             ),
             FormButton(
               text: 'Conferma',
-              onPressed: () => submit(jwt),
+              onPressed: () => submit(),
             ),
             SizedBox(
               height: screenHeight * .15,

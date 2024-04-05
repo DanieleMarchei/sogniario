@@ -32,15 +32,17 @@ dependencies:
     sdk: flutter
   
   carousel_slider:
-
   jwt_decoder: ^2.0.1
-
+  universal_html: ^2.2.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   http: ^1.2.1
   flutter_picker: ^2.1.0
+  path_provider: ^2.1.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:

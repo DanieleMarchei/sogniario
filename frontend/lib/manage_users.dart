@@ -26,15 +26,11 @@ class _ManageUsersState extends State<ManageUsers> {
 
   @override
   Widget build(BuildContext context) {
-
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    String jwt = arguments["jwt"];
-
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
     return FutureBuilder(
-      future: getAllUsers(),
+      future: getAllUsersOfMyOrganization(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Container(
@@ -103,11 +99,13 @@ class _ManageUsersState extends State<ManageUsers> {
                         children: [
                           SizedBox(height: screenHeight * .01),
                           ...users
-                              .where((user) =>
-                                  matchUsername(user.username))
-                              .map((user) => UserCardWidget(user: user, onActionPerformed: () {
-                                setState(() {});
-                              },)),
+                              .where((user) => matchUsername(user.username))
+                              .map((user) => UserCardWidget(
+                                    user: user,
+                                    onActionPerformed: () {
+                                      setState(() {});
+                                    },
+                                  )),
                         ],
                       )))),
         );
@@ -194,11 +192,12 @@ class ManageUserDialog extends StatefulWidget {
   final ManageUserDialogActions action;
   final Function? onSubmitted;
 
-  ManageUserDialog({super.key, this.user, required this.action, this.onSubmitted}) {
+  ManageUserDialog(
+      {super.key, this.user, required this.action, this.onSubmitted}) {
     assert(
         !(action == ManageUserDialogActions.edit ||
-          action == ManageUserDialogActions.visualize ||
-          action == ManageUserDialogActions.delete) ||
+                action == ManageUserDialogActions.visualize ||
+                action == ManageUserDialogActions.delete) ||
             user != null,
         "userId can be null only during creation.");
   }
@@ -208,7 +207,6 @@ class ManageUserDialog extends StatefulWidget {
 }
 
 class _ManageUserDialogState extends State<ManageUserDialog> {
-
   late UserData? tmpUser;
   TextEditingController controllerUsername = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
@@ -216,186 +214,243 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   @override
   void initState() {
     super.initState();
-    if(widget.action == ManageUserDialogActions.edit ||
-          widget.action == ManageUserDialogActions.visualize ||
-          widget.action == ManageUserDialogActions.delete){
+    if (widget.action == ManageUserDialogActions.edit ||
+        widget.action == ManageUserDialogActions.visualize ||
+        widget.action == ManageUserDialogActions.delete) {
       tmpUser = widget.user!;
-    }
-    else{
+    } else {
       tmpUser = UserData();
     }
+
+    if(widget.action == ManageUserDialogActions.edit && tmpUser!.birthdate == null){
+      tmpUser!.birthdate = DateTime.now();
+    }
+
     controllerUsername.text = tmpUser!.username;
     controllerUsername.addListener(_onUsernameChanged);
-    controllerPassword.text = tmpUser!.password;
-    controllerPassword.addListener(_onPasswordChanged);
+    if(widget.action == ManageUserDialogActions.edit || widget.action == ManageUserDialogActions.create){
+      controllerPassword.text = "";
+      controllerPassword.addListener(_onPasswordChanged);
+    }
   }
 
-  void _onUsernameChanged(){
+  void _onUsernameChanged() {
     setState(() {
       tmpUser!.username = controllerUsername.text;
     });
   }
-  
-  void _onPasswordChanged(){
+
+  void _onPasswordChanged() {
     setState(() {
       tmpUser!.password = controllerPassword.text;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
     switch (widget.action) {
       case ManageUserDialogActions.create:
         return create(context);
-      
-      case ManageUserDialogActions.edit:
+
       case ManageUserDialogActions.visualize:
-      return visualizeOrEdit(context);
+        return visualize(context);
+
+      case ManageUserDialogActions.edit:
+        return edit(context);
 
       case ManageUserDialogActions.delete:
-      return delete(context);
-      
+        return delete(context);
     }
-
   }
 
-  Widget delete(BuildContext context){
+  Widget delete(BuildContext context) {
     return AlertDialog(
-      content: Text("Confermi di voler eliminare l'utente ${widget.user!.username}?"),
+      content: Text(
+          "Confermi di voler eliminare l'utente ${widget.user!.username}?"),
       actions: [
-        TextButton(onPressed: () async {
-          await deleteUser(widget.user!.id);
-          if(widget.onSubmitted != null) widget.onSubmitted!();
-          if(mounted) Navigator.pop(context);
-        }, child: Text("Cancella"))
+        TextButton(
+            onPressed: () async {
+              await deleteUser(widget.user!.id);
+              if (widget.onSubmitted != null) widget.onSubmitted!();
+              if (mounted) Navigator.pop(context);
+            },
+            child: Text("Cancella"))
       ],
     );
   }
 
-  Widget create(BuildContext context){
+  Widget create(BuildContext context) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
     Random rnd = Random.secure();
 
-    String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
-        length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+    String getRandomString(int length) =>
+        String.fromCharCodes(Iterable.generate(
+            length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
 
     return SimpleDialog(
-            title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Text("Aggiungi utente"),
-              Spacer(),
-              IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  tooltip: "Annulla",
-                  icon: Icon(Icons.close))
-            ]),
-            children: [
-              SimpleDialogOption(
-                child: InputField(
-                  controller: controllerUsername,
-                  labelText: "Username",
-                  text: tmpUser!.username,
-                  onChanged: (String username) {
-                    setState(() {
-                      tmpUser!.username = username;
-                    });
-                  },
-                ),
-              ),
-              SimpleDialogOption(
-                child: InputField(
-                  controller: controllerPassword,
-                  labelText: "Password",
-                  text: tmpUser!.password,
-                  onChanged: (String password) {
-                    setState(() {
-                      tmpUser!.password = password;
-                    });
-                  },
-                ),
-              ),
-              SimpleDialogOption(
-                child: FormButton(
-                  text: "Genera casuale",
-                  onPressed: () {
-                    controllerUsername.text = getRandomString(8);
-                    controllerPassword.text = getRandomString(8);
-                  },
-                  )
-              ),
-              SimpleDialogOption(
-                child: FormButton(
-                  text: "Aggiungi",
-                  onPressed: () async {
-                    await addUser(tmpUser!);
-                    if(widget.onSubmitted != null) widget.onSubmitted!();
-                    if(mounted) Navigator.pop(context);
-                  },
-                  )
-              ),
-            ],
-          );
+      title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Text("Aggiungi utente"),
+        Spacer(),
+        IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            tooltip: "Annulla",
+            icon: Icon(Icons.close))
+      ]),
+      children: [
+        SimpleDialogOption(
+          child: InputField(
+            controller: controllerUsername,
+            labelText: "Username",
+            text: tmpUser!.username,
+            onChanged: (String username) {
+              setState(() {
+                tmpUser!.username = username;
+              });
+            },
+          ),
+        ),
+        SimpleDialogOption(
+          child: InputField(
+            controller: controllerPassword,
+            labelText: "Password",
+            text: tmpUser!.password,
+            onChanged: (String password) {
+              setState(() {
+                tmpUser!.password = password;
+              });
+            },
+          ),
+        ),
+        SimpleDialogOption(
+            child: FormButton(
+          text: "Genera casuale",
+          onPressed: () {
+            controllerUsername.text = getRandomString(8);
+            controllerPassword.text = getRandomString(8);
+          },
+        )),
+        SimpleDialogOption(
+            child: FormButton(
+          text: "Aggiungi",
+          onPressed: () async {
+            await addUser(tmpUser!);
+            if (widget.onSubmitted != null) widget.onSubmitted!();
+            if (mounted) Navigator.pop(context);
+          },
+        )),
+      ],
+    );
   }
 
-  Widget visualizeOrEdit(BuildContext context) {
-          
-          return SimpleDialog(
-            title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Text(tmpUser!.username),
-              Spacer(),
-              IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  tooltip: "Annulla",
-                  icon: Icon(Icons.close))
-            ]),
-            children: [
-              SimpleDialogOption(
-                child: InputField(
-                  labelText: "Password",
-                  text: tmpUser!.password,
-                  enabled: widget.action == ManageUserDialogActions.edit,
-                ),
-              ),
-              SimpleDialogOption(
-                child: DatePickerButton(
-                  initialValue: tmpUser!.birthdate!,
-                  text: "Data di nascita: ",
-                ),
-              ),
-              SimpleDialogOption(
-                child: DropdownButtonFormField<Sex>(
-                  decoration: const InputDecoration(
-                    label: Text("Sesso"),
-                  ),
-                  value: tmpUser!.sex,
-                  items: Sex.values
-                      .map<DropdownMenuItem<Sex>>((Sex gender) {
-                    return DropdownMenuItem<Sex>(
-                      value: gender,
-                      child: Text(gender.label),
-                    );
-                  }).toList(),
-                  onChanged: null,
-                ),
-              ),
-              if(widget.action == ManageUserDialogActions.edit)...{
-                SimpleDialogOption(
-                child: FormButton(
-                  text: "Modifica",
-                  onPressed: () async {
-                    await addUser(tmpUser!);
-                    if(widget.onSubmitted != null) widget.onSubmitted!();
-                    if(mounted) Navigator.pop(context);
-                  },
-                  )
-                )
-              }
-              
-            ],
-          );
+  Widget visualize(BuildContext context) {
+    return SimpleDialog(
+      title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Text(tmpUser!.username),
+        Spacer(),
+        IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            tooltip: "Chiudi",
+            icon: Icon(Icons.close))
+      ]),
+      children: [
+        SimpleDialogOption(
+          child: OutlinedButton(
+            onPressed: null,
+            child: Text(tmpUser!.birthdate == null
+                ? "Data di nascita non selezionata"
+                : "Data di nascita: ${tmpUser!.birthdate!.day}/${tmpUser!.birthdate!.month}/${tmpUser!.birthdate!.year}"),
+          ),
+        ),
+        SimpleDialogOption(
+          child: DropdownButtonFormField<Sex>(
+            decoration: const InputDecoration(
+              label: Text("Sesso"),
+            ),
+            value: tmpUser!.sex,
+            items: Sex.values.map<DropdownMenuItem<Sex>>((Sex sex) {
+              return DropdownMenuItem<Sex>(
+                value: sex,
+                child: Text(sex.label),
+              );
+            }).toList(),
+            onChanged: null,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget edit(BuildContext context) {
+    return SimpleDialog(
+      title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Text(tmpUser!.username),
+        Spacer(),
+        IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            tooltip: "Annulla",
+            icon: Icon(Icons.close))
+      ]),
+      children: [
+        SimpleDialogOption(
+          child: InputField(
+            labelText: "Nuova password",
+            enabled: true,
+            toggleObscure: true,
+            obscureText: true,
+            controller: controllerPassword,
+            onChanged: (String password) {
+              setState(() {
+                tmpUser!.password = password;
+              });
+            },
+          ),
+        ),
+        SimpleDialogOption(
+            child: DatePickerButton(
+          initialValue: tmpUser!.birthdate ?? DateTime.now(),
+          text: "Data di nascita: ",
+          onSelectedDate: (DateTime newDate) {
+            setState(() {
+              tmpUser!.birthdate = newDate;
+            });
+          },
+        )),
+        SimpleDialogOption(
+          child: DropdownButtonFormField<Sex>(
+            decoration: const InputDecoration(
+              label: Text("Sesso"),
+            ),
+            value: tmpUser!.sex,
+            items: Sex.values.map<DropdownMenuItem<Sex>>((Sex sex) {
+              return DropdownMenuItem<Sex>(
+                value: sex,
+                child: Text(sex.label),
+              );
+            }).toList(),
+            onChanged: (Sex? newValue) {
+              setState(() {
+                tmpUser!.sex = newValue;
+              });
+            },
+          ),
+        ),
+        SimpleDialogOption(
+            child: FormButton(
+          text: "Modifica",
+          onPressed: () async {
+            await updateUserPassword(tmpUser!.id, tmpUser!.password);
+            await updateUserGeneralInfo(tmpUser!.id, tmpUser!.sex!, tmpUser!.birthdate!);
+            if (widget.onSubmitted != null) widget.onSubmitted!();
+            if (mounted) Navigator.pop(context);
+          },
+        ))
+      ],
+    );
   }
 }

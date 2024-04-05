@@ -10,8 +10,6 @@ class HomeUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    String jwt = arguments["jwt"];
 
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -42,45 +40,45 @@ class HomeUser extends StatelessWidget {
                                     )))),
                         SizedBox(height: screenHeight * .025),
                         if (showMobileLayout)
-                          ...mobileWidgets(context, jwt)
+                          ...mobileWidgets(context)
                         else
-                          ...desktopWidgets(context, jwt)
+                          ...desktopWidgets(context)
                       ],
                     )))),
         floatingActionButton: showMobileLayout
             ? FloatingActionButton(
-                onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"jwt": jwt})},
+                onPressed: () => {Navigator.pushNamed(context, "/add_dream")},
                 tooltip: 'Racconta un sogno',
                 child: const Icon(Icons.cloud_upload),
               )
             : null);
   }
 
-  List<Widget> desktopWidgets(BuildContext context, String jwt) {
+  List<Widget> desktopWidgets(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
       IconTextButton(
         icon: const Icon(Icons.cloud_upload),
         text: "Racconta un sogno",
-        onPressed: () => {Navigator.pushNamed(context, "/add_dream", arguments: {"jwt": jwt})}
+        onPressed: () => {Navigator.pushNamed(context, "/add_dream")}
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.format_list_bulleted),
         text: "PSQI",
-        onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"jwt": jwt})}
+        onPressed: () => {Navigator.pushNamed(context, "/psqi")}
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
-        onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"jwt":jwt}),
+        onPressed: () => Navigator.pushNamed(context, "/dreams_list"),
       ),
     ];
   }
 
-  List<Widget> mobileWidgets(BuildContext context, String jwt) {
+  List<Widget> mobileWidgets(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return [
@@ -88,14 +86,14 @@ class HomeUser extends StatelessWidget {
         child: SimpleCircularIconButton(
             iconData: Icons.rocket_launch, 
             text: "I miei sogni",
-            onPressed: () => Navigator.pushNamed(context, "/dreams_list", arguments: {"jwt":jwt})
+            onPressed: () => Navigator.pushNamed(context, "/dreams_list")
         ),
       ),
       SizedBox(height: screenHeight * .025),
       Row(
         children: [
           SimpleCircularIconButton(
-              onPressed: () => {Navigator.pushNamed(context, "/psqi", arguments: {"jwt": jwt})},
+              onPressed: () => {Navigator.pushNamed(context, "/psqi")},
               iconData: Icons.format_list_bulleted,
               showAlert: true,
               text: "PSQI"),

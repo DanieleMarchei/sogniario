@@ -176,6 +176,7 @@ class UserData {
   DateTime? birthdate = null;
   Sex? sex = null;
   int? organizationId;
+  String? organizationName;
 
 }
 

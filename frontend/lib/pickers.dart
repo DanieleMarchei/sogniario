@@ -14,15 +14,15 @@ class DatePickerButton extends StatefulWidget with WithInitialValue<DateTime> {
     required this.text,
     this.onSelectedDate,
     DateTime? initialValue,
-    }){
-      if(initialValue == null){
-        this.initialValue = DateTime.now();
-      }else{
-        this.initialValue = initialValue;
+  }){
+    if(initialValue == null){
+      this.initialValue = DateTime.now();
+    }else{
+      this.initialValue = initialValue;
 
-      }
-      
     }
+    
+  }
 
   final String text;
   final void Function(DateTime)? onSelectedDate;

@@ -1,14 +1,21 @@
 import 'dart:convert' as convert;
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/utils.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:path_provider/path_provider.dart';
+import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
 String authority = "localhost:3000";
 // String authority = "10.0.0.2:3000";
 String server = "http://$authority";
+
+var tokenBox = Hive.box('tokens');
+
 
 enum RequestType {
   delete(func: http.delete, needBody: false),
@@ -23,24 +30,36 @@ enum RequestType {
 }
 
 enum TableName {
-  authLogin(label: "auth/login"),
-  authRegister(label: "auth/register"),
-  chronotype(label: "chronotype"),
-  dream(label: "dream"),
-  psqi(label: "psqi"),
-  user(label: "user"),
-  userDownload(label: "user/download");
+  authLoginUser(label: "auth/login/user", needJwt: false, deletable: false),
+  authRegisterUser(label: "auth/register/user", needJwt: false, deletable: false),
+  authLoginResearcher(label: "auth/login/researcher", needJwt: false, deletable: false),
+  authRegisterResearcher(label: "auth/register/researcher", needJwt: false, deletable: false),
 
-  const TableName({required this.label});
+  chronotype(label: "chronotype", needJwt: true, deletable: true),
+  dream(label: "dream", needJwt: true, deletable: true),
+  psqi(label: "psqi", needJwt: true, deletable: true),
+
+  researcher(label: "researcher", needJwt: true, deletable: true),
+
+
+  user(label: "user", needJwt: true, deletable: true),
+  userDownload(label: "user/download", needJwt: true, deletable: false),
+  
+  organization(label: "Organization", needJwt: true, deletable: false);
+
+  const TableName({required this.label, required this.needJwt, required this.deletable});
   final String label;
+  final bool needJwt;
+  final bool deletable;
 }
 
 class HttpRequest {
   List<String>? fields;
-  Map<String, dynamic>? search;
+  Map<String, dynamic> search = {};
+  int? id;
   String? jwt;
   RequestType requestType;
-  bool useId;
+  bool useIdInJwt;
   TableName tableName;
   TableName? joinWith;
   Map<String, dynamic>? body;
@@ -48,18 +67,36 @@ class HttpRequest {
   HttpRequest({
     required this.tableName,
     this.fields,
-    this.jwt,
-    this.search,
+    Map<String, dynamic>? search,
+    this.id,
     required this.requestType,
-    this.useId = false,
+    this.useIdInJwt = false,
     this.joinWith,
-    this.body
-  });
+    this.body,
+    includeDeletedRows = false
+  }) {
+    if(useIdInJwt || tableName.needJwt){
+      this.jwt = tokenBox.get("jwt");
+    }
+
+    this.search = Map<String, dynamic>.from(search ?? {});
+
+    if(this.tableName.deletable) {
+      this.search["deleted"] = includeDeletedRows;
+    }
+
+    if(joinWith != null && joinWith!.deletable){
+      this.search["${joinWith!.label}s.deleted"] = includeDeletedRows;
+    }
+  }
 
   Future<http.Response> exec() async {
 
     String idQuery = "";
-    if(useId){
+    if(id != null){
+      idQuery = "/$id";
+    }
+    if(useIdInJwt){
       int id = JwtDecoder.decode(jwt!)["sub"];
       idQuery = "/$id";
     }
@@ -69,10 +106,8 @@ class HttpRequest {
       queries.add(fieldsQuery);
     };
 
-    if(search != null){
-      String searchQuery = "s=${convert.jsonEncode(search)}";
-      queries.add(searchQuery);
-    }
+    String searchQuery = "s=${convert.jsonEncode(this.search)}";
+    queries.add(searchQuery);
 
     if(joinWith != null){
       String joinQuery = "join=${joinWith!.label}s";
@@ -118,7 +153,8 @@ UserData _jsonToUser(Map<String, dynamic> json){
   user.password = json["password"];
   user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]) : null;
   user.sex = json["sex"] != null ? Sex.values[json["sex"]] : null;
-  user.organizationId = json["organizationId"] != null ? json["organizationId"]: null;
+  user.organizationId = json["organization"] != null ? json["organization"]["id"] : null;
+  user.organizationName = json["organization"] != null ? json["organization"]["name"] : null;
 
   return user;
 }
@@ -145,10 +181,10 @@ ChronoTypeData _jsonToChronotype(Map<String, dynamic> json){
   return chronotype;
 }
 
-Future<(bool, String?)> isValidLogin(String username, String password) async{
+Future<bool> isValidLoginUser(String username, String password) async{
 
   var response = await HttpRequest(
-    tableName: TableName.authLogin,
+    tableName: TableName.authLoginUser,
     requestType: RequestType.post,
     body: {
       "username" : username,
@@ -157,27 +193,45 @@ Future<(bool, String?)> isValidLogin(String username, String password) async{
     .exec();
 
   bool isValid = response.success;
-  if(!isValid) return (false, null);
+  if(!isValid) return false;
 
   var jsonResponse = convert.jsonDecode(response.body);
   String? token = jsonResponse["access_token"];
-    
+  tokenBox.put("jwt", token!);
 
-  return (true, token);
+  return true;
 }
 
-Future<(DateTime?, Sex?)> getGeneralInfo(String jwt) async {
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
-  int id = decodedToken["sub"];
+Future<bool> isValidLoginResearcher(String username, String password) async{
 
-  var url = Uri.parse('${server}/user/${id}');
+  var response = await HttpRequest(
+    tableName: TableName.authLoginResearcher,
+    requestType: RequestType.post,
+    body: {
+      "username" : username,
+      "password" : password
+    })
+    .exec();
 
-  var headers = {
-    HttpHeaders.authorizationHeader: jwtHeader(jwt)
-  };
+  bool isValid = response.success;
+  if(!isValid) return false;
 
-  var response = await http.get(url, headers: headers);
-  if(!response.success) throw Exception("User $id not found.");
+  var jsonResponse = convert.jsonDecode(response.body);
+  String? token = jsonResponse["access_token"];
+  tokenBox.put("jwt", token!);
+
+  return true;
+}
+
+Future<(DateTime?, Sex?)> getMyGeneralInfo() async {
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    requestType: RequestType.get,
+    useIdInJwt: true
+  ).exec();
+
+  if(!response.success) throw Exception("Cannot get general info.");
 
   var jsonResponse = convert.jsonDecode(response.body);
 
@@ -190,84 +244,153 @@ Future<(DateTime?, Sex?)> getGeneralInfo(String jwt) async {
 
 
 Future<bool> addUser(UserData user) async {
-  var url = Uri.parse('${server}/user/');
+
+  UserData myUser = await getMyResearcher();
 
   var body = {
-    "username": "${user.username}",
-    "password": "${user.password}",
+    "username": user.username,
+    "password": user.password,
+    "organization": myUser.organizationId
   };
 
   if(user.birthdate != null) body["birthday"] = "${user.birthdate}";
-  if(user.sex != null) body["sex"] = "${user.sex!.id}";
+  if(user.sex != null) body["sex"] = user.sex!.id;
 
-  var response = await http.post(url, body : body);
+  var response = await HttpRequest(
+    tableName: TableName.authRegisterUser,
+    requestType: RequestType.post,
+    body: body
+  ).exec();
+
   return response.success;
 }
 
 Future<bool> deleteUser(int id) async {
-  var url = Uri.parse('${server}/user/${id}');
-
-  var response = await http.delete(url);
-  return response.success;
-}
-
-Future<bool> updateUserGeneralInfo(Sex sex, DateTime birthdate, String jwt) async {
-
   var response = await HttpRequest(
     tableName: TableName.user,
-    useId: true, 
+    id: id, 
     requestType: RequestType.patch,
     body: {
-      "birthdate": "$birthdate",
-      "sex": "${sex.id}"
+      "deleted": true
     },
-    jwt: jwt
     ).exec();
 
 
   return response.success;
 }
 
-Future<List<UserData>> getAllUsers() async {
-  var url = Uri.parse('${server}/user/');
+Future<bool> updateMyGeneralInfo(Sex sex, DateTime birthdate) async {
 
-  var response = await http.get(url);
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    useIdInJwt: true, 
+    requestType: RequestType.patch,
+    body: {
+      "birthdate": "$birthdate",
+      "sex": "${sex.id}"
+    },
+    ).exec();
+
+
+  return response.success;
+}
+
+
+Future<bool> updateUserGeneralInfo(int id, Sex sex, DateTime birthdate) async {
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    id: id, 
+    requestType: RequestType.patch,
+    body: {
+      "birthdate": "$birthdate",
+      "sex": "${sex.id}"
+    },
+  ).exec();
+
+
+  return response.success;
+}
+
+Future<bool> updateUserPassword(int id, String password) async {
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    id: id, 
+    requestType: RequestType.patch,
+    body: {
+      "password": password,
+    },
+  ).exec();
+
+
+  return response.success;
+}
+
+Future<List<UserData>> getAllUsersOfMyOrganization() async {
+  UserData user = await getMyResearcher();
+  var response = await HttpRequest(
+    tableName: TableName.organization,
+    requestType: RequestType.get,
+    search: {
+      "id": user.organizationId,
+    },
+    joinWith: TableName.user
+
+  ).exec();
+
   var jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
-  return jsonResponse.map((json) => _jsonToUser(json)).toList();
+  
+  if(jsonResponse.isEmpty) return [];
+
+  var jsonUsers = jsonResponse[0]["users"] as List<dynamic>;
+  return jsonUsers.map((json) => _jsonToUser(json)).toList();
 }
 
 
 Future<UserData> getUser(int id) async {
-  var url = Uri.parse('${server}/user/${id}');
-
-  var response = await http.get(url);
-  var jsonResponse = convert.jsonDecode(response.body);
-  return _jsonToUser(jsonResponse);
-}
-
-Future<UserData> getMyUser(String jwt) async {
-  // var url = Uri.parse('${server}/user/${id}');
-
-  // var response = await http.get(url);
 
   var response = await HttpRequest(
     tableName: TableName.user,
     requestType: RequestType.get,
-    jwt: jwt,
-    useId: true).exec();
+    id: id
+  ).exec();
 
   var jsonResponse = convert.jsonDecode(response.body);
   return _jsonToUser(jsonResponse);
 }
 
-Future<bool> addChronotype(String jwt, ChronoTypeData chronotype) async{
+Future<UserData> getMyUser() async {
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    requestType: RequestType.get,
+    useIdInJwt: true).exec();
+
+  var jsonResponse = convert.jsonDecode(response.body);
+  return _jsonToUser(jsonResponse);
+}
+
+
+Future<UserData> getMyResearcher() async {
+
+  var response = await HttpRequest(
+    tableName: TableName.researcher,
+    requestType: RequestType.get,
+    useIdInJwt: true).exec();
+
+  var jsonResponse = convert.jsonDecode(response.body);
+  return _jsonToUser(jsonResponse);
+}
+
+Future<bool> addMyChronotype(ChronoTypeData chronotype) async{
 
   Map<String, dynamic> body = {};
   for (var i = 1; i <= 19; i++) {
     body["q$i"] = "${chronotype.report[i-1]}";
   }
 
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(tokenBox.get("jwt"));
   int id = decodedToken["sub"];
   body["user"] = id;
 
@@ -275,7 +398,6 @@ Future<bool> addChronotype(String jwt, ChronoTypeData chronotype) async{
   var response = await HttpRequest(
     tableName: TableName.chronotype,
     requestType: RequestType.post,
-    jwt: jwt,
     body: body
     ).exec();
 
@@ -283,7 +405,7 @@ Future<bool> addChronotype(String jwt, ChronoTypeData chronotype) async{
 }
 
 
-Future<bool> addPSQI(String jwt, PSQIData psqi) async{
+Future<bool> addMyPSQI(PSQIData psqi) async{
   Map<String, dynamic> body = {};
   for (var i = 0; i < 19; i++) {
     late var value;
@@ -300,14 +422,13 @@ Future<bool> addPSQI(String jwt, PSQIData psqi) async{
 
   body["q15_text"] = psqi.optionalText;
 
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(tokenBox.get("jwt"));
   int id = decodedToken["sub"];
   body["user"] = id;
 
   var response = await HttpRequest(
     tableName: TableName.psqi,
     requestType: RequestType.post,
-    jwt: jwt,
     body: body
   ).exec();
 
@@ -315,18 +436,13 @@ Future<bool> addPSQI(String jwt, PSQIData psqi) async{
 }
 
 
-Future<ChronoTypeData?> getChronotype(String jwt) async {
-  // var url = Uri.parse('${server}/user/${userId}?fields=chronotypes&join=chronotypes');
-
-
-  // var response = await http.get(url);
+Future<ChronoTypeData?> getMyChronotype() async {
 
   var response = await HttpRequest(
     tableName: TableName.user,
     requestType: RequestType.get,
     joinWith: TableName.chronotype,
-    jwt: jwt,
-    useId: true
+    useIdInJwt: true
     ).exec();
 
 
@@ -337,8 +453,8 @@ Future<ChronoTypeData?> getChronotype(String jwt) async {
 }
 
 
-Future<bool> addDream(String jwt, DreamData dream) async {
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+Future<bool> addDream(DreamData dream) async {
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(tokenBox.get("jwt"));
   int id = decodedToken["sub"];
   
   var body = {
@@ -357,19 +473,17 @@ Future<bool> addDream(String jwt, DreamData dream) async {
     tableName: TableName.dream,
     requestType: RequestType.post,
     body: body,
-    jwt: jwt
   ).exec();
 
   return response.success;
 } 
 
-Future<List<DreamData>> getAllDreams(String jwt) async {
+Future<List<DreamData>> getMyDreams() async {
 
   var response = await HttpRequest(
     tableName: TableName.user,
     requestType: RequestType.get,
-    jwt: jwt,
-    useId: true,
+    useIdInJwt: true,
     fields: ["dreams"],
     joinWith: TableName.dream
   ).exec();
@@ -380,17 +494,46 @@ Future<List<DreamData>> getAllDreams(String jwt) async {
   return dreams;
 }
 
-Future<bool> getDatabase(String jwt) async {
-  int id = JwtDecoder.decode(jwt)["sub"];
-  UserData user = await getMyUser(jwt);
+Future<String?> downloadDatabase() async {
+  int id = JwtDecoder.decode(tokenBox.get("jwt"))["sub"];
+  UserData user = await getMyResearcher();
   var response = await HttpRequest(
     tableName: TableName.userDownload,
     requestType: RequestType.post,
     body: {
       "organizationId": user.organizationId
     },
-    jwt: jwt
     ).exec();
 
-  return response.success;
+  if(!response.success) return null;
+  
+  String fileName = "sogniario (${user.organizationName}) - ${DateTime.now()}.zip";
+
+  if(kIsWeb){
+    final blob = html.Blob([response.bodyBytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.document.createElement('a') as html.AnchorElement
+      ..href = url
+      ..style.display = 'none'
+      ..download = fileName;
+
+    html.document.body!.children.add(anchor);
+    anchor.click();
+
+    html.document.body!.children.remove(anchor);
+    html.Url.revokeObjectUrl(url);
+    return null;
+  }
+
+  final directory = await getApplicationDocumentsDirectory();
+  final filePath = directory.path + "/${fileName}";
+  if(filePath != null){
+    var file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+  }
+
+  return filePath;
+
+
+  
 }

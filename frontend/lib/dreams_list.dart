@@ -15,12 +15,8 @@ class _DreamsListState extends State<DreamsList> {
     double screenWidth = MediaQuery.of(context).size.width;
     bool showMobileLayout = screenWidth < widthConstraint;
 
-    final arguments = (ModalRoute.of(context)?.settings.arguments ??
-        <String, dynamic>{}) as Map;
-    String jwt = arguments["jwt"];
-
     return FutureBuilder(
-      future: getAllDreams(jwt),
+      future: getMyDreams(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Container(
