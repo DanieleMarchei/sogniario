@@ -10,8 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
-String authority = "localhost:3000";
-// String authority = "10.0.2.2:3000";
+// String authority = "localhost:3000";
+String authority = "10.0.2.2:3000";
 String server = "http://$authority";
 
 var tokenBox = Hive.box('tokens');

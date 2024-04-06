@@ -110,11 +110,8 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
           Flexible(
             child: ElevatedButton(
               onPressed: _current > 1
-                  ? () {
-                      setState(() {
-                        _current -= 1;
-                        _controller.previousPage();
-                      });
+                  ? () async {
+                      await _controller.previousPage();
                     }
                   : null,
               child: const Icon(Icons.arrow_back),
@@ -123,14 +120,12 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
           Flexible(child: Text("${_current}/${widget.questionWidgets.length}")),
           Flexible(
             child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _current += 1;
-                  _controller.nextPage();
-                  if (_current == widget.questionWidgets.length) {
-                    widget.onSubmitted();
-                  }
-                });
+              onPressed: _current >= widget.questionWidgets.length 
+              ? () {
+                  widget.onSubmitted();
+              } 
+              : () async {
+                await _controller.nextPage();
               },
               child: _current < widget.questionWidgets.length
                   ? const Icon(Icons.arrow_forward)
