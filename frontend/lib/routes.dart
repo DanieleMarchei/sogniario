@@ -9,6 +9,7 @@ import 'package:frontend/dreams_list.dart';
 import 'package:frontend/general_info.dart';
 import 'package:frontend/home_admin.dart';
 import 'package:frontend/home_user.dart';
+import 'package:frontend/info_privacy.dart';
 import 'package:frontend/login.dart';
 import 'package:frontend/manage_users.dart';
 import 'package:frontend/psqi.dart';
@@ -79,6 +80,11 @@ class Routes {
         return PageTransition(
             settings: settings, 
             builder: (context) => const ChronoType());
+      
+      case "/info_and_privacy":
+        return PageTransition(
+            settings: settings, 
+            builder: (context) => InfoAndProvacy());
 
       default:
         return errorPage();

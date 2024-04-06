@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
@@ -42,7 +41,13 @@ class HomeUser extends StatelessWidget {
                         if (showMobileLayout)
                           ...mobileWidgets(context)
                         else
-                          ...desktopWidgets(context)
+                          ...desktopWidgets(context),
+                        SizedBox(height: screenHeight * .05),
+                        IconTextButton(
+                          icon: const Icon(Icons.privacy_tip_outlined),
+                          text: "Info e privacy",
+                          onPressed: () => {Navigator.pushNamed(context, "/info_and_privacy")}
+                        ),
                       ],
                     )))),
         floatingActionButton: showMobileLayout
