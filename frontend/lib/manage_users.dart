@@ -29,42 +29,45 @@ class _ManageUsersState extends State<ManageUsers> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
+    bool showMobileLayout = screenWidth < widthConstraint;
+
+    onPressedAddUser() async {
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return ManageUserDialog(
+              action: ManageUserDialogActions.create,
+              showMobileLayout: showMobileLayout,
+            );
+          });
+      setState(() {});
+    }
+
     return FutureBuilder(
       future: getAllUsersOfMyOrganization(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Container(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+          return const Center(
+            child: CircularProgressIndicator(),
           );
         }
 
         List<UserData> users = snapshot.data!;
         return Scaffold(
+          floatingActionButton: showMobileLayout
+              ? FloatingActionButton(
+                  onPressed: onPressedAddUser,
+                  tooltip: "Aggiungi utente",
+                  child: const Icon(Icons.person_add_alt_1_rounded),
+                )
+              : null,
           appBar: AppBar(
             title: const Text("Gestisci utenti"),
             backgroundColor: Colors.orange,
-            actions: [
-              Row(
+            bottom: showMobileLayout ? PreferredSize(
+              preferredSize: Size(100, 30),
+              child: Column(
                 children: [
-                  IconButton(
-                    onPressed: () async {
-                      await showDialog(
-                          context: context,
-                          builder: (context) {
-                            return ManageUserDialog(
-                              action: ManageUserDialogActions.create,
-                            );
-                          });
-                      setState(() {});
-                    },
-                    icon: Icon(Icons.person_add_alt_1_rounded),
-                    tooltip: "Aggiungi utente",
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
                   SizedBox(
                     width: 250,
                     height: 40,
@@ -82,11 +85,43 @@ class _ManageUsersState extends State<ManageUsers> {
                       },
                     ),
                   ),
-                  SizedBox(
+                  SizedBox(height: 10,)
+                ],
+              ),
+            ) : null,
+            actions: [
+              if (!showMobileLayout) ...{
+                Row(children: [
+                  IconButton(
+                    onPressed: onPressedAddUser,
+                    icon: const Icon(Icons.person_add_alt_1_rounded),
+                    tooltip: "Aggiungi utente",
+                  ),
+                  const SizedBox(
                     width: 10,
                   ),
-                ],
-              )
+                ]),
+                SizedBox(
+                  width: showMobileLayout ? 150 : 250,
+                  height: 40,
+                  child: InputField(
+                    labelText: "Cerca",
+                    onCleared: () {
+                      setState(() {
+                        searchQuery = "";
+                      });
+                    },
+                    onChanged: (String query) {
+                      setState(() {
+                        searchQuery = query;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+              },
             ],
           ),
           body: Padding(
@@ -105,6 +140,7 @@ class _ManageUsersState extends State<ManageUsers> {
                                     onActionPerformed: () {
                                       setState(() {});
                                     },
+                                    showMobileLayout: showMobileLayout
                                   )),
                         ],
                       )))),
@@ -117,8 +153,13 @@ class _ManageUsersState extends State<ManageUsers> {
 class UserCardWidget extends StatefulWidget {
   final UserData user;
   final Function? onActionPerformed;
+  final bool showMobileLayout;
 
-  const UserCardWidget({super.key, required this.user, this.onActionPerformed});
+  const UserCardWidget({
+    super.key,
+    required this.user,
+    this.onActionPerformed,
+    this.showMobileLayout = false});
 
   @override
   State<StatefulWidget> createState() => _UserCardWidgetState();
@@ -131,12 +172,37 @@ class _UserCardWidgetState extends State<UserCardWidget> {
         decoration: const BoxDecoration(color: Colors.orange),
         margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-        child: Row(
+        child: widget.showMobileLayout ? mobileLayout(context) : desktopLayout(context)
+    );
+  }
+
+  Widget desktopLayout(BuildContext context){
+    return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(widget.user.username),
-            Spacer(),
-            IconButton(
+            const Spacer(),
+            ...getButtons(context)
+          ],
+        );
+  }
+
+  Widget mobileLayout(BuildContext context){
+    return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(widget.user.username),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: getButtons(context),
+            )
+          ],
+        );
+  }
+
+  List<Widget> getButtons(BuildContext context){
+    return [
+      IconButton(
               onPressed: () {
                 showDialog(
                     context: context,
@@ -144,10 +210,11 @@ class _UserCardWidgetState extends State<UserCardWidget> {
                       return ManageUserDialog(
                         action: ManageUserDialogActions.visualize,
                         user: widget.user,
+                        showMobileLayout: widget.showMobileLayout,
                       );
                     });
               },
-              icon: Icon(Icons.visibility),
+              icon: const Icon(Icons.visibility),
               tooltip: "Visualizza",
             ),
             IconButton(
@@ -159,10 +226,11 @@ class _UserCardWidgetState extends State<UserCardWidget> {
                         action: ManageUserDialogActions.edit,
                         user: widget.user,
                         onSubmitted: widget.onActionPerformed,
+                        showMobileLayout: widget.showMobileLayout,
                       );
                     });
               },
-              icon: Icon(Icons.edit),
+              icon: const Icon(Icons.edit),
               tooltip: "Modifica",
             ),
             IconButton(
@@ -174,14 +242,14 @@ class _UserCardWidgetState extends State<UserCardWidget> {
                         action: ManageUserDialogActions.delete,
                         user: widget.user,
                         onSubmitted: widget.onActionPerformed,
+                        showMobileLayout: widget.showMobileLayout,
                       );
                     });
               },
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               tooltip: "Elimina",
             ),
-          ],
-        ));
+    ];
   }
 }
 
@@ -191,9 +259,15 @@ class ManageUserDialog extends StatefulWidget {
   final UserData? user;
   final ManageUserDialogActions action;
   final Function? onSubmitted;
+  final bool showMobileLayout;
 
-  ManageUserDialog(
-      {super.key, this.user, required this.action, this.onSubmitted}) {
+  ManageUserDialog({
+    super.key,
+    this.user,
+    required this.action,
+    this.onSubmitted,
+    this.showMobileLayout = false
+    }) {
     assert(
         !(action == ManageUserDialogActions.edit ||
                 action == ManageUserDialogActions.visualize ||
@@ -222,13 +296,15 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
       tmpUser = UserData();
     }
 
-    if(widget.action == ManageUserDialogActions.edit && tmpUser!.birthdate == null){
+    if (widget.action == ManageUserDialogActions.edit &&
+        tmpUser!.birthdate == null) {
       tmpUser!.birthdate = DateTime.now();
     }
 
     controllerUsername.text = tmpUser!.username;
     controllerUsername.addListener(_onUsernameChanged);
-    if(widget.action == ManageUserDialogActions.edit || widget.action == ManageUserDialogActions.create){
+    if (widget.action == ManageUserDialogActions.edit ||
+        widget.action == ManageUserDialogActions.create) {
       controllerPassword.text = "";
       controllerPassword.addListener(_onPasswordChanged);
     }
@@ -265,16 +341,31 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
 
   Widget delete(BuildContext context) {
     return AlertDialog(
-      content: Text(
-          "Confermi di voler eliminare l'utente ${widget.user!.username}?"),
+      content: Container(
+        height: 100,
+        child: Column(
+          children: [
+            Flexible(
+              child: Text("Confermi di voler eliminare questo utente?", overflow: TextOverflow.visible,)
+            ),
+            SizedBox(height: 10,),
+            Text(widget.user!.username, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
+          ]
+        ),
+      ),
       actions: [
         TextButton(
-            onPressed: () async {
-              await deleteUser(widget.user!.id);
-              if (widget.onSubmitted != null) widget.onSubmitted!();
-              if (mounted) Navigator.pop(context);
-            },
-            child: Text("Cancella"))
+          onPressed: () async {
+            await deleteUser(widget.user!.id);
+            if (widget.onSubmitted != null) widget.onSubmitted!();
+            if (mounted) Navigator.pop(context);
+          },
+          child: const Text("Elimina")),
+        TextButton(
+          onPressed: () async {
+            if (mounted) Navigator.pop(context);
+          },
+          child: const Text("Non eliminare"))
       ],
     );
   }
@@ -289,14 +380,14 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
 
     return SimpleDialog(
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        Text("Aggiungi utente"),
-        Spacer(),
+        Text(widget.showMobileLayout ? "Aggiungi\nutente" : "Aggiungi utente"),
+        const Spacer(),
         IconButton(
             onPressed: () {
               Navigator.pop(context);
             },
             tooltip: "Annulla",
-            icon: Icon(Icons.close))
+            icon: const Icon(Icons.close))
       ]),
       children: [
         SimpleDialogOption(
@@ -348,13 +439,13 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
     return SimpleDialog(
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         Text(tmpUser!.username),
-        Spacer(),
+        const Spacer(),
         IconButton(
             onPressed: () {
               Navigator.pop(context);
             },
             tooltip: "Chiudi",
-            icon: Icon(Icons.close))
+            icon: const Icon(Icons.close))
       ]),
       children: [
         SimpleDialogOption(
@@ -388,13 +479,13 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
     return SimpleDialog(
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         Text(tmpUser!.username),
-        Spacer(),
+        const Spacer(),
         IconButton(
             onPressed: () {
               Navigator.pop(context);
             },
             tooltip: "Annulla",
-            icon: Icon(Icons.close))
+            icon: const Icon(Icons.close))
       ]),
       children: [
         SimpleDialogOption(
@@ -445,7 +536,8 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
           text: "Modifica",
           onPressed: () async {
             await updateUserPassword(tmpUser!.id, tmpUser!.password);
-            await updateUserGeneralInfo(tmpUser!.id, tmpUser!.sex!, tmpUser!.birthdate!);
+            await updateUserGeneralInfo(
+                tmpUser!.id, tmpUser!.sex!, tmpUser!.birthdate!);
             if (widget.onSubmitted != null) widget.onSubmitted!();
             if (mounted) Navigator.pop(context);
           },

@@ -106,8 +106,10 @@ class HttpRequest {
       queries.add(fieldsQuery);
     };
 
-    String searchQuery = "s=${convert.jsonEncode(this.search)}";
-    queries.add(searchQuery);
+    if(this.search.isNotEmpty){
+      String searchQuery = "s=${convert.jsonEncode(this.search)}";
+      queries.add(searchQuery);
+    }
 
     if(joinWith != null){
       String joinQuery = "join=${joinWith!.label}s";

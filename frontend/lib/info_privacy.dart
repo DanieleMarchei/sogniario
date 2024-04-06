@@ -17,7 +17,7 @@ class InfoAndProvacy extends StatelessWidget {
     bool showMobileLayout = screenWidth < widthConstraint;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Info e Privacy"),
+        title: const Text("Info e Privacy"),
         backgroundColor: Colors.purple.shade100,
       ),
       body: Padding(
@@ -28,15 +28,15 @@ class InfoAndProvacy extends StatelessWidget {
             child: ListView(
               children: [
                 SizedBox(height: screenHeight * 0.025,),
-                Center(
+                const Center(
                   child: Text("Informazioni", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-                Text(infoText, textAlign: TextAlign.justify),
+                const Text(infoText, textAlign: TextAlign.justify),
                 SizedBox(height: screenHeight * 0.025,),
-                Center(
+                const Center(
                   child: Text("Privacy", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-                Text(privacyText, textAlign: TextAlign.justify),
+                const Text(privacyText, textAlign: TextAlign.justify),
                 SizedBox(height: screenHeight * 0.025,),
               ],
             ),
