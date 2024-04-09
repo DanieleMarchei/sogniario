@@ -496,7 +496,9 @@ Future<List<DreamData>> getMyDreams() async {
   return dreams;
 }
 
-Future<String?> downloadDatabase() async {
+Future<void> downloadDatabaseDesktop() async {
+  if(!kIsWeb) return;
+
   int id = JwtDecoder.decode(tokenBox.get("jwt"))["sub"];
   UserData user = await getMyResearcher();
   var response = await HttpRequest(
@@ -507,35 +509,63 @@ Future<String?> downloadDatabase() async {
     },
     ).exec();
 
-  if(!response.success) return null;
+  if(!response.success) return;
   
   String fileName = "sogniario (${user.organizationName}) - ${DateTime.now()}.zip";
 
-  if(kIsWeb){
-    final blob = html.Blob([response.bodyBytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = fileName;
+  final blob = html.Blob([response.bodyBytes]);
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  final anchor = html.document.createElement('a') as html.AnchorElement
+    ..href = url
+    ..style.display = 'none'
+    ..download = fileName;
 
-    html.document.body!.children.add(anchor);
-    anchor.click();
+  html.document.body!.children.add(anchor);
+  anchor.click();
 
-    html.document.body!.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
-    return null;
+  html.document.body!.children.remove(anchor);
+  html.Url.revokeObjectUrl(url);
+
+  return;
+}
+
+enum MobileDBDownloadState {
+  fileAlreadyExists,
+  downloadFinished,
+  downloadFailed
+}
+
+
+Future<(File, MobileDBDownloadState)> downloadDatabaseMobile() async {
+  UserData user = await getMyResearcher();
+  String fileName = "sogniario (${user.organizationName}) - ${DateTime.now()}.zip";
+
+  Directory? directory = await getDownloadsDirectory();
+  directory ??= await getTemporaryDirectory();
+
+  final filePath = "${directory.path}/${fileName}";
+  var file = File(filePath);
+  if(file.existsSync()){
+    return (file, MobileDBDownloadState.fileAlreadyExists);
+  }else{
+    var state = await downloadDatabaseMobileConfirmed(file);
+    return (file, state);
   }
+}
 
-  final directory = await getApplicationDocumentsDirectory();
-  final filePath = directory.path + "/${fileName}";
-  if(filePath != null){
-    var file = File(filePath);
-    await file.writeAsBytes(response.bodyBytes);
-  }
+Future<MobileDBDownloadState> downloadDatabaseMobileConfirmed(File file) async {
+  int id = JwtDecoder.decode(tokenBox.get("jwt"))["sub"];
+  UserData user = await getMyResearcher();
+  var response = await HttpRequest(
+    tableName: TableName.userDownload,
+    requestType: RequestType.post,
+    body: {
+      "organizationId": user.organizationId
+    },
+    ).exec();
 
-  return filePath;
+  if(!response.success) return MobileDBDownloadState.downloadFailed;
 
-
-  
+  await file.writeAsBytes(response.bodyBytes);
+  return MobileDBDownloadState.downloadFinished;
 }

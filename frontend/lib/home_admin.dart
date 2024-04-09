@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -61,9 +62,27 @@ class HomeAdmin extends StatelessWidget {
                               icon: const Icon(Icons.download),
                               text: "Scarica il database",
                               onPressed: () async {
-                                String? filePath = await downloadDatabase();
-                                if (!kIsWeb) {
-                                  showAlert(context, filePath);
+                                if (kIsWeb) return await downloadDatabaseDesktop();
+
+                                File file;
+                                MobileDBDownloadState state;
+                                (file, state) = await downloadDatabaseMobile();
+                                switch (state) {
+                                  case MobileDBDownloadState.downloadFinished:
+                                    await showAlert(context, file, state);
+                                    break;
+
+                                  case MobileDBDownloadState.fileAlreadyExists:
+                                    bool overwriteFile = await showAlert(context, file, state) ?? false;
+                                    if(overwriteFile){
+                                      state = await downloadDatabaseMobileConfirmed(file);
+                                      await showAlert(context, file, state);
+                                    }
+                                    break;
+                      
+                                  case MobileDBDownloadState.downloadFailed:
+                                    await showAlert(context, file, state);
+                                    break;
                                 }
                               }),
                         ],
@@ -73,48 +92,67 @@ class HomeAdmin extends StatelessWidget {
     );
   }
 
-  void showAlert(BuildContext context, String? filePath) {
-    if (filePath == null) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              "Errore",
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+  Future<bool?> showAlert(BuildContext context, File file, MobileDBDownloadState state) async {
+
+    late String title;
+    late String content;
+    late String actionsLbl;
+    var actionsToShow = {
+      "yes_no" : <Widget>[
+            TextButton(
+              child: const Text('Si'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
             ),
-            content: Text("Errore durante il download."),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              "Download effettuato",
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
             ),
-            content: Text("Database scaricato in $filePath."),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+          ],
+      "ok": <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+    };
+
+    switch (state) {
+      case MobileDBDownloadState.downloadFinished:
+        title = "Download effettuato!";
+        content = "Database scaricato in ${file.path}.";
+        actionsLbl = "ok";
+        break;
+
+      case MobileDBDownloadState.fileAlreadyExists:
+        title = "Sovrascrivere il file?";
+        String fileName = file.uri.pathSegments.last;
+        content = "Esiste già un file chiamato \"$fileName\" in ${file.parent.path}.";
+        actionsLbl = "yes_no";
+        break;
+
+      case MobileDBDownloadState.downloadFailed:
+        title = "Download fallito!";
+        content = "C'è stato un errore durante la preparazione del database.";
+        actionsLbl = "ok";
+        break;
     }
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: actionsToShow[actionsLbl]
+        );
+      },
+    );
+    
   }
 }
