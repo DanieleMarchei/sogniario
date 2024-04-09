@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'dart:math';
@@ -26,7 +30,10 @@ class _LoginState extends State<Login> {
 
     usernameError = null;
     passwordError = null;
+
   }
+
+
 
   void resetErrorText() {
     setState(() {
@@ -56,13 +63,33 @@ class _LoginState extends State<Login> {
     }
 
     bool loginValid;
-    loginValid = await validateFunc(username, password);
+    try {
+      
+      loginValid = await validateFunc(username, password);
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Errore: impossibile contattare il server.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 12.0
+      );
+      return false;
+    }
     isValid &= loginValid;
 
     if (!isValid) {
-      setState(() {
-        loginError = "Credenziali errate";
-      });
+      Fluttertoast.showToast(
+        msg: "Credenziali errate.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 12.0
+      );
     }
 
     return isValid;
