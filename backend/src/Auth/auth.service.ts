@@ -49,6 +49,7 @@ export class AuthService {
 
     const researcher = await this.researcerService.findOne({
       where: { username: username, deleted: false },
+      relations: ['organization']
     });
     if (!researcher || !(await bcrypt.compare(pass, researcher.password))) {
       throw new UnauthorizedException();
@@ -57,6 +58,7 @@ export class AuthService {
       sub: researcher.id,
       username: researcher.username,
       type: researcher.type,
+      organization: researcher.organization.id
     };
     return {
       access_token: await this.jwtService.signAsync(payload),
