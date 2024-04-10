@@ -357,8 +357,32 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
       actions: [
         TextButton(
           onPressed: () async {
-            await deleteUser(widget.user!.id);
+            bool deleted = await deleteUser(widget.user!.id);
+            if(!deleted){
+              Fluttertoast.showToast(
+                msg: "Eliminaione non riuscita.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 12.0
+              );
+              return;
+            }
             if (widget.onSubmitted != null) widget.onSubmitted!();
+            if(!deleted){
+              Fluttertoast.showToast(
+                msg: "Utente cancellato!",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 12.0
+              );
+              return;
+            }
             if (mounted) Navigator.pop(context);
           },
           child: const Text("Elimina")),
@@ -557,10 +581,47 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
             child: FormButton(
           text: "Modifica",
           onPressed: () async {
-            await updateUserPassword(tmpUser!.id, tmpUser!.password);
-            await updateUserGeneralInfo(
+            bool updated = await updateUserPassword(tmpUser!.id, tmpUser!.password);
+            if(!updated){
+              Fluttertoast.showToast(
+                msg: "Modifica non riuscita.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 12.0
+              );
+              return;
+            }
+            
+            updated = await updateUserGeneralInfo(
                 tmpUser!.id, tmpUser!.sex!, tmpUser!.birthdate!);
+            if(!updated){
+              Fluttertoast.showToast(
+                msg: "Modifica non riuscita.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 12.0
+              );
+              return;
+            }
             if (widget.onSubmitted != null) widget.onSubmitted!();
+            if(!updated){
+              Fluttertoast.showToast(
+                msg: "Modifica effettuata!",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 12.0
+              );
+              return;
+            }
             if (mounted) Navigator.pop(context);
           },
         ))
