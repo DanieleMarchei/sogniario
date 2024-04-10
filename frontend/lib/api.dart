@@ -124,7 +124,7 @@ class HttpRequest {
     if(jwt != null) {
       headers[HttpHeaders.authorizationHeader] = jwtHeader(jwt!);
     }
-
+    
     if(requestType.needBody){
       headers[HttpHeaders.contentTypeHeader] = 'application/json';
       String jsonbody = convert.jsonEncode(body);
@@ -268,12 +268,14 @@ Future<bool> addUser(UserData user) async {
 }
 
 Future<bool> deleteUser(int id) async {
+  UserData user = await getUser(id);
   var response = await HttpRequest(
     tableName: TableName.user,
     id: id, 
     requestType: RequestType.patch,
     body: {
-      "deleted": true
+      "deleted": true,
+      "username": "deleted_${user.username}"
     },
     ).exec();
 
@@ -568,4 +570,27 @@ Future<MobileDBDownloadState> downloadDatabaseMobileConfirmed(File file) async {
 
   await file.writeAsBytes(response.bodyBytes);
   return MobileDBDownloadState.downloadFinished;
+}
+
+Future<void> downloadAndroidApp() async {
+  if(!kIsWeb) return;
+
+  File apk = File.fromUri(Uri.parse("assets/sogniario.apk"));
+  print(apk.existsSync());
+
+  final blob = html.Blob([apk.readAsBytesSync()]);
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  final anchor = html.document.createElement('a') as html.AnchorElement
+    ..href = url
+    ..style.display = 'none'
+    ..download = "sogniario.apk";
+
+  html.document.body!.children.add(anchor);
+  anchor.click();
+
+  html.document.body!.children.remove(anchor);
+  html.Url.revokeObjectUrl(url);
+
+
+  return;
 }

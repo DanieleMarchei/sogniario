@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
@@ -125,7 +126,7 @@ class _LoginState extends State<Login> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
-
+    print(kIsWeb);
     return Scaffold(
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -203,7 +204,7 @@ class _LoginState extends State<Login> {
                           icon: const Icon(Icons.person),
                           text: 'Entra come utente',
                           onPressed: submitUser,
-                        ),
+                      ),
                       
                       SizedBox(
                         height: 10,
@@ -212,8 +213,18 @@ class _LoginState extends State<Login> {
                           icon: const Icon(Icons.person_search_rounded),
                           text: 'Entra come ricercatore',
                           onPressed: submitResearcher,
-                        ),
+                      ),
                       
+                    },
+                    if(kIsWeb)...{
+                      SizedBox(
+                        height: 50,
+                      ),
+                      IconTextButton(
+                          icon: const Icon(Icons.android),
+                          text: "Scarica l'app (Android)",
+                          onPressed: downloadAndroidApp,
+                      ),
                     }
                   ])))),
     );
