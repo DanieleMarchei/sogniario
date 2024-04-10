@@ -267,7 +267,6 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
 
   @override
   Widget build(BuildContext context) {
-    // print(widget.increment);
     return OutlinedButton(
       onPressed: () {
         Picker(

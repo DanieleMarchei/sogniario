@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
@@ -9,13 +11,19 @@ class HomeUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
     bool showMobileLayout = screenWidth < widthConstraint;
 
     return Scaffold(
+        floatingActionButton: showMobileLayout
+            ? FloatingActionButton(
+                onPressed: () => {Navigator.pushNamed(context, "/add_dream")},
+                tooltip: 'Racconta un sogno',
+                child: const Icon(Icons.cloud_upload),
+              )
+            : null,
         body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
             child: Center(
@@ -25,18 +33,33 @@ class HomeUser extends StatelessWidget {
                     child: ListView(
                       children: [
                         SizedBox(height: screenHeight * .01),
-                        const Center(
-                            child: Hero(
-                                tag: "SogniarioLogo",
-                                child: Material(
-                                    type: MaterialType.transparency,
-                                    child: Text(
-                                      "Sogniario",
-                                      style: TextStyle(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )))),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          const Center(
+                              child: Text(
+                            "Sogniario",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
+                          if (kIsWeb) ...{
+                            Spacer(),
+                            IconTextButton(
+                              icon: Icon(Icons.logout),
+                              text: "Esci",
+                              onPressed: () async {
+                                deleteJwt();
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  "/",
+                                  (route) => false,
+                                );
+                              },
+                            )
+                          }
+                        ]),
                         SizedBox(height: screenHeight * .025),
                         if (showMobileLayout)
                           ...mobileWidgets(context)
@@ -44,19 +67,25 @@ class HomeUser extends StatelessWidget {
                           ...desktopWidgets(context),
                         SizedBox(height: screenHeight * .05),
                         IconTextButton(
-                          icon: const Icon(Icons.privacy_tip_outlined),
-                          text: "Info e privacy",
-                          onPressed: () => {Navigator.pushNamed(context, "/info_and_privacy")}
-                        ),
+                            icon: const Icon(Icons.privacy_tip_outlined),
+                            text: "Info e privacy",
+                            onPressed: () => {
+                                  Navigator.pushNamed(
+                                      context, "/info_and_privacy")
+                                }),
+                        if(!kIsWeb)...{
+                          SizedBox(height: 100,),
+                          IconTextButton(
+                              icon: Icon(Icons.logout),
+                              text: "Esci",
+                              onPressed: () async {
+                                deleteJwt();
+                                Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false,);
+                              },
+                            )
+                        }
                       ],
-                    )))),
-        floatingActionButton: showMobileLayout
-            ? FloatingActionButton(
-                onPressed: () => {Navigator.pushNamed(context, "/add_dream")},
-                tooltip: 'Racconta un sogno',
-                child: const Icon(Icons.cloud_upload),
-              )
-            : null);
+                    )))));
   }
 
   List<Widget> desktopWidgets(BuildContext context) {
@@ -64,47 +93,55 @@ class HomeUser extends StatelessWidget {
 
     return [
       IconTextButton(
-        icon: const Icon(Icons.cloud_upload),
-        text: "Racconta un sogno",
-        onPressed: () => {Navigator.pushNamed(context, "/add_dream")}
-      ),
-      SizedBox(height: screenHeight * .01),
-      IconTextButton(
-        icon: const Icon(Icons.format_list_bulleted),
-        text: "PSQI",
-        onPressed: () => {Navigator.pushNamed(context, "/psqi")}
-      ),
+          icon: const Icon(Icons.cloud_upload),
+          text: "Racconta un sogno",
+          onPressed: () => {Navigator.pushNamed(context, "/add_dream")}),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
         onPressed: () => Navigator.pushNamed(context, "/dreams_list"),
       ),
+      SizedBox(height: screenHeight * .01),
+      IconTextButton(
+          icon: const Icon(Icons.format_list_bulleted),
+          text: "PSQI",
+          onPressed: () => {Navigator.pushNamed(context, "/psqi")}),
     ];
   }
 
   List<Widget> mobileWidgets(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
+    // return [
+    //   Center(
+    //     child: SimpleCircularIconButton(
+    //         iconData: Icons.rocket_launch,
+    //         text: "I miei sogni",
+    //         onPressed: () => Navigator.pushNamed(context, "/dreams_list")),
+    //   ),
+    //   SizedBox(height: screenHeight * .025),
+    //   Row(
+    //     children: [
+    //       SimpleCircularIconButton(
+    //           onPressed: () => {Navigator.pushNamed(context, "/psqi")},
+    //           iconData: Icons.format_list_bulleted,
+    //           showAlert: true,
+    //           text: "PSQI"),
+    //     ],
+    //   )
+    // ];
     return [
-      Center(
-        child: SimpleCircularIconButton(
-            iconData: Icons.rocket_launch, 
-            text: "I miei sogni",
-            onPressed: () => Navigator.pushNamed(context, "/dreams_list")
-        ),
+      IconTextButton(
+        icon: const Icon(Icons.rocket_launch),
+        text: "I miei sogni",
+        onPressed: () => Navigator.pushNamed(context, "/dreams_list"),
       ),
-      SizedBox(height: screenHeight * .025),
-      Row(
-        children: [
-          SimpleCircularIconButton(
-              onPressed: () => {Navigator.pushNamed(context, "/psqi")},
-              iconData: Icons.format_list_bulleted,
-              showAlert: true,
-              text: "PSQI"),
-        ],
-      )
+      SizedBox(height: screenHeight * .01),
+      IconTextButton(
+          icon: const Icon(Icons.format_list_bulleted),
+          text: "PSQI",
+          onPressed: () => {Navigator.pushNamed(context, "/psqi")}),
     ];
   }
 }
-

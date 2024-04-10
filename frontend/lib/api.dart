@@ -16,6 +16,17 @@ String server = "http://$authority";
 
 var tokenBox = Hive.box('tokens');
 
+bool doIHaveJwt(){
+  if(!tokenBox.containsKey("jwt")) return false;
+  bool validJwt = !JwtDecoder.isExpired(tokenBox.get("jwt"));
+  return validJwt;
+}
+
+void deleteJwt(){
+  if(!tokenBox.containsKey("jwt")) return;
+  tokenBox.delete("jwt");
+}
+
 
 enum RequestType {
   delete(func: http.delete, needBody: false),
@@ -576,7 +587,6 @@ Future<void> downloadAndroidApp() async {
   if(!kIsWeb) return;
 
   File apk = File.fromUri(Uri.parse("assets/sogniario.apk"));
-  print(apk.existsSync());
 
   final blob = html.Blob([apk.readAsBytesSync()]);
   final url = html.Url.createObjectUrlFromBlob(blob);
