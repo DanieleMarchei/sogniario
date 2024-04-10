@@ -26,11 +26,12 @@ export class AuthService {
 
     const user = await this.usersService.findOne({
       where: { username: username, deleted: false },
+      relations: ['organization']
     });
     if (!user || !(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, username: user.username, type: user.type };
+    const payload = { sub: user.id, username: user.username, type: user.type, organization: user.organization.id };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
