@@ -68,7 +68,7 @@ export class Psqi {
   q15: number;
 
   @ApiProperty()
-  @Column()
+  @Column({ nullable: true })
   q15_text: String;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
