@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
@@ -426,8 +427,29 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
             child: FormButton(
           text: "Aggiungi",
           onPressed: () async {
-            await addUser(tmpUser!);
+            bool added = await addUser(tmpUser!);
+            if(!added){
+              Fluttertoast.showToast(
+                msg: "Impossibile create l'utente.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 12.0
+              );
+              return;
+            }
             if (widget.onSubmitted != null) widget.onSubmitted!();
+            Fluttertoast.showToast(
+              msg: "Utente creato con successo!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 12.0
+            );
             if (mounted) Navigator.pop(context);
           },
         )),
