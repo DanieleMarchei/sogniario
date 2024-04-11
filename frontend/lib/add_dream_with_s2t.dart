@@ -92,7 +92,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
       title: "Racconta un sogno",
       onSubmitted: () async {
         await addDream(dream);
-        Navigator.pop(context);
+        Navigator.pushNamed(context, "/home_user");
       }
     );
   }
@@ -189,59 +189,87 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     double screenWidth = MediaQuery.of(context).size.width;
     bool isMobile = !kIsWeb;
 
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _hasSpeech && isMobile 
-        ? AvatarGlow(
-          animate: speech.isListening,
-          glowColor: Colors.red,
-          duration: const Duration(seconds: 2),
-          repeat: true,
-          child: FloatingActionButton(
-            shape: CircleBorder(),
-            backgroundColor: Colors.red,
-            onPressed: () {
-              if(speech.isListening){
-                cancelListening();
-              }else{
-                startListening();
-              }
-            },
-            child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
-          ),
-        ) 
-        : null,
-      body: Column(
-        children: [
-          SizedBox(height: screenHeight * 0.01,),
-          MultilineInputField(
-            controller: dreamController,
-            labelText: "Racconta il tuo sogno",
-            maxLines: 10,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            errorText: textError,
-            onChanged: (value) {
-              setState(() {
-                text = value;
-                resetErrorText();
-                if (widget.onTextChanged != null) widget.onTextChanged!(value);
-              });
-            },
-            autoFocus: false,
-          ),
-          if(isMobile)...{
-            SizedBox(height: screenHeight * 0.01,),
-            Text(
-              "💡 Suggerimento: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 12
-              ),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        bool pop = await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text("Tornare indietro?"),
+                content: Text("Vuoi davvero annullare il racconto di questo sogno?", textAlign: TextAlign.justify,),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Si'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('No'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                ],);
+          },
+        );
+        if(pop) Navigator.pushNamed(context, "/home_user");
+      },
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: _hasSpeech && isMobile 
+          ? AvatarGlow(
+            animate: speech.isListening,
+            glowColor: Colors.red,
+            duration: const Duration(seconds: 2),
+            repeat: true,
+            child: FloatingActionButton(
+              shape: CircleBorder(),
+              backgroundColor: Colors.red,
+              onPressed: () {
+                if(speech.isListening){
+                  cancelListening();
+                }else{
+                  startListening();
+                }
+              },
+              child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
             ),
-          }
-      
-        ],
+          ) 
+          : null,
+        body: Column(
+          children: [
+            SizedBox(height: screenHeight * 0.01,),
+            MultilineInputField(
+              controller: dreamController,
+              labelText: "Racconta il tuo sogno",
+              maxLines: 10,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
+              errorText: textError,
+              onChanged: (value) {
+                setState(() {
+                  text = value;
+                  resetErrorText();
+                  if (widget.onTextChanged != null) widget.onTextChanged!(value);
+                });
+              },
+              autoFocus: false,
+            ),
+            if(isMobile)...{
+              SizedBox(height: screenHeight * 0.01,),
+              Text(
+                "💡 Suggerimento: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
+                style: TextStyle(
+                  color: Colors.grey.shade700,
+                  fontSize: 12
+                ),
+              ),
+            }
+        
+          ],
+        ),
       ),
     );
   }
@@ -283,6 +311,9 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
           dreamController.text += ' ' + result.recognizedWords;
         }
       });
+      print(result.recognizedWords);
+      if (widget.onTextChanged != null) widget.onTextChanged!(dreamController.text);
+
     }
   }
 

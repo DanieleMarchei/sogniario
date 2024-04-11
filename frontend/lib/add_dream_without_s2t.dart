@@ -88,7 +88,8 @@ class _AddDreamWithoutS2TState extends State<AddDreamWithoutS2T> {
       title: "Racconta un sogno",
       onSubmitted: () async {
         await addDream(dream);
-        Navigator.pop(context);
+        Navigator.pushNamed(context, "/home_user");
+
       }
     );
   }

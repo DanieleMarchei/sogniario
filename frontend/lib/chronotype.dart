@@ -110,7 +110,7 @@ List<QA> questions = [
       question:
           "Devi fare un test, sai che durerà due ore, sai che sarà mentalmente molto faticoso, e vuoi essere al massimo della forma per farlo bene. Considerando i tuoi ritmi, quale orario sceglieresti?",
       answers: [
-        "Dalle 8 e le 10 di sera.",
+        "Dalle 8 e le 10 del mattino.",
         "Dalle 11 del mattino all' una.",
         "Dalle 3 alle 5 del pomeriggio.",
         "Dalle 7 alle 9 di sera.",
@@ -150,7 +150,7 @@ List<QA> questions = [
       question:
           "Devi fare due ore di lavoro fisicamente pesante e sei libero di pianificare la tua giornata. Considerando i tuoi ritmi, quale orario sceglieresti?",
       answers: [
-        "Dalle 8 e le 10 di sera.",
+        "Dalle 8 e le 10 del mattino.",
         "Dalle 11 del mattino all' una.",
         "Dalle 3 alle 5 del pomeriggio.",
         "Dalle 7 alle 9 di sera.",
@@ -269,6 +269,7 @@ class _ChronoTypeState extends State<ChronoType> {
               child: Center(
                 child: Column(
                   children: [
+                    SizedBox(height: 20,),
                     const Text(
                       "Il tuo cronotipo",
                       style: TextStyle(

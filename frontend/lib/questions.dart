@@ -89,7 +89,15 @@ class _MultipleChoiceQuestionState extends QuestionWithDirectionState<MultipleCh
         ...Iterable<int>.generate(widget.answers.length).map(
                 (int idx) => Flexible(
                   child: ListTile(
-                  title: Text(widget.answers[idx]),
+                  title: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedAnswer = widget.answers[idx];
+                        if(widget.onSelected != null) widget.onSelected!(idx);
+                      });
+                    },
+                    child: Text(widget.answers[idx]),
+                  ),
                   leading: Radio<String>(
                     value: widget.answers[idx],
                     groupValue: selectedAnswer,
@@ -387,7 +395,30 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
           ...Iterable<int>.generate(no_yes.length).map(
                   (int idx) => Flexible(
                     child: ListTile(
-                    title: Text(no_yes[idx]),
+                    title: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _firstQuestionAnswer = widget.answers[idx];
+                          idxFirstQuestion = idx;
+                          if (_firstQuestionAnswer == no_yes[1]){
+                            idxOptionalAnswer2 = 0;
+                            _optionalAnswer2 = widget.answers[idxOptionalAnswer2!];
+                          }
+                          else{
+                            _optionalAnswer2 = null;
+                            idxOptionalAnswer2 = null;
+                          }
+
+                          _optionalAnswer1 = null;
+
+                        });
+
+                        if(widget.onSelected != null){
+                          widget.onSelected!(idxFirstQuestion == 1, _optionalAnswer1, idxOptionalAnswer2);
+                        } 
+                      },
+                      child: Text(no_yes[idx])
+                    ),
                     leading: Radio<String>(
                       value: no_yes[idx],
                       groupValue: _firstQuestionAnswer,
@@ -431,7 +462,18 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
             SizedBox(height: 10,),
             ...Iterable<int>.generate(widget.answers.length).map(
                               (int idx) => Flexible( child: ListTile(
-                                title: Text(widget.answers[idx]),
+                                title: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _optionalAnswer2 = widget.answers[idx];
+                                      idxOptionalAnswer2 = idx;
+                                      if(widget.onSelected != null){
+                                        widget.onSelected!(idxFirstQuestion == 1, _optionalAnswer1, idxOptionalAnswer2);
+                                      } 
+                                    });
+                                  },
+                                  child: Text(widget.answers[idx])
+                                ),
                                 leading: Radio<String>(
                                   value: widget.answers[idx],
                                   groupValue: _optionalAnswer2,

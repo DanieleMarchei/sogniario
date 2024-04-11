@@ -87,7 +87,7 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[3] = i1 + i2 / 10;
+            psqi.report[3] = i1 + i2 / 100;
           });
         },
       ),
@@ -103,7 +103,7 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[4] = i1 + i2 / 10;
+            psqi.report[4] = i1 + i2 / 100;
           });
         },
       ),
@@ -284,10 +284,10 @@ class _PSQIState extends State<PSQI> {
     psqi.report[2] = (psqiQuestions[2] as WithInitialValue).initialValue;
 
     (int, int) r3 = (psqiQuestions[3] as WithInitialValue).initialValue;
-    psqi.report[3] = r3.$1 + r3.$2 / 10;
+    psqi.report[3] = r3.$1 + r3.$2 / 100;
 
     (int, int) r4 = (psqiQuestions[4] as WithInitialValue).initialValue;
-    psqi.report[4] = r4.$1 + r4.$2 / 10;
+    psqi.report[4] = r4.$1 + r4.$2 / 100;
     
     psqi.report[5] = (psqiQuestions[5] as WithInitialValue).initialValue;
     psqi.report[6] = (psqiQuestions[6] as WithInitialValue).initialValue;
@@ -330,6 +330,7 @@ class _PSQIState extends State<PSQI> {
               child: Center(
                 child: Column(
                   children: [
+                    SizedBox(height: 20,),
                     const Text(
                       "Il tuo PSQI",
                       style: TextStyle(
