@@ -360,7 +360,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
             bool deleted = await deleteUser(widget.user!.id);
             if(!deleted){
               Fluttertoast.showToast(
-                msg: "Eliminaione non riuscita.",
+                msg: "Eliminazione non riuscita.",
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.BOTTOM,
                 timeInSecForIosWeb: 3,
@@ -371,18 +371,15 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               return;
             }
             if (widget.onSubmitted != null) widget.onSubmitted!();
-            if(!deleted){
-              Fluttertoast.showToast(
-                msg: "Utente cancellato!",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 12.0
-              );
-              return;
-            }
+            Fluttertoast.showToast(
+              msg: "Utente cancellato!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 12.0
+            );
             if (mounted) Navigator.pop(context);
           },
           child: const Text("Elimina")),
@@ -610,18 +607,15 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               return;
             }
             if (widget.onSubmitted != null) widget.onSubmitted!();
-            if(!updated){
-              Fluttertoast.showToast(
-                msg: "Modifica effettuata!",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 12.0
-              );
-              return;
-            }
+            Fluttertoast.showToast(
+              msg: "Modifica effettuata!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 12.0
+            );
             if (mounted) Navigator.pop(context);
           },
         ))

@@ -12,6 +12,7 @@ import "package:universal_html/html.dart" as html;
 // String server = "http://localhost:3000";
 // String authority = "localhost:3000";
 String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
+// String authority = "192.168.151.2:3000";
 String server = "http://$authority";
 
 var tokenBox = Hive.box('tokens');
@@ -117,7 +118,7 @@ class HttpRequest {
       queries.add(fieldsQuery);
     };
 
-    if(this.search.isNotEmpty){
+    if(this.search.isNotEmpty && id == null){
       String searchQuery = "s=${convert.jsonEncode(this.search)}";
       queries.add(searchQuery);
     }
@@ -164,7 +165,7 @@ UserData _jsonToUser(Map<String, dynamic> json){
   user.id = json["id"];
   user.username = json["username"];
   user.password = json["password"];
-  user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]) : null;
+  user.birthdate = json["birthdate"] != null ? DateTime.parse(json["birthdate"]).toLocal() : null;
   user.sex = json["sex"] != null ? Sex.values[json["sex"]] : null;
   user.organizationId = json["organization"] != null ? json["organization"]["id"] : null;
   user.organizationName = json["organization"] != null ? json["organization"]["name"] : null;
