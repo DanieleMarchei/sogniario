@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
@@ -134,6 +135,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
         onStatus: statusListener,
         debugLogging: true,
         finalTimeout: Duration(milliseconds: 0));
+    
     if (hasSpeech) {
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale?.localeId ?? '';
@@ -185,7 +187,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     double screenHeight = MediaQuery.of(context).size.height;
 
     double screenWidth = MediaQuery.of(context).size.width;
-    bool isMobile = screenWidth < widthConstraint;
+    bool isMobile = !kIsWeb;
 
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -231,21 +233,12 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
           if(isMobile)...{
             SizedBox(height: screenHeight * 0.01,),
             Text(
-              "💡 Suggerimento: puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
+              "💡 Suggerimento: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
               style: TextStyle(
                 color: Colors.grey.shade700,
                 fontSize: 12
               ),
             ),
-
-            // TextButton(
-            //   onPressed: speech.isListening ? cancelListening : null,
-            //   child: Text('Cancella', style: TextStyle(fontSize: 17)),
-            // ),
-            // TextButton(
-            //   onPressed: !_hasSpeech || speech.isListening ? null : startListening,
-            //   child: Text(speech.isListening ? 'In ascolto..' : 'Racconta', style: TextStyle(fontSize: 17)),
-            // ),
           }
       
         ],

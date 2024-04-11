@@ -115,13 +115,6 @@ class _AddDreamWithoutS2TTextState extends QuestionWithDirectionState<AddDreamWi
   @override
   bool get wantKeepAlive => true;
 
-  bool _hasSpeech = false;
-  double level = 0.0;
-  double minSoundLevel = 50000;
-  double maxSoundLevel = -50000;
-  String _currentLocaleId = '';
-  int resultListened = 0;
-
   TextEditingController dreamController = TextEditingController();
 
   @override
