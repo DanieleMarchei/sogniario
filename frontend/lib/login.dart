@@ -144,6 +144,7 @@ class _LoginState extends State<Login> {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     SizedBox(height: screenHeight * .12),
                     InputField(

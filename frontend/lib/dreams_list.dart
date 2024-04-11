@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
 class DreamsList extends StatefulWidget {
@@ -38,7 +39,21 @@ class _DreamsListState extends State<DreamsList> {
                   child: ConstrainedBox(
                 constraints: BoxConstraints.tightFor(
                     width: min(screenWidth, widthConstraint)),
-                child: ListView(
+                child: dreams.length == 0 
+                ? Column(
+                  children: [
+                    Text("Non hai ancora registrato nessun sogno."),
+                    SizedBox(height: 10,),
+                    IconTextButton(
+                      icon: Icon(Icons.cloud_upload),
+                      text: "Racconta un sogno!",
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/add_dream");
+                      },
+                    )
+                  ],
+                )
+                : ListView(
                     children: List.generate(dreams.length, (index) {
                   DreamData dream = dreams[index];
                   return DreamCard(dream: dream);
