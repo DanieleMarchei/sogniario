@@ -130,95 +130,13 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
               child: _current < widget.questionWidgets.length
                   ? const Icon(Icons.arrow_forward)
                   : const Icon(Icons.check),
+              style: _current < widget.questionWidgets.length
+                  ? null
+                  : ElevatedButton.styleFrom(backgroundColor: Colors.green.shade400),
             ),
           )
         ])
       ])),
     );
-  }
-}
-
-class AddDreamText extends StatefulWidget {
-  const AddDreamText({super.key});
-  @override
-  State<AddDreamText> createState() => _AddDreamTextState();
-}
-
-class _AddDreamTextState extends State<AddDreamText> {
-  late String text;
-  String? textError;
-
-  @override
-  void initState() {
-    super.initState();
-    text = '';
-  }
-
-  void resetErrorText() {
-    setState(() {
-      textError = null;
-    });
-  }
-
-  bool validate() {
-    resetErrorText();
-
-    if (text.isEmpty) {
-      setState(() {
-        textError = 'Testo non presente';
-      });
-      return false;
-    }
-    RegExp whiteSpaces = RegExp(r'\s+', multiLine: true);
-    if (text.trim().split(whiteSpaces).length <= 2) {
-      setState(() {
-        textError = 'Testo troppo corto. Scrivi almeno tre parole.';
-      });
-      return false;
-    }
-
-    return true;
-  }
-
-  void submit() {
-    if (validate()) {
-      // Navigator.pushNamed(context, "/home");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: ListView(
-        children: [
-          SizedBox(height: screenHeight * .01),
-          MultilineInputField(
-            labelText: "Racconta il tuo sogno",
-            maxLines: 10,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            errorText: textError,
-            onChanged: (value) {
-              setState(() {
-                text = value;
-                resetErrorText();
-              });
-            },
-            autoFocus: false,
-          ),
-          SizedBox(height: screenHeight * .025),
-          SimpleCircularIconButton(
-            radius: 50,
-            iconData: Icons.mic,
-            fillColor: Colors.red,
-            iconColor: Colors.black,
-          )
-        ],
-      ),
-    ));
   }
 }
