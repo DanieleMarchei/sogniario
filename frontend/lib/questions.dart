@@ -417,8 +417,7 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
                 ),
           if (_firstQuestionAnswer == no_yes[1])
           ...[
-            Flexible(child: Text(widget.question1)),
-            SizedBox(height: 20,),
+            SizedBox(height: 10,),
             Flexible(child:InputField(labelText : "Quale?", onChanged: (String newText) {
               setState(() {
                 _optionalAnswer1 = newText;
@@ -427,6 +426,9 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
                 } 
               });
             },),),
+            SizedBox(height: 10,),
+            Flexible(child: Text(widget.question2)),
+            SizedBox(height: 10,),
             ...Iterable<int>.generate(widget.answers.length).map(
                               (int idx) => Flexible( child: ListTile(
                                 title: Text(widget.answers[idx]),
