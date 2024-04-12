@@ -87,13 +87,41 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
   @override
   Widget build(BuildContext context) {
 
-    return ResponsiveReport(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        bool pop = await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text("Tornare indietro?"),
+                content: Text("Vuoi davvero annullare il racconto di questo sogno?", textAlign: TextAlign.justify,),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Si'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('No'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                ],);
+          },
+        );
+        if(pop) Navigator.pushNamed(context, "/home_user");
+      },
+      child: ResponsiveReport(
       questionWidgets: dreamQuestions,
       title: "Racconta un sogno",
       onSubmitted: () async {
         await addDream(dream);
         Navigator.pushNamed(context, "/home_user");
       }
+    )
     );
   }
   
@@ -188,35 +216,8 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
 
     double screenWidth = MediaQuery.of(context).size.width;
     bool isMobile = !kIsWeb;
-
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) async {
-        bool pop = await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text("Tornare indietro?"),
-                content: Text("Vuoi davvero annullare il racconto di questo sogno?", textAlign: TextAlign.justify,),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('Si'),
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text('No'),
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                  ),
-                ],);
-          },
-        );
-        if(pop) Navigator.pushNamed(context, "/home_user");
-      },
-      child: Scaffold(
+    
+    return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _hasSpeech && isMobile 
           ? AvatarGlow(
@@ -270,8 +271,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
         
           ],
         ),
-      ),
-    );
+      );
   }
 
 

@@ -178,5 +178,32 @@ class UserData {
   int? organizationId;
   String? organizationName;
 
+  @override
+  bool operator ==(other){
+    if(other is! UserData) return false;
+
+    return other.id == id && 
+          other.username == username &&
+          other.password == password &&
+          other.birthdate == birthdate &&
+          other.sex == sex &&
+          other.organizationId == organizationId &&
+          other.organizationName == organizationName;
+  }
+
+  UserData copy(){
+    UserData user = UserData();
+    user.id = id;
+    user.username = username;
+    user.password = password;
+    user.birthdate = birthdate;
+    user.sex = sex;
+    user.organizationId = organizationId;
+    user.organizationName = organizationName;
+
+    return user;
+  }
+  
+
 }
 

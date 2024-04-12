@@ -292,7 +292,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
     if (widget.action == ManageUserDialogActions.edit ||
         widget.action == ManageUserDialogActions.visualize ||
         widget.action == ManageUserDialogActions.delete) {
-      tmpUser = widget.user!;
+      tmpUser = widget.user!.copy();
     } else {
       tmpUser = UserData();
     }
@@ -577,7 +577,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         SimpleDialogOption(
             child: FormButton(
           text: "Modifica",
-          onPressed: () async {
+          onPressed: (widget.user == tmpUser) ? null :() async {
             bool updated = await updateUserPassword(tmpUser!.id, tmpUser!.password);
             if(!updated){
               Fluttertoast.showToast(

@@ -11,8 +11,8 @@ import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
 // String authority = "localhost:3000";
-// String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
-String authority = "192.168.115.2:3000";
+String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
+// String authority = "192.168.115.2:3000";
 String server = "http://$authority";
 
 var tokenBox = Hive.box('tokens');
@@ -160,6 +160,10 @@ String jwtHeader(String jwt){
   return "Bearer $jwt";
 }
 
+Map<String, dynamic> myJwtData(){
+  return JwtDecoder.decode(tokenBox.get("jwt"));
+}
+
 UserData _jsonToUser(Map<String, dynamic> json){
   UserData user = UserData();
   user.id = json["id"];
@@ -259,12 +263,12 @@ Future<(DateTime?, Sex?)> getMyGeneralInfo() async {
 
 Future<bool> addUser(UserData user) async {
 
-  UserData myUser = await getMyResearcher();
+  int organizationId = myJwtData()["organization"];
 
   var body = {
     "username": user.username,
     "password": user.password,
-    "organization": myUser.organizationId
+    "organization": organizationId
   };
 
   if(user.birthdate != null) body["birthday"] = "${user.birthdate}";
@@ -344,12 +348,13 @@ Future<bool> updateUserPassword(int id, String password) async {
 }
 
 Future<List<UserData>> getAllUsersOfMyOrganization() async {
-  UserData user = await getMyResearcher();
+  int organizationId = myJwtData()["organization"];
+
   var response = await HttpRequest(
     tableName: TableName.organization,
     requestType: RequestType.get,
     search: {
-      "id": user.organizationId,
+      "id": organizationId,
     },
     joinWith: TableName.user
 
@@ -406,8 +411,7 @@ Future<bool> addMyChronotype(ChronoTypeData chronotype) async{
     body["q$i"] = "${chronotype.report[i-1]}";
   }
 
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(tokenBox.get("jwt"));
-  int id = decodedToken["sub"];
+  int id = myJwtData()["sub"];
   body["user"] = id;
 
 
@@ -438,8 +442,7 @@ Future<bool> addMyPSQI(PSQIData psqi) async{
 
   body["q15_text"] = psqi.optionalText;
 
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(tokenBox.get("jwt"));
-  int id = decodedToken["sub"];
+  int id = myJwtData()["sub"];
   body["user"] = id;
 
   var response = await HttpRequest(
@@ -470,8 +473,7 @@ Future<ChronoTypeData?> getMyChronotype() async {
 
 
 Future<bool> addDream(DreamData dream) async {
-  Map<String, dynamic> decodedToken = JwtDecoder.decode(tokenBox.get("jwt"));
-  int id = decodedToken["sub"];
+  int id = myJwtData()["sub"];
   
   var body = {
     "text": dream.dreamText,
@@ -513,7 +515,7 @@ Future<List<DreamData>> getMyDreams() async {
 Future<void> downloadDatabaseDesktop() async {
   if(!kIsWeb) return;
 
-  int id = JwtDecoder.decode(tokenBox.get("jwt"))["sub"];
+  int id = myJwtData()["sub"];
   UserData user = await getMyResearcher();
   var response = await HttpRequest(
     tableName: TableName.userDownload,
@@ -568,13 +570,12 @@ Future<(File, MobileDBDownloadState)> downloadDatabaseMobile() async {
 }
 
 Future<MobileDBDownloadState> downloadDatabaseMobileConfirmed(File file) async {
-  int id = JwtDecoder.decode(tokenBox.get("jwt"))["sub"];
-  UserData user = await getMyResearcher();
+  int organizationId = myJwtData()["organization"];
   var response = await HttpRequest(
     tableName: TableName.userDownload,
     requestType: RequestType.post,
     body: {
-      "organizationId": user.organizationId
+      "organizationId": organizationId
     },
     ).exec();
 

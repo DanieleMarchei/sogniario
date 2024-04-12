@@ -102,6 +102,7 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
               setState(() {
                 _current = index + 1;
               });
+              if(FocusManager.instance.primaryFocus != null) FocusManager.instance.primaryFocus!.unfocus();
             },
           ),
           carouselController: _controller,
