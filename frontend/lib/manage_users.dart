@@ -54,6 +54,9 @@ class _ManageUsersState extends State<ManageUsers> {
         }
 
         List<UserData> users = snapshot.data!;
+        users.sort((a, b) {
+          return a.username.compareTo(b.username);
+        });
         return Scaffold(
           floatingActionButton: showMobileLayout
               ? FloatingActionButton(
@@ -540,7 +543,12 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
             controller: controllerPassword,
             onChanged: (String password) {
               setState(() {
-                tmpUser!.password = password;
+                if(password.isNotEmpty){
+                  tmpUser!.password = password;
+                }else{
+                  tmpUser!.password = widget.user!.password;
+                }
+
               });
             },
           ),
@@ -577,7 +585,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         SimpleDialogOption(
             child: FormButton(
           text: "Modifica",
-          onPressed: (widget.user == tmpUser) ? null :() async {
+          onPressed: (widget.user == tmpUser || tmpUser!.password.isEmpty) ? null :() async {
             bool updated = await updateUserPassword(tmpUser!.id, tmpUser!.password);
             if(!updated){
               Fluttertoast.showToast(

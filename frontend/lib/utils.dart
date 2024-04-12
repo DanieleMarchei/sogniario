@@ -203,6 +203,11 @@ class UserData {
 
     return user;
   }
+
+  @override
+  String toString() {
+    return (id, username, password, birthdate, sex, organizationId, organizationName).toString();
+  }
   
 
 }

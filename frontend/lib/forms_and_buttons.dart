@@ -57,16 +57,15 @@ class IconTextButton extends StatelessWidget {
       ),
       child: Center(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(width: 10,),
             icon,
-            Expanded(
-              child: Text(
-                text,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
+            const SizedBox(width: 10,),
+            Text(
+              text,
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
