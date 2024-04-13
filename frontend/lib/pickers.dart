@@ -3,46 +3,27 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_picker/picker.dart';
 import 'package:frontend/utils.dart';
 
-mixin WithInitialValue<T> {
-  abstract T initialValue;
-}
-
-class DatePickerButton extends StatefulWidget with WithInitialValue<DateTime> {
+class DatePickerButton extends StatefulWidget {
 
   DatePickerButton({
     super.key,
     required this.text,
     this.onSelectedDate,
-    DateTime? initialValue,
-  }){
-    if(initialValue == null){
-      this.initialValue = DateTime.now();
-    }else{
-      this.initialValue = initialValue;
-
-    }
-    
-  }
+    this.helpText = "Seleziona data"
+  });
 
   final String text;
+  final String helpText;
   final void Function(DateTime)? onSelectedDate;
 
   @override
   State<DatePickerButton> createState() => _DatePickerState();
   
-  @override
-  late final DateTime initialValue;
 }
 
 class _DatePickerState extends State<DatePickerButton> {
 
-  late DateTime selectedValue;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedValue = widget.initialValue;
-  }
+  DateTime? selectedValue;
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +33,7 @@ class _DatePickerState extends State<DatePickerButton> {
               adapter: DateTimePickerAdapter(
                 months: ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"],
                 maxValue: DateTime.now(),
-                type: PickerDateTimeType.kDMY,
-                value: widget.initialValue
+                type: PickerDateTimeType.kYMD,
               ),
               changeToFirst: false,
               hideHeader: true,
@@ -62,65 +42,53 @@ class _DatePickerState extends State<DatePickerButton> {
               title: Text("Data di nascita"),
               backgroundColor: Color.fromARGB(255, 238, 232, 244),
               onConfirm: (Picker picker, List value) {
-                int day = value[0] + 1;
+                int day = value[2] + 1;
                 int month = value[1] + 1;
-                int year = value[2] + (picker.adapter as DateTimePickerAdapter).yearBegin;
+                int year = value[0] + (picker.adapter as DateTimePickerAdapter).yearBegin;
                 DateTime selected = DateTime(year, month, day);
                 setState(() {
                   selectedValue = selected;
                 });
-                if(widget.onSelectedDate != null) widget.onSelectedDate!(selectedValue);
+                if(widget.onSelectedDate != null) widget.onSelectedDate!(selected);
               },
           ).showDialog(context);
       },
       child: Text(
-          '${widget.text}${selectedValue.day}/${selectedValue.month}/${selectedValue.year}'),
+        selectedValue != null 
+        ? '${widget.text}${selectedValue!.day}/${selectedValue!.month}/${selectedValue!.year}'
+        : '${widget.text}${widget.helpText}'
+      ),
     );
   }
 
 }
 
-class TimeOfDayPickerButton extends StatefulWidget with WithInitialValue<TimeOfDay> {
+class TimeOfDayPickerButton extends StatefulWidget {
   TimeOfDayPickerButton({
     super.key,
     required this.text,
     this.onSelectedTimeOfDay,
-    TimeOfDay? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = TimeOfDay.now();
-      }
-      else{
-        this.initialValue = initialValue;
-      }
-    }
+    this.helpText = "Seleziona un orario"
+  });
 
   final String text;
+  final String helpText;
   final void Function(TimeOfDay)? onSelectedTimeOfDay;
   
-  @override
-  late final TimeOfDay initialValue;
-
   @override
   State<TimeOfDayPickerButton> createState() => _TimeOfDayState();
 }
 
 class _TimeOfDayState extends State<TimeOfDayPickerButton>{
 
-  late TimeOfDay selectedValue;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedValue = widget.initialValue;
-  }
+  TimeOfDay? selectedValue;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () async {
         TimeOfDay? selected = await showTimePicker(context: context, 
-          initialTime: widget.initialValue,
+          initialTime: TimeOfDay.now(),
           cancelText: "Cancella",
           confirmText: "Conferma",
           initialEntryMode: TimePickerEntryMode.dial,
@@ -133,15 +101,19 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton>{
           setState(() {
             selectedValue = selected;
           });
-          if(widget.onSelectedTimeOfDay != null) widget.onSelectedTimeOfDay!(selectedValue);
+          if(widget.onSelectedTimeOfDay != null) widget.onSelectedTimeOfDay!(selected);
         }
       },
-      child: Text('${widget.text}${timeOfDaytoString(selectedValue)}'),
+      child: Text(
+        selectedValue != null
+        ? '${widget.text}${timeOfDaytoString(selectedValue!)}'
+        : '${widget.text}${widget.helpText}'
+      ),
     );
   }
 }
 
-class IntegerPickerButton extends StatefulWidget with WithInitialValue<int> {
+class IntegerPickerButton extends StatefulWidget {
   IntegerPickerButton({
     super.key,
     required this.text,
@@ -149,17 +121,11 @@ class IntegerPickerButton extends StatefulWidget with WithInitialValue<int> {
     this.maxValue = 120,
     this.increment = 1,
     this.onSelectedInteger,
-    int? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = minValue;
-      }else{
-        this.initialValue = initialValue;
-      }
-      assert(minValue <= this.initialValue && this.initialValue <= maxValue, "initialValue must be between minValue and maxValue.");
-    }
+    this.helpText = "Seleziona"
+  });
 
   final String text;
+  final String helpText;
   final int minValue;
   final int maxValue;
   final int increment;
@@ -168,19 +134,11 @@ class IntegerPickerButton extends StatefulWidget with WithInitialValue<int> {
   @override
   State<IntegerPickerButton> createState() => _IntegerPickerButtonState();
   
-  @override
-  late final int initialValue;
 }
 
 class _IntegerPickerButtonState extends State<IntegerPickerButton> {
 
-  late int selectedValue;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedValue = widget.initialValue;
-  }
+  int? selectedValue;
 
   @override
   Widget build(BuildContext context) {
@@ -203,17 +161,20 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
                 setState(() {
                   selectedValue = int.parse(picker.getSelectedValues()[0]);
                 });
-                if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedValue);
+                if(widget.onSelectedInteger != null) widget.onSelectedInteger!(selectedValue!);
               },
           ).showDialog(context);
       },
       child: Text(
-          '${widget.text}${selectedValue}'),
+        selectedValue != null
+        ? '${widget.text}${selectedValue}'
+        : '${widget.helpText}'
+        ),
     );
   }
 }
 
-class DoubleIntegerPickerButton extends StatefulWidget with WithInitialValue<(int, int)> {
+class DoubleIntegerPickerButton extends StatefulWidget {
   DoubleIntegerPickerButton({
     super.key,
     required this.text1,
@@ -225,18 +186,12 @@ class DoubleIntegerPickerButton extends StatefulWidget with WithInitialValue<(in
     this.increment1 = 1,
     this.increment2 = 1,
     this.onIntegersSelected,
-    (int, int)? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = (minValue1, minValue2);
-      }else{
-        this.initialValue = initialValue;
-      }
-      assert(minValue1 <= this.initialValue.$1 && this.initialValue.$1 <= maxValue1, "initialValue.\$1 must be between minValue1 and maxValue1.");
-      assert(minValue2 <= this.initialValue.$2 && this.initialValue.$2 <= maxValue2, "initialValue.\$2 must be between minValue2 and maxValue2.");
-    }
+    this.helpText = "Seleziona"
+    });
+
   final String text1;
   final String text2;
+  final String helpText;
   final int minValue1;
   final int maxValue1;
   final int minValue2;
@@ -248,22 +203,13 @@ class DoubleIntegerPickerButton extends StatefulWidget with WithInitialValue<(in
   @override
   State<DoubleIntegerPickerButton> createState() => _DoubleIntegerPickerButtonState();
   
-  @override
-  late final (int, int) initialValue;
 }
 
 
 class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
 
-  late int selectedValue1;
-  late int selectedValue2;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedValue1 = widget.initialValue.$1;
-    selectedValue2 = widget.initialValue.$2;
-  }
+  int? selectedValue1;
+  int? selectedValue2;
 
   @override
   Widget build(BuildContext context) {
@@ -291,12 +237,15 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                   selectedValue1 = int.parse(picker.getSelectedValues()[0]);
                   selectedValue2 = int.parse(picker.getSelectedValues()[1]);
                 });
-                if(widget.onIntegersSelected != null) widget.onIntegersSelected!(selectedValue1, selectedValue2);
+                if(widget.onIntegersSelected != null) widget.onIntegersSelected!(selectedValue1!, selectedValue2!);
               },
           ).showDialog(context);
       },
       child: Text(
-          '${selectedValue1} ${widget.text1} e ${selectedValue2} ${widget.text2}'),
+          (selectedValue1 == null) || (selectedValue2 == null) 
+          ? '${selectedValue1} ${widget.text1} e ${selectedValue2} ${widget.text2}'
+          : '${widget.helpText}'
+        ),
     );
   }
 }

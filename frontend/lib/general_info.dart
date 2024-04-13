@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
@@ -13,11 +15,11 @@ class GeneralInfo extends StatefulWidget {
 }
 
 class _GeneralInfoState extends State<GeneralInfo> {
-  DateTime selectedDate = DateTime.now();
-  Sex sex = Sex.notSpecified;
+  DateTime? selectedDate;
+  Sex? sex;
 
   void submit() async {
-    bool updateDone = await updateMyGeneralInfo(sex, selectedDate);
+    bool updateDone = await updateMyGeneralInfo(sex!, selectedDate!);
     if(updateDone){
       ChronoTypeData? chronotype = await getMyChronotype();
       if (chronotype == null){
@@ -32,58 +34,75 @@ class _GeneralInfoState extends State<GeneralInfo> {
   Widget build(BuildContext context) {
 
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ListView(
-          children: [
-            SizedBox(height: screenHeight * .05),
-            Text(
-              'Informazioni generali',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: screenHeight * .12),
-            DropdownButtonFormField<Sex>(
-              decoration: const InputDecoration(
-                label: Text("Sesso"),
-              ),
-              value: sex,
-              items:
-                  Sex.values.map<DropdownMenuItem<Sex>>((Sex sex) {
-                return DropdownMenuItem<Sex>(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints.tightFor(width: min(screenWidth, halfWidthConstraint)),
+            child: ListView(
+              children: [
+                SizedBox(height: screenHeight * .05),
+                Text(
+                  'Informazioni generali',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: screenHeight * .12),
+                DropdownButtonFormField<Sex>(
+                  decoration: InputDecoration(
+                    label: Text("Sesso"),
+                    helperText: sex == null ? "Seleziona il tuo sesso" : null,
+                  ),
                   value: sex,
-                  child: Text(sex.label),
-                );
-              }).toList(),
-              onChanged: (Sex? value) {
-                setState(() {
-                  sex = value!;
-                });
-              },
+                  items:
+                      Sex.values.map<DropdownMenuItem<Sex>>((Sex sex) {
+                    return DropdownMenuItem<Sex>(
+                      value: sex,
+                      child: Text(sex.label),
+                    );
+                  }).toList(),
+                  onChanged: (Sex? value) {
+                    setState(() {
+                      sex = value!;
+                    });
+                  },
+                ),
+                SizedBox(height: screenHeight * .025),
+                DatePickerButton(
+                  text : "Data di nascita: ",
+                  onSelectedDate: (DateTime newDate) {
+                    selectedDate = newDate;
+                  },  
+                ),
+                SizedBox(
+                  height: screenHeight * .075,
+                ),
+                FormButton(
+                  text: 'Conferma',
+                  onPressed: () {
+                    if(sex != null && selectedDate != null){
+                      submit();
+                      return;
+                    }
+                    if(sex == null){
+                      
+                    }
+                    if(selectedDate == null){
+
+                    }
+                  },
+                ),
+                SizedBox(
+                  height: screenHeight * .15,
+                )
+              ],
             ),
-            SizedBox(height: screenHeight * .025),
-            DatePickerButton(
-              text : "Data di nascita: ",
-              initialValue: selectedDate,
-              onSelectedDate: (DateTime newDate) {
-                selectedDate = newDate;
-              },  
-            ),
-            SizedBox(
-              height: screenHeight * .075,
-            ),
-            FormButton(
-              text: 'Conferma',
-              onPressed: () => submit(),
-            ),
-            SizedBox(
-              height: screenHeight * .15,
-            )
-          ],
+          ),
         ),
       ),
     );

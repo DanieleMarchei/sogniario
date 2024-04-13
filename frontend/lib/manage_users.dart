@@ -554,9 +554,9 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
           ),
         ),
         SimpleDialogOption(
-            child: DatePickerButton(
-          initialValue: tmpUser!.birthdate ?? DateTime.now(),
+          child: DatePickerButton(
           text: "Data di nascita: ",
+          helpText: "Data non selezionata.",
           onSelectedDate: (DateTime newDate) {
             setState(() {
               tmpUser!.birthdate = newDate;

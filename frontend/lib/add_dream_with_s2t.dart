@@ -78,7 +78,6 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
             });
           },
         );
-        dream.report[index] = s[mcq.initialValue];
         return mcq;
       }),
     ];
@@ -86,6 +85,25 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
 
   @override
   Widget build(BuildContext context) {
+
+    var responsiveReport = ResponsiveReport(
+      questionWidgets: dreamQuestions,
+      title: "Racconta un sogno",
+      onSubmitted: () async {
+        await addDream(dream);
+        Navigator.pushNamed(context, "/home_user");
+      }, unansweredQuestions: () { 
+        List<int> uq = [];
+        if(dream.dreamText.split(" ").length < 3){
+          uq.add(0);
+        }
+        for (var i = 0; i < dream.report.length; i++) {
+          if(dream.report[i] == null) uq.add(i +1);
+        }
+
+        return uq;
+      },
+    );
 
     return PopScope(
       canPop: false,
@@ -114,14 +132,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
         );
         if(pop) Navigator.pushNamed(context, "/home_user");
       },
-      child: ResponsiveReport(
-      questionWidgets: dreamQuestions,
-      title: "Racconta un sogno",
-      onSubmitted: () async {
-        await addDream(dream);
-        Navigator.pushNamed(context, "/home_user");
-      }
-    )
+      child: responsiveReport
     );
   }
   

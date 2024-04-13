@@ -279,34 +279,34 @@ class _PSQIState extends State<PSQI> {
       ),
     ];
 
-    psqi.report[0] = (psqiQuestions[0] as WithInitialValue).initialValue;
-    psqi.report[1] = (psqiQuestions[1] as WithInitialValue).initialValue;
-    psqi.report[2] = (psqiQuestions[2] as WithInitialValue).initialValue;
+    // psqi.report[0] = (psqiQuestions[0] as WithInitialValue).initialValue;
+    // psqi.report[1] = (psqiQuestions[1] as WithInitialValue).initialValue;
+    // psqi.report[2] = (psqiQuestions[2] as WithInitialValue).initialValue;
 
-    (int, int) r3 = (psqiQuestions[3] as WithInitialValue).initialValue;
-    psqi.report[3] = r3.$1 + r3.$2 / 100;
+    // (int, int) r3 = (psqiQuestions[3] as WithInitialValue).initialValue;
+    // psqi.report[3] = r3.$1 + r3.$2 / 100;
 
-    (int, int) r4 = (psqiQuestions[4] as WithInitialValue).initialValue;
-    psqi.report[4] = r4.$1 + r4.$2 / 100;
+    // (int, int) r4 = (psqiQuestions[4] as WithInitialValue).initialValue;
+    // psqi.report[4] = r4.$1 + r4.$2 / 100;
     
-    psqi.report[5] = (psqiQuestions[5] as WithInitialValue).initialValue;
-    psqi.report[6] = (psqiQuestions[6] as WithInitialValue).initialValue;
-    psqi.report[7] = (psqiQuestions[7] as WithInitialValue).initialValue;
-    psqi.report[8] = (psqiQuestions[8] as WithInitialValue).initialValue;
-    psqi.report[9] = (psqiQuestions[9] as WithInitialValue).initialValue;
-    psqi.report[10] = (psqiQuestions[10] as WithInitialValue).initialValue;
-    psqi.report[11] = (psqiQuestions[11] as WithInitialValue).initialValue;
-    psqi.report[12] = (psqiQuestions[12] as WithInitialValue).initialValue;
-    psqi.report[13] = (psqiQuestions[13] as WithInitialValue).initialValue;
+    // psqi.report[5] = (psqiQuestions[5] as WithInitialValue).initialValue;
+    // psqi.report[6] = (psqiQuestions[6] as WithInitialValue).initialValue;
+    // psqi.report[7] = (psqiQuestions[7] as WithInitialValue).initialValue;
+    // psqi.report[8] = (psqiQuestions[8] as WithInitialValue).initialValue;
+    // psqi.report[9] = (psqiQuestions[9] as WithInitialValue).initialValue;
+    // psqi.report[10] = (psqiQuestions[10] as WithInitialValue).initialValue;
+    // psqi.report[11] = (psqiQuestions[11] as WithInitialValue).initialValue;
+    // psqi.report[12] = (psqiQuestions[12] as WithInitialValue).initialValue;
+    // psqi.report[13] = (psqiQuestions[13] as WithInitialValue).initialValue;
 
-    (bool, String?, int?) r14 = (psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?);
-    psqi.report[14] = [null, 0, 1, 2].indexOf(r14.$3);
-    psqi.optionalText = r14.$2;
+    // (bool, String?, int?) r14 = (psqiQuestions[14] as WithInitialValue).initialValue as (bool, String?, int?);
+    // psqi.report[14] = [null, 0, 1, 2].indexOf(r14.$3);
+    // psqi.optionalText = r14.$2;
     
-    psqi.report[15] = (psqiQuestions[15] as WithInitialValue).initialValue;
-    psqi.report[16] = (psqiQuestions[16] as WithInitialValue).initialValue;
-    psqi.report[17] = (psqiQuestions[17] as WithInitialValue).initialValue;
-    psqi.report[18] = (psqiQuestions[18] as WithInitialValue).initialValue;
+    // psqi.report[15] = (psqiQuestions[15] as WithInitialValue).initialValue;
+    // psqi.report[16] = (psqiQuestions[16] as WithInitialValue).initialValue;
+    // psqi.report[17] = (psqiQuestions[17] as WithInitialValue).initialValue;
+    // psqi.report[18] = (psqiQuestions[18] as WithInitialValue).initialValue;
 
   }
 
@@ -323,7 +323,14 @@ class _PSQIState extends State<PSQI> {
         setState(() {
           showScore = true;
         });
-      }
+      },
+      unansweredQuestions: () { 
+        List<int> uq = [];
+        for (var i = 0; i < psqi.report.length; i++) {
+          if(psqi.report[i] == null) uq.add(i);
+        }
+        return uq;
+      },
     ) : Scaffold(
             body: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),

@@ -34,7 +34,7 @@ class QuestionWithDirectionState<T extends QuestionWithDirection> extends State<
 }
 
 
-class MultipleChoiceQuestion extends QuestionWithDirection with WithInitialValue<int> {
+class MultipleChoiceQuestion extends QuestionWithDirection {
   
   final String question;
   final List<String> answers;
@@ -47,34 +47,16 @@ class MultipleChoiceQuestion extends QuestionWithDirection with WithInitialValue
       required this.question,
       required this.answers,
       this.onSelected,
-      int? initialValue
-    }) : super(direction: Axis.vertical, canChangeDirection : false) {
-      if(initialValue == null){
-        this.initialValue = 0;
-      }else{
-        this.initialValue = initialValue;
-      }
-      assert(0 <= this.initialValue && this.initialValue <= (this.answers.length - 1), "initialValue must be between 0 and ${this.answers.length - 1}.");
-    }
+    }) : super(direction: Axis.vertical, canChangeDirection : false);
     
   @override
   State<MultipleChoiceQuestion> createState() => _MultipleChoiceQuestionState();
   
-  @override
-  late final int initialValue;
-  
-
 }
 
 class _MultipleChoiceQuestionState extends QuestionWithDirectionState<MultipleChoiceQuestion>{
 
-  late String selectedAnswer;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedAnswer = widget.answers[widget.initialValue];
-  }
+  String? selectedAnswer;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +100,7 @@ class _MultipleChoiceQuestionState extends QuestionWithDirectionState<MultipleCh
 
 
 
-class SelectHourQuestion extends QuestionWithDirection with WithInitialValue<TimeOfDay>{
+class SelectHourQuestion extends QuestionWithDirection{
   
   final String question;
   final void Function(TimeOfDay)? onSelected;
@@ -131,32 +113,16 @@ class SelectHourQuestion extends QuestionWithDirection with WithInitialValue<Tim
       super.direction,
       super.canChangeDirection,
       this.onSelected,
-      TimeOfDay? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = TimeOfDay.now();
-      }else{
-        this.initialValue = initialValue;
-      }
-    }
+    });
 
   @override
   State<SelectHourQuestion> createState() => _SelectHourQuestionState();
-  
-  @override
-  late final TimeOfDay initialValue;
 }
 
 class _SelectHourQuestionState extends QuestionWithDirectionState<SelectHourQuestion>{
 
-  late TimeOfDay selectedValue;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedValue = widget.initialValue;
-  }
-
+  TimeOfDay? selectedValue;
+  
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -168,8 +134,7 @@ class _SelectHourQuestionState extends QuestionWithDirectionState<SelectHourQues
           TimeOfDayPickerButton(
             text: "Ora: ",
             onSelectedTimeOfDay: widget.onSelected,
-            initialValue: widget.initialValue,
-            )
+          )
         ],
       );
   }
@@ -177,16 +142,13 @@ class _SelectHourQuestionState extends QuestionWithDirectionState<SelectHourQues
 }
 
 
-class SelectIntQuestion extends QuestionWithDirection with WithInitialValue<int>{
+class SelectIntQuestion extends QuestionWithDirection{
   
   final String question;
   final String text;
   final int maxValue;
   final int minValue;
   final void Function(int)? onSelected;
-  
-  @override
-  late final int initialValue; 
   
   SelectIntQuestion(
     {
@@ -198,15 +160,7 @@ class SelectIntQuestion extends QuestionWithDirection with WithInitialValue<int>
       super.direction,
       super.canChangeDirection,
       this.onSelected,
-      int? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = minValue;
-      }else{
-        this.initialValue = initialValue;
-      }
-      assert(minValue <= this.initialValue && this.initialValue <= maxValue, "initialValue must be between minValue and maxValue.");
-    }
+    });
 
   @override
   State<SelectIntQuestion> createState() => _SelectIntQuestionState();
@@ -228,8 +182,7 @@ class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuesti
             minValue: widget.minValue,
             maxValue: widget.maxValue,
             onSelectedInteger: widget.onSelected,
-            initialValue: widget.initialValue,
-            )
+          )
         ],
       );
   }
@@ -237,7 +190,7 @@ class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuesti
 }
 
 
-class SelectTwoIntsQuestion extends QuestionWithDirection with WithInitialValue<(int, int)>{
+class SelectTwoIntsQuestion extends QuestionWithDirection{
   
   final String question;
   final String text1;
@@ -266,33 +219,16 @@ class SelectTwoIntsQuestion extends QuestionWithDirection with WithInitialValue<
       super.direction,
       super.canChangeDirection,
       this.onSelected,
-      (int, int)? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = (minValue1, minValue2);
-      }else{
-        this.initialValue = initialValue;
-      }
-      assert(minValue1 <= this.initialValue.$1 && this.initialValue.$1 <= maxValue1, "initialValue.\$1 must be between minValue1 and maxValue1.");
-      assert(minValue2 <= this.initialValue.$2 && this.initialValue.$2 <= maxValue2, "initialValue.\$2 must be between minValue2 and maxValue2.");
-    }
+    });
 
   @override
   State<SelectTwoIntsQuestion> createState() => _SelectTwoIntsQuestionState();
   
-  @override
-  late final (int, int) initialValue;
 }
 
 class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIntsQuestion>{
 
-  late (int, int) selectedValue;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedValue = widget.initialValue;
-  }
+  (int, int)? selectedValue;
 
   @override
   Widget build(BuildContext context) {
@@ -312,8 +248,7 @@ class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIn
             increment1: widget.increment1,
             increment2: widget.increment2,
             onIntegersSelected: widget.onSelected,
-            initialValue: widget.initialValue,
-            ),
+          ),
         ],
       );
   }
@@ -321,7 +256,7 @@ class _SelectTwoIntsQuestionState extends QuestionWithDirectionState<SelectTwoIn
 }
 
 
-class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(bool, String?, int?)>{
+class SpecifyIfYesQuestion extends QuestionWithDirection{
   
   final String question1;
   final String question2;
@@ -337,48 +272,22 @@ class SpecifyIfYesQuestion extends QuestionWithDirection with WithInitialValue<(
       super.direction,
       super.canChangeDirection = false,
       this.onSelected,
-      (bool, String?, int?)? initialValue
-    }){
-      if(initialValue == null){
-        this.initialValue = (false, null, null);
-      }else{
-        this.initialValue = initialValue;
-      }
-
-      assert(!(this.initialValue.$1 == true) || (this.initialValue.$2 != null && this.initialValue.$3 != null), "if initialValue.\$1 is true, then the other two values must be non-null.");
-      assert(!(this.initialValue.$1 == false) || (this.initialValue.$2 == null && this.initialValue.$3 == null), "if initialValue.\$1 is false, then the other two values must be null.");
-
-    }
+    });
 
   @override
   State<SpecifyIfYesQuestion> createState() => _SpecifyIfYesQuestionState();
   
-  @override
-  late final (bool, String?, int?) initialValue;
 }
 
 class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYesQuestion>{
 
 
   List<String> no_yes = ["No.", "Si."];
-  late String _firstQuestionAnswer;
-  late int idxFirstQuestion;
+  String? _firstQuestionAnswer;
+  int? idxFirstQuestion;
   String? _optionalAnswer1;
   String? _optionalAnswer2;
   int? idxOptionalAnswer2;
-
-  @override
-  void initState() {
-    super.initState();
-    idxFirstQuestion = widget.initialValue.$1 ? 1 : 0;
-    _firstQuestionAnswer = no_yes[idxFirstQuestion];
-
-    _optionalAnswer1 = widget.initialValue.$2;
-    idxOptionalAnswer2 = widget.initialValue.$3;
-    if(idxOptionalAnswer2 != null){
-      _optionalAnswer2 = widget.answers[idxOptionalAnswer2!];
-    }
-  }
 
 
   @override

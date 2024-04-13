@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/home_user.dart';
 import 'package:frontend/questions.dart';
@@ -13,11 +14,15 @@ class ResponsiveReport extends StatefulWidget {
     required this.questionWidgets,
     required this.title,
     required this.onSubmitted,
+    required this.unansweredQuestions,
+    this.ignoreUnansweredQuestions = false
   });
 
   final List<QuestionWithDirection> questionWidgets;
   final String title;
   final Function onSubmitted;
+  final List<int> Function() unansweredQuestions;
+  final bool ignoreUnansweredQuestions;
 
   @override
   State<ResponsiveReport> createState() => _ResponsiveReportState();
@@ -70,7 +75,19 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
       desktopQuestions.add(spacingBox);
     }
 
-    FormButton sendButton = FormButton(text: "Conferma", onPressed: widget.onSubmitted,);
+    FormButton sendButton = FormButton(
+      text: "Conferma",
+      onPressed: () {
+        if(widget.ignoreUnansweredQuestions){
+          widget.onSubmitted();
+          return;
+        }
+
+        List<int> uq = widget.unansweredQuestions();
+        // TODO
+
+      }
+    );
     desktopQuestions.add(sendButton);
     desktopQuestions.add(spacingBox);
     return ListView(
@@ -123,7 +140,27 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
             child: ElevatedButton(
               onPressed: _current >= widget.questionWidgets.length 
               ? () {
+                if(widget.ignoreUnansweredQuestions){
                   widget.onSubmitted();
+                  return;
+                }
+
+                List<int> uq = widget.unansweredQuestions();
+                if(uq.isNotEmpty){
+                  _controller.animateToPage(uq.first);
+                  Fluttertoast.showToast(
+                    msg: "Alcune domande non sono state compilate.",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 3,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 12.0
+                  );
+                }else{
+                  widget.onSubmitted();
+                }
+
               } 
               : () async {
                 await _controller.nextPage();

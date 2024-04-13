@@ -243,7 +243,6 @@ class _ChronoTypeState extends State<ChronoType> {
           });
         },
       );
-      chronoType.report[index] = s[mcq.initialValue];
       return mcq;
     });
   }
@@ -262,7 +261,15 @@ class _ChronoTypeState extends State<ChronoType> {
               setState(()  {
                 showScore = true;
               });
-            })
+            }, 
+            unansweredQuestions: () { 
+              //TODO: q15 
+              List<int> uq = [];
+              for (var i = 0; i < chronoType.report.length; i++) {
+                if(chronoType.report[i] == null) uq.add(i);
+              }
+              return uq;
+            },)
         : Scaffold(
             body: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),

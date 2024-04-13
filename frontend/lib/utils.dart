@@ -37,7 +37,7 @@ class QA {
 
 class DreamData {
   String dreamText = "";
-  List<int> report = List<int>.generate(6, (index) => 0);
+  List<int?> report = List<int?>.generate(6, (index) => null);
   DateTime? createdAt;
 
   @override
@@ -147,7 +147,7 @@ class PSQIData {
 }
 
 class ChronoTypeData {
-  List<int> report = List<int>.generate(19, (index) => 0);
+  List<int?> report = List<int?>.generate(19, (index) => null);
 
   @override
   String toString() {
@@ -156,7 +156,7 @@ class ChronoTypeData {
 
   int score(){
     return report.reduce((value, element){
-      return value + element;});
+      return value! + element!;})!;
   }
 }
 
