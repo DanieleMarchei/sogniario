@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
@@ -28,7 +29,8 @@ class _DreamsListState extends State<DreamsList> {
         }
         List<DreamData> dreams = snapshot.data!;
 
-        return Scaffold(
+        return ScaffoldWithCircles(
+            context: context,
             appBar: AppBar(
               backgroundColor: Colors.blue,
               title: Text("I miei sogni"),
@@ -39,25 +41,27 @@ class _DreamsListState extends State<DreamsList> {
                   child: ConstrainedBox(
                 constraints: BoxConstraints.tightFor(
                     width: min(screenWidth, widthConstraint)),
-                child: dreams.length == 0 
-                ? Column(
-                  children: [
-                    Text("Non hai ancora registrato nessun sogno."),
-                    SizedBox(height: 10,),
-                    IconTextButton(
-                      icon: Icon(Icons.cloud_upload),
-                      text: "Racconta un sogno!",
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/add_dream");
-                      },
-                    )
-                  ],
-                )
-                : ListView(
-                    children: List.generate(dreams.length, (index) {
-                  DreamData dream = dreams[index];
-                  return DreamCard(dream: dream);
-                })),
+                child: dreams.length == 0
+                    ? Column(
+                        children: [
+                          Text("Non hai ancora registrato nessun sogno."),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          IconTextButton(
+                            icon: Icon(Icons.cloud_upload),
+                            text: "Racconta un sogno!",
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/add_dream");
+                            },
+                          )
+                        ],
+                      )
+                    : ListView(
+                        children: List.generate(dreams.length, (index) {
+                        DreamData dream = dreams[index];
+                        return DreamCard(dream: dream);
+                      })),
               )),
             ));
       },
@@ -77,20 +81,19 @@ class DreamCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.blue.shade100,
-        child: ExpansionTile(
-          title: Text(
-              "${dream.createdAt!.day}/${dream.createdAt!.month}/${dream.createdAt!.year}",
-              ),
-          children: <Widget>[
-            
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                dream.dreamText, 
-                textAlign: TextAlign.justify,
-              ),
+      child: ExpansionTile(
+        title: Text(
+          "${dream.createdAt!.day}/${dream.createdAt!.month}/${dream.createdAt!.year}",
+        ),
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              dream.dreamText,
+              textAlign: TextAlign.justify,
             ),
-          ],
+          ),
+        ],
       ),
     );
   }

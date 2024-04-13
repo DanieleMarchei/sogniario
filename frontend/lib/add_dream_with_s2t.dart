@@ -152,7 +152,6 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
   double minSoundLevel = 50000;
   double maxSoundLevel = -50000;
   String _currentLocaleId = '';
-  int resultListened = 0;
 
   final SpeechToText speech = SpeechToText();
   TextEditingController dreamController = TextEditingController();
@@ -162,7 +161,8 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
         onError: errorListener,
         onStatus: statusListener,
         debugLogging: true,
-        finalTimeout: Duration(milliseconds: 0));
+        finalTimeout: Duration(milliseconds: 100)
+      );
     
     if (hasSpeech) {
       var systemLocale = await speech.systemLocale();
@@ -216,62 +216,71 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
 
     double screenWidth = MediaQuery.of(context).size.width;
     bool isMobile = !kIsWeb;
+
+    FloatingActionButton recordBtn = FloatingActionButton(
+      shape: CircleBorder(),
+      backgroundColor: Colors.red,
+      tooltip: speech.isListening ? "Premi per interrompere la trascrizione." : "Premi per trascrivere il tuo sogno.",
+      onPressed: () {
+        if(speech.isListening){
+          cancelListening();
+        }else{
+          startListening();
+        }
+      },
+      child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
+    );
+
+    FloatingActionButton recordBtnNoSpeech = FloatingActionButton(
+      shape: CircleBorder(),
+      backgroundColor:  Colors.grey,
+      tooltip: "Trascrizione audio non disponibile.",
+      onPressed: null,
+      child: Icon(Icons.mic_off)
+    );
+
+    AvatarGlow glowRecordBtn = AvatarGlow(
+      animate: speech.isListening,
+      glowColor: Colors.red,
+      duration: const Duration(seconds: 2),
+      repeat: true,
+      child: _hasSpeech ? recordBtn : recordBtnNoSpeech
+    );
     
-    return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: _hasSpeech && isMobile 
-          ? AvatarGlow(
-            animate: speech.isListening,
-            glowColor: Colors.red,
-            duration: const Duration(seconds: 2),
-            repeat: true,
-            child: FloatingActionButton(
-              shape: CircleBorder(),
-              backgroundColor: Colors.red,
-              onPressed: () {
-                if(speech.isListening){
-                  cancelListening();
-                }else{
-                  startListening();
-                }
-              },
-              child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
-            ),
-          ) 
-          : null,
-        body: Column(
-          children: [
-            SizedBox(height: screenHeight * 0.01,),
-            MultilineInputField(
-              controller: dreamController,
-              labelText: "Racconta il tuo sogno",
-              maxLines: 10,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-              errorText: textError,
-              onChanged: (value) {
-                setState(() {
-                  text = value;
-                  resetErrorText();
-                  if (widget.onTextChanged != null) widget.onTextChanged!(value);
-                });
-              },
-              autoFocus: false,
-            ),
-            if(isMobile)...{
+    return Column(
+            children: [
               SizedBox(height: screenHeight * 0.01,),
-              Text(
-                "💡 Suggerimento: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 12
-                ),
+              MultilineInputField(
+                controller: dreamController,
+                labelText: "Racconta il tuo sogno",
+                maxLines: 10,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                errorText: textError,
+                onChanged: (value) {
+                  setState(() {
+                    text = value;
+                    resetErrorText();
+                    if (widget.onTextChanged != null) widget.onTextChanged!(value);
+                  });
+                },
+                autoFocus: false,
               ),
-            }
-        
-          ],
-        ),
-      );
+              if(isMobile)...{
+                SizedBox(height: screenHeight * 0.01,),
+                Text(
+                  "💡 Suggerimento: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 12
+                  ),
+                ),
+              },
+              SizedBox(height: screenHeight * 0.05,),
+              glowRecordBtn
+          
+            ],
+          );
   }
 
 
@@ -283,7 +292,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
         localeId: _currentLocaleId,
         onSoundLevelChange: soundLevelListener,
         listenOptions: SpeechListenOptions(
-          listenMode: ListenMode.dictation,
+          listenMode: ListenMode.confirmation,
           cancelOnError: false,
           partialResults: true,
         )
@@ -301,7 +310,6 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
   }
 
   void resultListener(SpeechRecognitionResult result) {
-    ++resultListened;
 
     if (result.finalResult) {
       setState(() {

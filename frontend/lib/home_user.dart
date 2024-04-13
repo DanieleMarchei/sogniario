@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
@@ -16,76 +17,78 @@ class HomeUser extends StatelessWidget {
 
     bool showMobileLayout = screenWidth < widthConstraint;
 
-    return Scaffold(
-        floatingActionButton: showMobileLayout
-            ? FloatingActionButton(
-                onPressed: () => {Navigator.pushNamed(context, "/add_dream")},
-                tooltip: 'Racconta un sogno',
-                child: const Icon(Icons.cloud_upload),
-              )
-            : null,
-        body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50),
-            child: Center(
-                child: ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                        width: min(screenWidth, halfWidthConstraint)),
-                    child: ListView(
-                      children: [
-                        SizedBox(height: screenHeight * .01),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                          const Center(
-                              child: Text(
-                            "Sogniario",
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )),
-                          if (kIsWeb) ...{
-                            Spacer(),
-                            IconTextButton(
-                              icon: Icon(Icons.logout),
-                              text: "Esci",
-                              onPressed: () async {
-                                deleteJwt();
-                                Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  "/",
-                                  (route) => false,
-                                );
-                              },
-                            )
-                          }
-                        ]),
-                        SizedBox(height: screenHeight * .025),
-                        if (showMobileLayout)
-                          ...mobileWidgets(context)
-                        else
-                          ...desktopWidgets(context),
-                        SizedBox(height: screenHeight * .05),
-                        IconTextButton(
-                            icon: const Icon(Icons.privacy_tip_outlined),
-                            text: "Info e privacy",
-                            onPressed: () => {
-                                  Navigator.pushNamed(
-                                      context, "/info_and_privacy")
-                                }),
-                        if(!kIsWeb)...{
-                          SizedBox(height: 100,),
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) async {
+        if (doIHaveJwt()) {
+          tokenBox.delete("jwt");
+        }
+      },
+      child: ScaffoldWithCircles(
+          context: context,
+          body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Center(
+                  child: ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                          width: min(screenWidth, halfWidthConstraint)),
+                      child: ListView(
+                        children: [
+                          SizedBox(height: screenHeight * .01),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                            const Center(
+                                child: Text(
+                              "Sogniario",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )),
+                            if (kIsWeb) ...{
+                              Spacer(),
+                              IconTextButton(
+                                icon: Icon(Icons.logout),
+                                text: "Esci",
+                                onPressed: () async {
+                                  deleteJwt();
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    "/",
+                                    (route) => false,
+                                  );
+                                },
+                              )
+                            }
+                          ]),
+                          SizedBox(height: screenHeight * .025),
+                          if (showMobileLayout)
+                            ...mobileWidgets(context)
+                          else
+                            ...desktopWidgets(context),
+                          SizedBox(height: screenHeight * .05),
                           IconTextButton(
-                              icon: Icon(Icons.logout),
-                              text: "Esci",
-                              onPressed: () async {
-                                deleteJwt();
-                                Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false,);
-                              },
-                            )
-                        }
-                      ],
-                    )))));
+                              icon: const Icon(Icons.privacy_tip_outlined),
+                              text: "Info e privacy",
+                              onPressed: () => {
+                                    Navigator.pushNamed(
+                                        context, "/info_and_privacy")
+                                  }),
+                          if(!kIsWeb)...{
+                            SizedBox(height: 100,),
+                            IconTextButton(
+                                icon: Icon(Icons.logout),
+                                text: "Esci",
+                                onPressed: () async {
+                                  deleteJwt();
+                                  Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false,);
+                                },
+                              )
+                          }
+                        ],
+                      ))))),
+    );
   }
 
   List<Widget> desktopWidgets(BuildContext context) {
@@ -132,6 +135,11 @@ class HomeUser extends StatelessWidget {
     //   )
     // ];
     return [
+      IconTextButton(
+          icon: const Icon(Icons.cloud_upload),
+          text: "Racconta un sogno",
+          onPressed: () => {Navigator.pushNamed(context, "/add_dream")}),
+      SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",

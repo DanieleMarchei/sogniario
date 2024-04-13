@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'dart:math';
 
@@ -26,7 +27,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    if(doIHaveJwt()){
+    if (doIHaveJwt()) {
       tokenBox.delete("jwt");
     }
     username = '';
@@ -34,10 +35,7 @@ class _LoginState extends State<Login> {
 
     usernameError = null;
     passwordError = null;
-
   }
-
-
 
   void resetErrorText() {
     setState(() {
@@ -68,32 +66,29 @@ class _LoginState extends State<Login> {
 
     bool loginValid;
     try {
-      
       loginValid = await validateFunc(username, password);
     } catch (e) {
       Fluttertoast.showToast(
-        msg: "Errore: impossibile contattare il server.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 12.0
-      );
+          msg: "Errore: impossibile contattare il server.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 12.0);
       return false;
     }
     isValid &= loginValid;
 
     if (!isValid) {
       Fluttertoast.showToast(
-        msg: "Credenziali errate.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 12.0
-      );
+          msg: "Credenziali errate.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 12.0);
     }
 
     return isValid;
@@ -129,7 +124,8 @@ class _LoginState extends State<Login> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
-    return Scaffold(
+    return ScaffoldWithCircles(
+      context: context,
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Center(
@@ -138,7 +134,7 @@ class _LoginState extends State<Login> {
                       width: min(screenWidth, halfWidthConstraint)),
                   child: ListView(children: [
                     SizedBox(height: screenHeight * .12),
-                    Text(
+                    const Text(
                       'Sogniario',
                       style: TextStyle(
                         fontSize: 28,
@@ -200,29 +196,27 @@ class _LoginState extends State<Login> {
                       ),
                     } else ...{
                       IconTextButton(
-                          icon: const Icon(Icons.person),
-                          text: 'Entra come utente',
-                          onPressed: submitUser,
+                        icon: const Icon(Icons.person),
+                        text: 'Entra come utente',
+                        onPressed: submitUser,
                       ),
-                      
                       SizedBox(
                         height: 10,
                       ),
                       IconTextButton(
-                          icon: const Icon(Icons.person_search_rounded),
-                          text: 'Entra come ricercatore',
-                          onPressed: submitResearcher,
+                        icon: const Icon(Icons.person_search_rounded),
+                        text: 'Entra come ricercatore',
+                        onPressed: submitResearcher,
                       ),
-                      
                     },
-                    if(kIsWeb)...{
+                    if (kIsWeb) ...{
                       SizedBox(
                         height: 50,
                       ),
                       IconTextButton(
-                          icon: const Icon(Icons.android),
-                          text: "Scarica l'app (Android)",
-                          onPressed: downloadAndroidApp,
+                        icon: const Icon(Icons.android),
+                        text: "Scarica l'app (Android)",
+                        onPressed: downloadAndroidApp,
                       ),
                     }
                   ])))),

@@ -58,11 +58,12 @@ class Routes {
         return PageTransitionOrLogin(
             settings: settings, 
             builder: (context) {
-              if(kIsWeb){
-                return AddDreamWithoutS2T();
-              }else{
-                return AddDreamWithS2T();
-              }
+              return AddDreamWithS2T();
+              // if(kIsWeb){
+              //   return AddDreamWithoutS2T();
+              // }else{
+              //   return AddDreamWithS2T();
+              // }
             });
 
       case "/dreams_list":
