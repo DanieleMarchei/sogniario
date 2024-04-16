@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/utils.dart';
 
 class CircleDecoration extends StatelessWidget {
   double height;
@@ -63,11 +64,14 @@ class ScaffoldWithCircles extends Scaffold {
 }
 
 Stack getCircles(BuildContext context, body){
+  double screenWidth = MediaQuery.of(context).size.width;
+  double screenHeight = MediaQuery.of(context).size.height;
+  bool showDesktopLayout = screenWidth > widthConstraint;
   return Stack(
       children: [
         Positioned(
           top: -50,
-          left: MediaQuery.of(context).size.width / 4 - 25,
+          left: screenWidth / 4 - 25,
           child: CircleDecoration(
             height: 250,
             width: 250,
@@ -90,17 +94,43 @@ Stack getCircles(BuildContext context, body){
           ),
         ),
         Positioned(
-          bottom: MediaQuery.of(context).size.height / 4,
+          bottom: screenHeight / 4,
           left: -50,
           child: CircleDecoration(
             height: 200,
             width: 200,
             offset: Offset(2, 2),
             shadow: Colors.blue.shade700,
-            gradientOne: Colors.blue.shade100,
-            gradientTwo: Colors.blue.shade100,
+            gradientOne: Colors.blue.shade100.withOpacity(0.4),
+            gradientTwo: Colors.blue.shade200,
           ),
         ),
+        if(showDesktopLayout)...{
+          Positioned(
+            bottom: screenHeight / 4 - 150,
+            left: screenWidth / 2,
+            child: CircleDecoration(
+              height: 200,
+              width: 200,
+              offset: Offset(1, 2),
+              shadow: Colors.blue.shade700,
+              gradientOne: Colors.blue.shade200,
+              gradientTwo: Colors.blue.shade100.withOpacity(0.4),
+            ),
+          ),
+          Positioned(
+            bottom: screenHeight / 2 + 100,
+            left: screenWidth / 2 + 250,
+            child: CircleDecoration(
+              height: 200,
+              width: 200,
+              offset: Offset(2, 0),
+              shadow: Colors.blue.shade700,
+              gradientOne: Colors.blue.shade100.withOpacity(0.4),
+              gradientTwo: Colors.blue.shade100,
+            ),
+          ),
+        },
         body
       ],
     );

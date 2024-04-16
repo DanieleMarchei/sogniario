@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/home_user.dart';
 import 'package:frontend/questions.dart';
@@ -21,7 +22,7 @@ class ResponsiveReport extends StatefulWidget {
   final List<QuestionWithDirection> questionWidgets;
   final String title;
   final Function onSubmitted;
-  final List<int> Function() unansweredQuestions;
+  final List<int> Function()  unansweredQuestions;
   final bool ignoreUnansweredQuestions;
 
   @override
@@ -47,7 +48,8 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
       widgetToShow = desktopWidgets(context);
     }
 
-    return Scaffold(
+    return ScaffoldWithCircles(
+      context: context,
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(widget.title),
@@ -84,7 +86,28 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
         }
 
         List<int> uq = widget.unansweredQuestions();
-        // TODO
+        if(uq.isEmpty){
+          widget.onSubmitted();
+          return;
+        }
+
+      showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Attenzione!"),
+          content: Text("Alcune domande non sono state compilate."),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+      );
+      },
+    );
 
       }
     );

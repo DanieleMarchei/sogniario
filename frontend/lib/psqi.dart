@@ -329,6 +329,13 @@ class _PSQIState extends State<PSQI> {
         for (var i = 0; i < psqi.report.length; i++) {
           if(psqi.report[i] == null) uq.add(i);
         }
+
+        if(!uq.contains(14) && psqi.report[14] != 0){
+          if(psqi.optionalText == null || psqi.optionalText!.split(" ").length < 1){
+            uq.add(14);
+          }
+        }
+
         return uq;
       },
     ) : Scaffold(

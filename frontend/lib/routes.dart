@@ -32,7 +32,6 @@ class PageTransitionOrLogin extends MaterialPageRoute {
 
 class Routes {
   static Route<dynamic> routes(RouteSettings settings) {
-    print(settings.name);
     switch (settings.name) {
       case "/":
         return PageTransition(

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/utils.dart';
 
@@ -29,7 +30,8 @@ class HomeAdmin extends StatelessWidget {
 
           UserData user = snapshot.data!;
 
-          return Scaffold(
+          return ScaffoldWithCircles(
+            context: context,
             body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: Center(
@@ -74,8 +76,9 @@ class HomeAdmin extends StatelessWidget {
                                 icon: const Icon(Icons.download),
                                 text: "Scarica il database",
                                 onPressed: () async {
-                                  if (kIsWeb)
+                                  if (kIsWeb) {
                                     return await downloadDatabaseDesktop();
+                                  }
 
                                   File file;
                                   MobileDBDownloadState state;

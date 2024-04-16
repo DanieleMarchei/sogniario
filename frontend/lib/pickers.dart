@@ -242,7 +242,7 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
           ).showDialog(context);
       },
       child: Text(
-          (selectedValue1 == null) || (selectedValue2 == null) 
+          (selectedValue1 != null) && (selectedValue2 != null) 
           ? '${selectedValue1} ${widget.text1} e ${selectedValue2} ${widget.text2}'
           : '${widget.helpText}'
         ),
