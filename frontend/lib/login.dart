@@ -218,7 +218,9 @@ class _LoginState extends State<Login> {
                         text: "Scarica l'app (Android)",
                         onPressed: downloadAndroidApp,
                       ),
-                    }
+                    },
+                    SizedBox(height: screenHeight / 10,),
+                    SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,)
                   ])))),
     );
   }
