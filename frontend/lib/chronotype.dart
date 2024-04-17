@@ -168,7 +168,7 @@ List<QA> questions = [
       scores: inc4),
   QA(
       question:
-          "Supponiamo che tu possa sciegliere il tuo orario di lavoro. Sai che devi lavorare per cinque ore al giorno, sai che il tuo lavoro è interessante e vieni pagato a seconda di quanto rendi. A che ora, più o meno, sceglieresti di iniziare a lavorare?",
+          "Supponiamo che tu possa scegliere il tuo orario di lavoro. Sai che devi lavorare per cinque ore al giorno, sai che il tuo lavoro è interessante e vieni pagato a seconda di quanto rendi. A che ora, più o meno, sceglieresti di iniziare a lavorare?",
       answers: [
         "Tra le 4 e le 8 del mattino.",
         "Tra le 8 e le 9 del mattino.",
