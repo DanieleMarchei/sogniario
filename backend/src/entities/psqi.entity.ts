@@ -20,11 +20,11 @@ export class Psqi {
   q3: Date;
 
   @ApiProperty({ type: "float" })
-  @Column()
+  @Column("float")
   q4: number;
 
   @ApiProperty({ type: "float" })
-  @Column()
+  @Column("float")
   q5: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })

@@ -16,6 +16,7 @@ import { Organization } from "./entities/organization.entity";
 import { OrganizationModule } from "./Organization/organization.module";
 import { Researcher } from "./entities/researcher.entity";
 import { ResearcherModule } from "./Researcher/researcher.module";
+import { FileController } from "./Downloads/downloads.controller";
 
 @Module({
   imports: [
@@ -45,7 +46,7 @@ import { ResearcherModule } from "./Researcher/researcher.module";
     OrganizationModule,
     ResearcherModule,
   ],
-  controllers: [],
+  controllers: [FileController],
   providers: [],
 })
 export class AppModule {}
