@@ -58,7 +58,9 @@ enum TableName {
   user(label: "user", needJwt: true, deletable: true),
   userDownload(label: "user/download", needJwt: true, deletable: false),
   
-  organization(label: "Organization", needJwt: true, deletable: false);
+  organization(label: "Organization", needJwt: true, deletable: false),
+
+  downloadApk(label: "file/apk", needJwt: false, deletable: false);
 
   const TableName({required this.label, required this.needJwt, required this.deletable});
   final String label;
@@ -589,9 +591,12 @@ Future<MobileDBDownloadState> downloadDatabaseMobileConfirmed(File file) async {
 Future<void> downloadAndroidApp() async {
   if(!kIsWeb) return;
 
-  File apk = File.fromUri(Uri.parse("assets/sogniario.apk"));
+  var response = await HttpRequest(
+    tableName: TableName.downloadApk,
+    requestType: RequestType.get
+  ).exec();
 
-  final blob = html.Blob([apk.readAsBytesSync()]);
+  final blob = html.Blob([response.bodyBytes]);
   final url = html.Url.createObjectUrlFromBlob(blob);
   final anchor = html.document.createElement('a') as html.AnchorElement
     ..href = url
