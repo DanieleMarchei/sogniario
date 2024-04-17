@@ -107,6 +107,12 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton> {
           minuteLabelText: "Minuti",
           errorInvalidText: "Orario non valido",
           helpText: "Seleziona un orario",
+          builder: (_, Widget? child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+              child: child!,
+            );
+          },
         );
         if (selected != null) {
           setState(() {

@@ -11,8 +11,8 @@ import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
 // String authority = "localhost:3000";
-String authority = "sogniario.unicam.it:3000";
-// String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
+// String authority = "sogniario.unicam.it:3000";
+String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
 // String authority = "192.168.115.2:3000";
 String server = "http://$authority";
 
