@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/decorations.dart';
@@ -134,13 +135,27 @@ class _LoginState extends State<Login> {
                       width: min(screenWidth, halfWidthConstraint)),
                   child: Stack(
                     children: [
-                      Row(children: [
-                        Image(image: AssetImage('assets/unicam_logo.png'), width: 100,),
-                        Spacer(),
-                        Image(image: AssetImage('assets/bsrl_logo.png'), width: 200,),
-                      ],),
-                      ListView(children: [
-                        SizedBox(height: screenHeight * .12),
+                      Column(
+                        children: [
+                          SizedBox(height: 25),
+                          SizedBox(
+                            height: 100,
+                            child: Row(children: [
+                              Expanded(
+                                child: Image.asset('assets/unicam_logo.png', 
+                                scale: 0.5,
+                                ),),
+                              Spacer(),
+                              Expanded(
+                                child: Image.asset('assets/bsrl_logo.png', 
+                                scale: 1, 
+                                fit: BoxFit.contain,),),
+                            ],),
+                          ),
+                        ],
+                      ),
+                      ListView(children: [                        
+                        SizedBox(height: screenHeight * .2),
                         const Text(
                           'Sogniario',
                           style: TextStyle(
@@ -151,7 +166,7 @@ class _LoginState extends State<Login> {
                         ),
                         SizedBox(height: 10,),
                         SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
-                        SizedBox(height: screenHeight * .12),
+                        SizedBox(height: screenHeight * .05),
                         InputField(
                           onChanged: (value) {
                             setState(() {
