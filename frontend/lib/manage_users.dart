@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
@@ -289,6 +290,12 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   TextEditingController controllerUsername = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
 
+  String getRandomString(int length){
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    Random rnd = Random.secure();
+    return String.fromCharCodes(Iterable.generate(length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -311,6 +318,11 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         widget.action == ManageUserDialogActions.create) {
       controllerPassword.text = "";
       controllerPassword.addListener(_onPasswordChanged);
+    }
+
+    if(widget.action == ManageUserDialogActions.create){
+      controllerUsername.text = getRandomString(8);
+      controllerPassword.text = getRandomString(8);
     }
   }
 
@@ -396,12 +408,6 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   }
 
   Widget create(BuildContext context) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-    Random rnd = Random.secure();
-
-    String getRandomString(int length) =>
-        String.fromCharCodes(Iterable.generate(
-            length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
 
     return SimpleDialog(
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -425,6 +431,13 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 tmpUser!.username = username;
               });
             },
+            customAction: () {
+              setState(() {
+                controllerUsername.text = getRandomString(8);
+              });
+            },
+            customActionIcon: Icon(FontAwesomeIcons.dice, size: 20),
+            customActionTooltip: "Genera casuale",
           ),
         ),
         SimpleDialogOption(
@@ -437,20 +450,19 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
                 tmpUser!.password = password;
               });
             },
+            customAction: () {
+              setState(() {
+                controllerPassword.text = getRandomString(8);
+              });
+            },
+            customActionIcon: Icon(FontAwesomeIcons.dice, size: 20,),
+            customActionTooltip: "Genera casuale",
           ),
         ),
         SimpleDialogOption(
             child: FormButton(
-          text: "Genera casuale",
-          onPressed: () {
-            controllerUsername.text = getRandomString(8);
-            controllerPassword.text = getRandomString(8);
-          },
-        )),
-        SimpleDialogOption(
-            child: FormButton(
           text: "Aggiungi",
-          onPressed: () async {
+          onPressed: (tmpUser!.password.isEmpty || tmpUser!.username.isEmpty) ? null : () async {
             bool added = await addUser(tmpUser!);
             if(!added){
               Fluttertoast.showToast(

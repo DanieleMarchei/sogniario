@@ -92,6 +92,9 @@ class InputField extends StatefulWidget {
   final bool enabled;
   final bool toggleObscure;
   final TextEditingController? controller;
+  final void Function()? customAction;
+  final Icon? customActionIcon;
+  final String? customActionTooltip;
 
   InputField(
       {this.labelText,
@@ -108,6 +111,9 @@ class InputField extends StatefulWidget {
       this.text,
       this.controller,
       this.enabled = true,
+      this.customAction,
+      this.customActionIcon,
+      this.customActionTooltip,
       super.key});
 
   @override
@@ -123,6 +129,14 @@ class _InputFieldState extends State<InputField> {
   void initState() {
     super.initState();
     showText = widget.obscureText;
+    if(widget.customAction != null && widget.customActionIcon != null && widget.customActionTooltip != null){
+      iconButton = IconButton(
+        onPressed: widget.customAction,
+        icon: widget.customActionIcon!,
+        tooltip: widget.customActionTooltip,
+      );
+    }
+
     if(widget.onCleared != null){
       iconButton = IconButton(
           onPressed: () {

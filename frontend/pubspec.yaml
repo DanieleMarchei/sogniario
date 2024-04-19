@@ -49,6 +49,8 @@ dependencies:
   fluttertoast: ^8.2.4
   page_transition:
 
+  font_awesome_flutter: ^10.7.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
