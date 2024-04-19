@@ -125,128 +125,131 @@ class _LoginState extends State<Login> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
-    return ScaffoldWithCircles(
-      context: context,
-      body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Center(
-              child: ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(
-                      width: min(screenWidth, halfWidthConstraint)),
-                  child: Stack(
-                    children: [
-                      Column(
-                        children: [
-                          SizedBox(height: 25),
+    return PopScope(
+      canPop: false,
+      child: ScaffoldWithCircles(
+        context: context,
+        body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Center(
+                child: ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: min(screenWidth, halfWidthConstraint)),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            SizedBox(height: 25),
+                            SizedBox(
+                              height: 100,
+                              child: Row(children: [
+                                Expanded(
+                                  child: Image.asset('assets/unicam_logo.png', 
+                                  scale: 0.5,
+                                  ),),
+                                Spacer(),
+                                Expanded(
+                                  child: Image.asset('assets/bsrl_logo.png', 
+                                  scale: 1, 
+                                  fit: BoxFit.contain,),),
+                              ],),
+                            ),
+                          ],
+                        ),
+                        ListView(children: [                        
+                          SizedBox(height: screenHeight * .2),
+                          const Text(
+                            'Sogniario',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 10,),
+                          SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
+                          SizedBox(height: screenHeight * .05),
+                          InputField(
+                            onChanged: (value) {
+                              setState(() {
+                                username = value;
+                              });
+                            },
+                            labelText: 'Username',
+                            errorText: usernameError,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            autoFocus: true,
+                          ),
+                          SizedBox(height: screenHeight * .025),
+                          InputField(
+                            onChanged: (value) {
+                              setState(() {
+                                password = value;
+                              });
+                            },
+                            labelText: 'Password',
+                            errorText: passwordError,
+                            toggleObscure: true,
+                            obscureText: true,
+                            textInputAction: TextInputAction.next,
+                          ),
                           SizedBox(
-                            height: 100,
-                            child: Row(children: [
-                              Expanded(
-                                child: Image.asset('assets/unicam_logo.png', 
-                                scale: 0.5,
-                                ),),
-                              Spacer(),
-                              Expanded(
-                                child: Image.asset('assets/bsrl_logo.png', 
-                                scale: 1, 
-                                fit: BoxFit.contain,),),
-                            ],),
+                            height: screenHeight * .075,
                           ),
-                        ],
-                      ),
-                      ListView(children: [                        
-                        SizedBox(height: screenHeight * .2),
-                        const Text(
-                          'Sogniario',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 10,),
-                        SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
-                        SizedBox(height: screenHeight * .05),
-                        InputField(
-                          onChanged: (value) {
-                            setState(() {
-                              username = value;
-                            });
-                          },
-                          labelText: 'Username',
-                          errorText: usernameError,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          autoFocus: true,
-                        ),
-                        SizedBox(height: screenHeight * .025),
-                        InputField(
-                          onChanged: (value) {
-                            setState(() {
-                              password = value;
-                            });
-                          },
-                          labelText: 'Password',
-                          errorText: passwordError,
-                          toggleObscure: true,
-                          obscureText: true,
-                          textInputAction: TextInputAction.next,
-                        ),
-                        SizedBox(
-                          height: screenHeight * .075,
-                        ),
-                        if (loginError != null) Text(loginError!),
-                        if (isScreenWide) ...{
-                          Row(
-                            children: [
-                              Expanded(
-                                child: IconTextButton(
-                                  icon: const Icon(Icons.person),
-                                  text: 'Entra come utente',
-                                  onPressed: submitUser,
+                          if (loginError != null) Text(loginError!),
+                          if (isScreenWide) ...{
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: IconTextButton(
+                                    icon: const Icon(Icons.person),
+                                    text: 'Entra come utente',
+                                    onPressed: submitUser,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Expanded(
-                                child: IconTextButton(
-                                  icon: const Icon(Icons.person_search_rounded),
-                                  text: 'Entra come ricercatore',
-                                  onPressed: submitResearcher,
+                                SizedBox(
+                                  width: 10,
                                 ),
-                              ),
-                            ],
-                          ),
-                        } else ...{
-                          IconTextButton(
-                            icon: const Icon(Icons.person),
-                            text: 'Entra come utente',
-                            onPressed: submitUser,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          IconTextButton(
-                            icon: const Icon(Icons.person_search_rounded),
-                            text: 'Entra come ricercatore',
-                            onPressed: submitResearcher,
-                          ),
-                        },
-                        if (kIsWeb) ...{
-                          SizedBox(
-                            height: 50,
-                          ),
-                          IconTextButton(
-                            icon: const Icon(Icons.android),
-                            text: "Scarica l'app (Android)",
-                            onPressed: downloadAndroidApp,
-                          ),
-                        },
-                      
-                      ]),
-                    ],
-                  )))),
+                                Expanded(
+                                  child: IconTextButton(
+                                    icon: const Icon(Icons.person_search_rounded),
+                                    text: 'Entra come ricercatore',
+                                    onPressed: submitResearcher,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          } else ...{
+                            IconTextButton(
+                              icon: const Icon(Icons.person),
+                              text: 'Entra come utente',
+                              onPressed: submitUser,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            IconTextButton(
+                              icon: const Icon(Icons.person_search_rounded),
+                              text: 'Entra come ricercatore',
+                              onPressed: submitResearcher,
+                            ),
+                          },
+                          if (kIsWeb) ...{
+                            SizedBox(
+                              height: 50,
+                            ),
+                            IconTextButton(
+                              icon: const Icon(Icons.android),
+                              text: "Scarica l'app (Android)",
+                              onPressed: downloadAndroidApp,
+                            ),
+                          },
+                        
+                        ]),
+                      ],
+                    )))),
+      ),
     );
   }
 }
