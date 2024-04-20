@@ -8,9 +8,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
+import 'package:frontend/routes.dart';
 import 'dart:math';
 
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 enum LoginType { user, admin }
 
@@ -28,9 +30,9 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    if (doIHaveJwt()) {
-      tokenBox.delete("jwt");
-    }
+    // if (doIHaveJwt()) {
+    //   tokenBox.delete("jwt");
+    // }
     username = '';
     password = '';
 
@@ -97,18 +99,22 @@ class _LoginState extends State<Login> {
 
   void submitUser() async {
     if (await validate(isValidLoginUser)) {
+      print("validate jwt: ${doIHaveJwt()}");
       DateTime? birthdate;
       Sex? sex;
       (birthdate, sex) = await getMyGeneralInfo();
       bool redirectToGeneralInfo = birthdate == null || sex == null;
       if (redirectToGeneralInfo) {
-        Navigator.pushNamed(context, "/general_info");
+        context.goNamed(Routes.generalInfo.name);
+        // Navigator.pushNamed(context, "/general_info");
       } else {
         ChronoTypeData? chronotype = await getMyChronotype();
         if (chronotype == null) {
-          Navigator.pushNamed(context, "/chronotype");
+          context.goNamed(Routes.chronotype.name);
+          // Navigator.pushNamed(context, "/chronotype");
         } else {
-          Navigator.pushNamed(context, "/home_user");
+          context.goNamed(Routes.homeUser.name);
+          // Navigator.pushNamed(context, "/home_user");
         }
       }
     }
@@ -116,7 +122,9 @@ class _LoginState extends State<Login> {
 
   void submitResearcher() async {
     if (await validate(isValidLoginResearcher)) {
-      Navigator.pushNamed(context, "/home_admin");
+      context.goNamed(Routes.homeResearcher.name);
+
+      // Navigator.pushNamed(context, "/home_admin");
     }
   }
 

@@ -3,7 +3,9 @@ import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 const List<String> answersHowMuch = [
   "Per niente.",
@@ -263,7 +265,6 @@ class _ChronoTypeState extends State<ChronoType> {
               });
             }, 
             unansweredQuestions: () { 
-              //TODO: q15 
               List<int> uq = [];
               for (var i = 0; i < chronoType.report.length; i++) {
                 if(chronoType.report[i] == null) uq.add(i);
@@ -333,7 +334,7 @@ class _ChronoTypeState extends State<ChronoType> {
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
                       text: "Iniziamo!",
-                      onPressed: () => Navigator.pushNamed(context, "/home_user"),
+                      onPressed: () => context.goNamed(Routes.homeUser.name),
                     ),
                   ],
                 ),

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 class DreamsList extends StatefulWidget {
   @override
@@ -34,6 +36,11 @@ class _DreamsListState extends State<DreamsList> {
             appBar: AppBar(
               backgroundColor: Colors.blue,
               title: Text("I miei sogni"),
+              leading: IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () => context.goNamed(Routes.homeUser.name),
+                tooltip: "Torna alla pagina iniziale",
+              ),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -52,7 +59,7 @@ class _DreamsListState extends State<DreamsList> {
                             icon: Icon(Icons.cloud_upload),
                             text: "Racconta un sogno!",
                             onPressed: () {
-                              Navigator.pushNamed(context, "/add_dream");
+                              context.goNamed(Routes.addDream.name);
                             },
                           )
                         ],

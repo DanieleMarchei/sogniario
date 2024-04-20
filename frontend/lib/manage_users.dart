@@ -6,7 +6,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 class ManageUsers extends StatefulWidget {
   const ManageUsers({
@@ -69,6 +71,11 @@ class _ManageUsersState extends State<ManageUsers> {
           appBar: AppBar(
             title: const Text("Gestisci utenti"),
             backgroundColor: Colors.orange,
+            leading: IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () => context.goNamed(Routes.homeResearcher.name),
+              tooltip: "Torna alla pagina iniziale",
+            ),
             bottom: showMobileLayout ? PreferredSize(
               preferredSize: Size(100, 30),
               child: Column(
@@ -395,12 +402,12 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               textColor: Colors.white,
               fontSize: 12.0
             );
-            if (mounted) Navigator.pop(context);
+            if (mounted) context.pop();
           },
           child: const Text("Elimina")),
         TextButton(
           onPressed: () async {
-            if (mounted) Navigator.pop(context);
+            if (mounted) context.pop();
           },
           child: const Text("Non eliminare"))
       ],
@@ -415,7 +422,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         const Spacer(),
         IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
             },
             tooltip: "Annulla",
             icon: const Icon(Icons.close))
@@ -486,7 +493,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               textColor: Colors.white,
               fontSize: 12.0
             );
-            if (mounted) Navigator.pop(context);
+            if (mounted) context.pop();
           },
         )),
       ],
@@ -500,7 +507,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         const Spacer(),
         IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
             },
             tooltip: "Chiudi",
             icon: const Icon(Icons.close))
@@ -540,7 +547,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         const Spacer(),
         IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
             },
             tooltip: "Annulla",
             icon: const Icon(Icons.close))
@@ -636,7 +643,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
               textColor: Colors.white,
               fontSize: 12.0
             );
-            if (mounted) Navigator.pop(context);
+            if (mounted) context.pop();
           },
         ))
       ],

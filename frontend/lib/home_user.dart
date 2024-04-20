@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeUser extends StatelessWidget {
   const HomeUser({super.key});
@@ -16,15 +18,14 @@ class HomeUser extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 
     bool showMobileLayout = screenWidth < widthConstraint;
+    print("jwt? ${doIHaveJwt()}");
 
-    return PopScope(
-      canPop: true,
-      onPopInvoked: (didPop) async {
-        if (doIHaveJwt()) {
-          tokenBox.delete("jwt");
-        }
-      },
-      child: ScaffoldWithCircles(
+    var exitFunc = () async {
+      deleteJwt();
+      context.goNamed(Routes.login.name);
+    };
+
+    return ScaffoldWithCircles(
           context: context,
           body: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -51,14 +52,7 @@ class HomeUser extends StatelessWidget {
                               IconTextButton(
                                 icon: Icon(Icons.logout),
                                 text: "Esci",
-                                onPressed: () async {
-                                  deleteJwt();
-                                  Navigator.pushNamedAndRemoveUntil(
-                                    context,
-                                    "/",
-                                    (route) => false,
-                                  );
-                                },
+                                onPressed: exitFunc
                               )
                             }
                           ]),
@@ -72,23 +66,18 @@ class HomeUser extends StatelessWidget {
                               icon: const Icon(Icons.privacy_tip_outlined),
                               text: "Info e privacy",
                               onPressed: () => {
-                                    Navigator.pushNamed(
-                                        context, "/info_and_privacy")
+                                    context.goNamed(Routes.infoAndPrivacy.name)
                                   }),
                           if(!kIsWeb)...{
                             SizedBox(height: 100,),
                             IconTextButton(
                                 icon: Icon(Icons.logout),
                                 text: "Esci",
-                                onPressed: () async {
-                                  deleteJwt();
-                                  Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false,);
-                                },
+                                onPressed: exitFunc,
                               )
                           }
                         ],
-                      ))))),
-    );
+                      )))));
   }
 
   List<Widget> desktopWidgets(BuildContext context) {
@@ -96,20 +85,22 @@ class HomeUser extends StatelessWidget {
 
     return [
       IconTextButton(
-          icon: const Icon(Icons.cloud_upload),
-          text: "Racconta un sogno",
-          onPressed: () => {Navigator.pushNamed(context, "/add_dream")}),
+        icon: const Icon(Icons.cloud_upload),
+        text: "Racconta un sogno",
+        onPressed: () => context.goNamed(Routes.addDream.name)
+      ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
-        onPressed: () => Navigator.pushNamed(context, "/dreams_list"),
+        onPressed: () => context.goNamed(Routes.myDreams.name),
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
-          icon: const Icon(Icons.format_list_bulleted),
-          text: "PSQI",
-          onPressed: () => {Navigator.pushNamed(context, "/psqi")}),
+        icon: const Icon(Icons.format_list_bulleted),
+        text: "PSQI",
+        onPressed: () => context.goNamed(Routes.psqi.name)
+      ),
     ];
   }
 
@@ -138,18 +129,18 @@ class HomeUser extends StatelessWidget {
       IconTextButton(
           icon: const Icon(Icons.cloud_upload),
           text: "Racconta un sogno",
-          onPressed: () => {Navigator.pushNamed(context, "/add_dream")}),
+          onPressed: () => context.goNamed(Routes.addDream.name)),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
-        onPressed: () => Navigator.pushNamed(context, "/dreams_list"),
+        onPressed: () => context.goNamed(Routes.myDreams.name),
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(
           icon: const Icon(Icons.format_list_bulleted),
           text: "PSQI",
-          onPressed: () => {Navigator.pushNamed(context, "/psqi")}),
+          onPressed: () => context.goNamed(Routes.psqi.name)),
     ];
   }
 }

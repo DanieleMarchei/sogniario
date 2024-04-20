@@ -7,7 +7,9 @@ import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/home_user.dart';
 import 'package:frontend/questions.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 class ResponsiveReport extends StatefulWidget {
   const ResponsiveReport({
@@ -16,7 +18,8 @@ class ResponsiveReport extends StatefulWidget {
     required this.title,
     required this.onSubmitted,
     required this.unansweredQuestions,
-    this.ignoreUnansweredQuestions = false
+    this.ignoreUnansweredQuestions = false,
+    this.homeButtonTooltip
   });
 
   final List<QuestionWithDirection> questionWidgets;
@@ -24,6 +27,7 @@ class ResponsiveReport extends StatefulWidget {
   final Function onSubmitted;
   final List<int> Function()  unansweredQuestions;
   final bool ignoreUnansweredQuestions;
+  final String? homeButtonTooltip;
 
   @override
   State<ResponsiveReport> createState() => _ResponsiveReportState();
@@ -53,7 +57,35 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(widget.title),
-        
+        leading: widget.homeButtonTooltip == null ? null : IconButton(
+          icon: Icon(Icons.home),
+          onPressed: () async {
+            bool pop = await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: Text("Tornare indietro?"),
+                  content: Text(widget.homeButtonTooltip!, textAlign: TextAlign.justify,),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Si'),
+                      onPressed: () {
+                        context.pop(true);
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('No'),
+                      onPressed: () {
+                        context.pop(false);
+                      },
+                    ),
+                  ],);
+              },
+            );
+            if(pop) context.goNamed(Routes.homeUser.name);
+          },
+          tooltip: "Torna alla pagina iniziale",
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: padding),
@@ -101,7 +133,7 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
             TextButton(
               child: const Text('Ok'),
               onPressed: () {
-                Navigator.of(context).pop();
+                context.pop();
               },
             ),
           ],

@@ -34,14 +34,12 @@ class Frontend extends StatelessWidget {
         );
         }
     });
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Sogniario',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
-      onGenerateRoute: Routes.routes,
-      debugShowCheckedModeBanner: false,
+      routerConfig: routes,
     );
   }
 }

@@ -7,7 +7,9 @@ import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -89,9 +91,10 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
     var responsiveReport = ResponsiveReport(
       questionWidgets: dreamQuestions,
       title: "Racconta un sogno",
+      homeButtonTooltip: "Vuoi annullare il racconto di questo sognio e tornare alla schermata principale?",
       onSubmitted: () async {
         await addDream(dream);
-        Navigator.pushNamed(context, "/home_user");
+        context.goNamed(Routes.homeUser.name);
       }, unansweredQuestions: () { 
         List<int> uq = [];
         if(dream.dreamText.split(" ").length < 3){
@@ -105,35 +108,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
       },
     );
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) async {
-        bool pop = await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text("Tornare indietro?"),
-                content: Text("Vuoi davvero annullare il racconto di questo sogno?", textAlign: TextAlign.justify,),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('Si'),
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text('No'),
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                  ),
-                ],);
-          },
-        );
-        if(pop) Navigator.pushNamed(context, "/home_user");
-      },
-      child: responsiveReport
-    );
+    return responsiveReport;
   }
   
 }

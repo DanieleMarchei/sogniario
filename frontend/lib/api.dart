@@ -24,6 +24,23 @@ bool doIHaveJwt(){
   return validJwt;
 }
 
+enum UserType {
+  admin,
+  researcher,
+  user,
+  notLogged
+}
+
+UserType getMyUserType(){
+  if(!doIHaveJwt()) return UserType.notLogged;
+
+  var token = JwtDecoder.decode(tokenBox.get("jwt"));
+  if(![0,1,2].contains(token["type"])) return UserType.notLogged;
+
+  return UserType.values[token["type"]];
+
+}
+
 void deleteJwt(){
   if(!tokenBox.containsKey("jwt")) return;
   tokenBox.delete("jwt");
@@ -515,7 +532,10 @@ Future<List<DreamData>> getMyDreams() async {
   return dreams;
 }
 
+List<UserType> allowedToDownload = [UserType.admin, UserType.researcher];
+
 Future<void> downloadDatabaseDesktop() async {
+  if(!allowedToDownload.contains(getMyUserType())) return;
   if(!kIsWeb) return;
 
   int id = myJwtData()["sub"];
@@ -555,7 +575,9 @@ enum MobileDBDownloadState {
 }
 
 
-Future<(File, MobileDBDownloadState)> downloadDatabaseMobile() async {
+Future<(File, MobileDBDownloadState)?> downloadDatabaseMobile() async {
+  if(!allowedToDownload.contains(getMyUserType())) return null;
+
   UserData user = await getMyResearcher();
   String fileName = "sogniario (${user.organizationName}) - ${DateTime.now()}.zip";
 
@@ -568,11 +590,13 @@ Future<(File, MobileDBDownloadState)> downloadDatabaseMobile() async {
     return (file, MobileDBDownloadState.fileAlreadyExists);
   }else{
     var state = await downloadDatabaseMobileConfirmed(file);
-    return (file, state);
+    return (file, state!);
   }
 }
 
-Future<MobileDBDownloadState> downloadDatabaseMobileConfirmed(File file) async {
+Future<MobileDBDownloadState?> downloadDatabaseMobileConfirmed(File file) async {
+  if(!allowedToDownload.contains(getMyUserType())) return null;
+
   int organizationId = myJwtData()["organization"];
   var response = await HttpRequest(
     tableName: TableName.userDownload,

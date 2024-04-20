@@ -6,16 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
-class HomeAdmin extends StatelessWidget {
-  const HomeAdmin({super.key});
+class HomeResearcher extends StatelessWidget {
+  const HomeResearcher({super.key});
 
   @override
   Widget build(BuildContext context) {
 
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
+    var exitFunc = () async {
+      deleteJwt();
+      context.goNamed(Routes.login.name);
+    };
 
     return FutureBuilder(
         future: getMyResearcher(),
@@ -57,20 +64,14 @@ class HomeAdmin extends StatelessWidget {
                                 IconTextButton(
                                   icon: Icon(Icons.logout),
                                   text: "Esci",
-                                  onPressed: () async {
-                                    deleteJwt();
-                                    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false,);
-                                  },
+                                  onPressed: exitFunc
                                 )
                               }
                             ]),
                             IconTextButton(
                                 icon: const Icon(Icons.groups),
                                 text: "Gestisci utenti",
-                                onPressed: () => {
-                                      Navigator.pushNamed(
-                                          context, "/manage_users")
-                                    }),
+                                onPressed: () => context.goNamed(Routes.manageUsers.name)),
                             SizedBox(height: screenHeight * .01),
                             IconTextButton(
                                 icon: const Icon(Icons.download),
@@ -82,8 +83,7 @@ class HomeAdmin extends StatelessWidget {
 
                                   File file;
                                   MobileDBDownloadState state;
-                                  (file, state) =
-                                      await downloadDatabaseMobile();
+                                  (file, state) = (await downloadDatabaseMobile())!;
                                   switch (state) {
                                     case MobileDBDownloadState.downloadFinished:
                                       await showAlert(context, file, state);
@@ -95,9 +95,7 @@ class HomeAdmin extends StatelessWidget {
                                               context, file, state) ??
                                           false;
                                       if (overwriteFile) {
-                                        state =
-                                            await downloadDatabaseMobileConfirmed(
-                                                file);
+                                        state = (await downloadDatabaseMobileConfirmed(file))!;
                                         await showAlert(context, file, state);
                                       }
                                       break;
@@ -112,10 +110,7 @@ class HomeAdmin extends StatelessWidget {
                               IconTextButton(
                                   icon: Icon(Icons.logout),
                                   text: "Esci",
-                                  onPressed: () async {
-                                    deleteJwt();
-                                    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false,);
-                                  },
+                                  onPressed: exitFunc
                                 )
                             }
                           ],
@@ -134,13 +129,13 @@ class HomeAdmin extends StatelessWidget {
         TextButton(
           child: const Text('Si'),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            context.pop(true);
           },
         ),
         TextButton(
           child: const Text('No'),
           onPressed: () {
-            Navigator.of(context).pop(false);
+            context.pop(false);
           },
         ),
       ],
@@ -148,7 +143,7 @@ class HomeAdmin extends StatelessWidget {
         TextButton(
           child: const Text('Ok'),
           onPressed: () {
-            Navigator.of(context).pop();
+            context.pop();
           },
         ),
       ],
