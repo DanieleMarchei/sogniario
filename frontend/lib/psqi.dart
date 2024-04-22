@@ -316,7 +316,8 @@ class _PSQIState extends State<PSQI> {
     double screenHeight = MediaQuery.of(context).size.height;
     
     return !showScore ? ResponsiveReport(
-      questionWidgets: psqiQuestions, 
+      questionWidgets: psqiQuestions,
+      homeButtonTooltip: "Vuoi annullare la compilazione del PSQI e tornare alla schermata principale?",
       title: "PSQI", 
       onSubmitted: () async {
         await addMyPSQI(psqi);

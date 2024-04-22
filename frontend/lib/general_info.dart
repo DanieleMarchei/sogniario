@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 
 
@@ -23,9 +25,9 @@ class _GeneralInfoState extends State<GeneralInfo> {
     if(updateDone){
       ChronoTypeData? chronotype = await getMyChronotype();
       if (chronotype == null){
-        Navigator.pushNamed(context, "/chronotype");
+        context.goNamed(Routes.chronotype.name);
       }else{
-        Navigator.pushNamed(context, "/home_user");
+        context.goNamed(Routes.homeUser.name);
       }
     }
   }

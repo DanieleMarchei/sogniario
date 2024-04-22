@@ -47,9 +47,8 @@ dependencies:
   avatar_glow: ^3.0.1
   connectivity_plus: ^6.0.2
   fluttertoast: ^8.2.4
-  page_transition:
-
   font_awesome_flutter: ^10.7.0
+  go_router: ^13.2.4
 
 dev_dependencies:
   flutter_test:
