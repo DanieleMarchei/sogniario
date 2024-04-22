@@ -359,8 +359,8 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
       backgroundColor: const Color.fromARGB(255, 238, 232, 244),
       onConfirm: (Picker picker, List value) {
         setState(() {
-          selectedValue1 = picker.getSelectedValues()[0];
-          selectedValue2 = picker.getSelectedValues()[1];
+          selectedValue1 = int.parse(picker.getSelectedValues()[0]);
+          selectedValue2 = int.parse(picker.getSelectedValues()[1]);
         });
         if (widget.onIntegersSelected != null) {
           widget.onIntegersSelected!(selectedValue1!, selectedValue2!);

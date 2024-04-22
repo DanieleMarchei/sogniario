@@ -1,0 +1,123 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="it.unicam.sogniario"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="33" />
+10    <!--
+11         The INTERNET permission is required for development. Specifically,
+12         the Flutter tool needs it to communicate with the running application
+13         to allow setting breakpoints, to provide hot reload, etc.
+14    -->
+15    <uses-permission android:name="android.permission.INTERNET" />
+15-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:3:5-66
+15-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:3:22-64
+16    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+16-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:2:5-70
+16-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:2:22-68
+17    <uses-permission android:name="android.permission.BLUETOOTH" />
+17-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:4:5-67
+17-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:4:22-65
+18    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+18-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:5:5-73
+18-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:5:22-71
+19    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+19-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:6:5-75
+19-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:6:22-73
+20    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+20-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:7:5-81
+20-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:7:22-78
+21    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+21-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:8:5-80
+21-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:8:22-77
+22    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+22-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:9:5-79
+22-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:9:22-77
+23
+24    <queries>
+24-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:10:5-14:15
+25        <intent>
+25-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:11:9-13:18
+26            <action android:name="android.speech.RecognitionService" />
+26-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:12:13-72
+26-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:12:21-69
+27        </intent>
+28    </queries>
+29    <!--
+30 Required to query activities that can process text, see:
+31         https://developer.android.com/training/package-visibility?hl=en and
+32         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+33
+34         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
+35    -->
+36    <queries>
+36-->/home/daniele/Scrivania/sogniario/frontend/android/app/src/main/AndroidManifest.xml:10:5-14:15
+37        <intent>
+38            <action android:name="android.intent.action.PROCESS_TEXT" />
+39
+40            <data android:mimeType="text/plain" />
+41        </intent>
+42    </queries>
+43
+44    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+44-->[:connectivity_plus] /home/daniele/Scrivania/sogniario/frontend/build/connectivity_plus/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-79
+44-->[:connectivity_plus] /home/daniele/Scrivania/sogniario/frontend/build/connectivity_plus/intermediates/merged_manifest/debug/AndroidManifest.xml:9:22-76
+45
+46    <application
+47        android:name="android.app.Application"
+48        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+48-->[androidx.core:core:1.6.0] /home/daniele/.gradle/caches/transforms-3/2579a7de00054bf46a8dbc332552f622/transformed/core-1.6.0/AndroidManifest.xml:24:18-86
+49        android:debuggable="true"
+50        android:icon="@mipmap/launcher_icon"
+51        android:label="sogniario" >
+52        <activity
+53            android:name="it.unicam.sogniario.MainActivity"
+54            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+55            android:exported="true"
+56            android:hardwareAccelerated="true"
+57            android:launchMode="singleTop"
+58            android:theme="@style/LaunchTheme"
+59            android:windowSoftInputMode="adjustResize" >
+60
+61            <!--
+62                 Specifies an Android theme to apply to this Activity as soon as
+63                 the Android process has started. This theme is visible to the user
+64                 while the Flutter UI initializes. After that, this theme continues
+65                 to determine the Window background behind the Flutter UI.
+66            -->
+67            <meta-data
+68                android:name="io.flutter.embedding.android.NormalTheme"
+69                android:resource="@style/NormalTheme" />
+70
+71            <intent-filter>
+72                <action android:name="android.intent.action.MAIN" />
+73
+74                <category android:name="android.intent.category.LAUNCHER" />
+75            </intent-filter>
+76        </activity>
+77        <!--
+78             Don't delete the meta-data below.
+79             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+80        -->
+81        <meta-data
+82            android:name="flutterEmbedding"
+83            android:value="2" />
+84
+85        <uses-library
+85-->[androidx.window:window:1.0.0-beta04] /home/daniele/.gradle/caches/transforms-3/032f4dff274e516110d9363a9793a3e3/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:25:9-27:40
+86            android:name="androidx.window.extensions"
+86-->[androidx.window:window:1.0.0-beta04] /home/daniele/.gradle/caches/transforms-3/032f4dff274e516110d9363a9793a3e3/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:26:13-54
+87            android:required="false" />
+87-->[androidx.window:window:1.0.0-beta04] /home/daniele/.gradle/caches/transforms-3/032f4dff274e516110d9363a9793a3e3/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:27:13-37
+88        <uses-library
+88-->[androidx.window:window:1.0.0-beta04] /home/daniele/.gradle/caches/transforms-3/032f4dff274e516110d9363a9793a3e3/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:28:9-30:40
+89            android:name="androidx.window.sidecar"
+89-->[androidx.window:window:1.0.0-beta04] /home/daniele/.gradle/caches/transforms-3/032f4dff274e516110d9363a9793a3e3/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:29:13-51
+90            android:required="false" />
+90-->[androidx.window:window:1.0.0-beta04] /home/daniele/.gradle/caches/transforms-3/032f4dff274e516110d9363a9793a3e3/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:30:13-37
+91    </application>
+92
+93</manifest>
