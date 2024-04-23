@@ -36,7 +36,8 @@ class Frontend extends StatelessWidget {
         }
     });
     return MaterialApp.router(
-      title: 'Sogniario',
+      title: "Sogniario",
+      onGenerateTitle: (context) => "Sogniario",
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
