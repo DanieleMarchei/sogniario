@@ -11,12 +11,13 @@ import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
 // String authority = "localhost:3000";
-// String authority = "sogniario.unicam.it:3000";
-String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
+String authority = "sogniario.unicam.it/api";
+// String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
 // String authority = "192.168.115.2:3000";
-String server = "http://$authority";
+String server = "https://$authority";
 
 var tokenBox = Hive.box('tokens');
+var userDataBox = Hive.box('userData');
 
 bool doIHaveJwt(){
   if(!tokenBox.containsKey("jwt")) return false;
@@ -41,9 +42,10 @@ UserType getMyUserType(){
 
 }
 
-void deleteJwt(){
-  if(!tokenBox.containsKey("jwt")) return;
+void deleteJwtAndUserInfo(){
   tokenBox.delete("jwt");
+  userDataBox.delete("hasGeneralInfo");
+  userDataBox.delete("hasChronotype");
 }
 
 
