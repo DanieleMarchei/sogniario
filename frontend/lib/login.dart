@@ -26,6 +26,7 @@ class _LoginState extends State<Login> {
   late String username, password;
   String? usernameError, passwordError;
   String? loginError;
+  bool askToWait = false;
 
   @override
   void initState() {
@@ -248,9 +249,17 @@ class _LoginState extends State<Login> {
                               height: 50,
                             ),
                             IconTextButton(
-                              icon: const Icon(Icons.android),
+                              icon: askToWait ? CircularProgressIndicator() : const Icon(Icons.android),
                               text: "Scarica l'app (Android)",
-                              onPressed: downloadAndroidApp,
+                              onPressed: () async {
+                                setState(() {
+                                  askToWait = true;
+                                });
+                                await downloadAndroidApp();
+                                setState(() {
+                                  askToWait = false;
+                                });
+                              }
                             ),
                           },
                         

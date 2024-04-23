@@ -69,6 +69,7 @@ class _ManageUsersState extends State<ManageUsers> {
                 )
               : null,
           appBar: AppBar(
+            centerTitle: showMobileLayout,
             title: const Text("Gestisci utenti"),
             backgroundColor: Colors.orange,
             leading: IconButton(
@@ -192,7 +193,7 @@ class _UserCardWidgetState extends State<UserCardWidget> {
     return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.user.username),
+            SelectableText(widget.user.username),
             const Spacer(),
             ...getButtons(context)
           ],
@@ -203,7 +204,7 @@ class _UserCardWidgetState extends State<UserCardWidget> {
     return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(widget.user.username),
+            SelectableText(widget.user.username),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: getButtons(context),
