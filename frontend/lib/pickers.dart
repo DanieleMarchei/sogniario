@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_picker/picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
+
 
 class DatePickerButton extends StatefulWidget {
   DatePickerButton(
@@ -24,54 +27,232 @@ class DatePickerButton extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePickerButton> {
-  DateTime? selectedValue;
+  List<int?> selectedValue = [null, null, null];
+
+  final List<(String, String, int)> months = [
+    ("Gen", "Gennaio", 1),
+    ("Feb", "Febbraio", 2),
+    ("Mar", "Marzo", 3),
+    ("Apr", "Aprile", 4),
+    ("Mag", "Maggio", 5),
+    ("Giu", "Giugno", 6),
+    ("Lug", "Luglio", 7),
+    ("Ago", "Agosto", 8),
+    ("Set", "Settembre", 9),
+    ("Ott", "Ottobre", 10),
+    ("Nov", "Novembre", 11),
+    ("Dic", "Dicembre", 12)
+  ];
+
+  final List<int> years = List.generate(DateTime.now().year - 1900 + 1, (index) => 1900 + index);
+  final List<int> days = List.generate(31, (index) => index + 1);
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: () {
-        Picker(
-          adapter: DateTimePickerAdapter(
-            months: [
-              "Gen",
-              "Feb",
-              "Mar",
-              "Apr",
-              "Mag",
-              "Giu",
-              "Lug",
-              "Ago",
-              "Set",
-              "Ott",
-              "Nov",
-              "Dic"
-            ],
-            maxValue: DateTime.now(),
-            type: PickerDateTimeType.kYMD,
-          ),
-          changeToFirst: false,
-          hideHeader: true,
-          confirmText: 'Conferma',
-          cancelText: "Cancella",
-          title: const Text("Data di nascita"),
-          backgroundColor: const Color.fromARGB(255, 238, 232, 244),
-          onConfirm: (Picker picker, List value) {
-            int day = value[2] + 1;
-            int month = value[1] + 1;
-            int year =
-                value[0] + (picker.adapter as DateTimePickerAdapter).yearBegin;
-            DateTime selected = DateTime(year, month, day);
-            setState(() {
-              selectedValue = selected;
-            });
-            if (widget.onSelectedDate != null) widget.onSelectedDate!(selected);
-          },
-        ).showDialog(context);
+        if (kIsWeb) {
+          showDesktop(context);
+        } else {
+          showMobile(context);
+        }
       },
-      child: Text(selectedValue != null
-          ? '${widget.text}${selectedValue!.day}/${selectedValue!.month}/${selectedValue!.year}'
-          : '${widget.text}${widget.helpText}'),
+      child: Text(selectedValue.any((element) => element == null)
+          ? '${widget.text}${widget.helpText}'
+          : '${widget.text}${selectedValue[0]}/${months[selectedValue[1]! - 1].$1}/${selectedValue[2]}'
+      )
     );
+  }
+
+  void showDesktop(BuildContext conrtext) {
+    setState(() {
+      if(selectedValue.any((element) => element == null)){
+        selectedValue = [null, null, null];
+      }
+    });
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              const Text("Seleziona"),
+              const Spacer(),
+              IconButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  tooltip: "Annulla",
+                  icon: const Icon(Icons.close))
+            ]),
+            children: [
+              SimpleDialogOption(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          label: Text("Giorno"),
+                        ),
+                        value: selectedValue[0],
+                        items: days.map<DropdownMenuItem<int>>((int i) {
+                          return DropdownMenuItem<int>(
+                            value: i,
+                            child: Text(
+                              "$i",
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (int? value) {
+                          setState(() {
+                            selectedValue[0] = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 200,
+                      child: DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          label: Text("Mese"),
+                        ),
+                        value: selectedValue[1],
+                        items: months.map<DropdownMenuItem<int>>(((String, String, int) m_i) {
+                          return DropdownMenuItem<int>(
+                            value: m_i.$3,
+                            child: Text(
+                              "${m_i.$2}",
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (int? value) {
+                          setState(() {
+                            selectedValue[1] = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 200,
+                      child: DropdownButtonFormField<int>(
+                        decoration: InputDecoration(
+                          label: Text("Anno"),
+                        ),
+                        value: selectedValue[2],
+                        items: years.map<DropdownMenuItem<int>>((int i) {
+                          return DropdownMenuItem<int>(
+                            value: i,
+                            child: Text(
+                              "$i",
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (int? value) {
+                          setState(() {
+                            selectedValue[2] = value!;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                child: Row(
+                  children: [
+                    TextButton(
+                      child: const Text('Cancella'),
+                      onPressed: () {
+                        setState(() {
+                          selectedValue = [null, null, null];
+                        });
+                        context.pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Conferma'),
+                      onPressed: () {
+                        if(selectedValue.any((element) => element == null)){
+                          Fluttertoast.showToast(
+                            msg: "Data non valida!",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 12.0
+                          );
+                          return;
+                        }
+
+                        DateTime selected = DateTime(selectedValue[2]!, selectedValue[1]!, selectedValue[0]!);
+                        if(selected.year != selectedValue[2] || selected.month != selectedValue[1] || selected.day != selectedValue[0]){
+                          Fluttertoast.showToast(
+                            msg: "Data non valida!",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 12.0
+                          );
+                          return;
+                        }
+                        
+
+                        if(selected.isAfter(DateTime.now())){
+                          Fluttertoast.showToast(
+                            msg: "Inserire una data antecedente ad oggi.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 12.0
+                          );
+                          return;
+                        }
+                        
+                        if (widget.onSelectedDate != null) {
+                          widget.onSelectedDate!(selected);
+                        }
+                        context.pop();
+                      },
+                    ),
+                  ],
+                ),
+              )
+            ],
+          );
+        });
+  }
+
+  void showMobile(BuildContext conrtext) {
+    Picker(
+      adapter: DateTimePickerAdapter(
+        months: List<String>.generate(12, (index) => months[index].$2),
+        maxValue: DateTime.now(),
+        type: PickerDateTimeType.kYMD,
+      ),
+      changeToFirst: false,
+      hideHeader: true,
+      confirmText: 'Conferma',
+      cancelText: "Cancella",
+      title: const Text("Data di nascita"),
+      backgroundColor: const Color.fromARGB(255, 238, 232, 244),
+      onConfirm: (Picker picker, List value) {
+        int day = value[2] + 1;
+        int month = value[1] + 1;
+        int year =
+            value[0] + (picker.adapter as DateTimePickerAdapter).yearBegin;
+        DateTime selected = DateTime(year, month, day);
+        setState(() {
+          selectedValue = [year, month, day];
+        });
+        if (widget.onSelectedDate != null) widget.onSelectedDate!(selected);
+      },
+    ).showDialog(context);
   }
 }
 
@@ -109,7 +290,8 @@ class _TimeOfDayState extends State<TimeOfDayPickerButton> {
           helpText: "Seleziona un orario",
           builder: (_, Widget? child) {
             return MediaQuery(
-              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+              data:
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
               child: child!,
             );
           },
@@ -160,10 +342,9 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
   void initState() {
     super.initState();
     data = [
-            List.generate(
-                (widget.maxValue - widget.minValue) ~/ widget.increment + 1,
-                (index) => index * (widget.increment) + widget.minValue),
-          ];
+      List.generate((widget.maxValue - widget.minValue) ~/ widget.increment + 1,
+          (index) => index * (widget.increment) + widget.minValue),
+    ];
     tmpSelected = data[0][0];
   }
 
@@ -176,7 +357,6 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
         } else {
           showMobile(context);
         }
-        
       },
       child: Text(selectedValue != null
           ? '${widget.text}${selectedValue}'
@@ -184,27 +364,27 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
     );
   }
 
-  void showMobile(BuildContext context){
+  void showMobile(BuildContext context) {
     Picker(
-          adapter: PickerDataAdapter<String>(pickerData: data, isArray: true),
-          changeToFirst: false,
-          hideHeader: true,
-          confirmText: 'Conferma',
-          cancelText: "Cancella",
-          title: const Text("Minuti"),
-          backgroundColor: const Color.fromARGB(255, 238, 232, 244),
-          onConfirm: (Picker picker, List value) {
-            setState(() {
-              selectedValue = int.parse(picker.getSelectedValues()[0]);
-            });
-            if (widget.onSelectedInteger != null)
-              widget.onSelectedInteger!(selectedValue!);
-          },
-        ).showDialog(context);
+      adapter: PickerDataAdapter<String>(pickerData: data, isArray: true),
+      changeToFirst: false,
+      hideHeader: true,
+      confirmText: 'Conferma',
+      cancelText: "Cancella",
+      title: const Text("Minuti"),
+      backgroundColor: const Color.fromARGB(255, 238, 232, 244),
+      onConfirm: (Picker picker, List value) {
+        setState(() {
+          selectedValue = int.parse(picker.getSelectedValues()[0]);
+        });
+        if (widget.onSelectedInteger != null)
+          widget.onSelectedInteger!(selectedValue!);
+      },
+    ).showDialog(context);
   }
 
-  void showDesktop(BuildContext context){
-showDialog(
+  void showDesktop(BuildContext context) {
+    showDialog(
         context: context,
         builder: (context) {
           return SimpleDialog(
@@ -213,7 +393,7 @@ showDialog(
               const Spacer(),
               IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    context.pop();
                   },
                   tooltip: "Annulla",
                   icon: const Icon(Icons.close))
@@ -233,7 +413,9 @@ showDialog(
                         items: data[0].map<DropdownMenuItem<int>>((int i) {
                           return DropdownMenuItem<int>(
                             value: i,
-                            child: Text("$i",),
+                            child: Text(
+                              "$i",
+                            ),
                           );
                         }).toList(),
                         onChanged: (int? value) {
@@ -252,7 +434,7 @@ showDialog(
                     TextButton(
                       child: const Text('Cancella'),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        context.pop();
                       },
                     ),
                     TextButton(
@@ -264,7 +446,7 @@ showDialog(
                         if (widget.onSelectedInteger != null) {
                           widget.onSelectedInteger!(selectedValue!);
                         }
-                        Navigator.of(context).pop();
+                        context.pop();
                       },
                     ),
                   ],
@@ -370,7 +552,6 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
   }
 
   void showDesktop(BuildContext context) {
-
     showDialog(
         context: context,
         builder: (context) {
@@ -380,7 +561,7 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
               const Spacer(),
               IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    context.pop();
                   },
                   tooltip: "Annulla",
                   icon: const Icon(Icons.close))
@@ -400,7 +581,9 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                         items: data[0].map<DropdownMenuItem<int>>((int i) {
                           return DropdownMenuItem<int>(
                             value: i,
-                            child: Text("$i",),
+                            child: Text(
+                              "$i",
+                            ),
                           );
                         }).toList(),
                         onChanged: (int? value) {
@@ -443,7 +626,7 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                     TextButton(
                       child: const Text('Cancella'),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        context.pop();
                       },
                     ),
                     TextButton(
@@ -454,9 +637,10 @@ class _DoubleIntegerPickerButtonState extends State<DoubleIntegerPickerButton> {
                           selectedValue2 = tmpSelected2;
                         });
                         if (widget.onIntegersSelected != null) {
-                          widget.onIntegersSelected!(selectedValue1!, selectedValue2!);
+                          widget.onIntegersSelected!(
+                              selectedValue1!, selectedValue2!);
                         }
-                        Navigator.of(context).pop();
+                        context.pop();
                       },
                     ),
                   ],

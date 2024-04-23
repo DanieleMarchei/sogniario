@@ -33,7 +33,7 @@ class FormButton extends StatelessWidget {
 
 class IconTextButton extends StatelessWidget {
   final String text;
-  final Icon icon;
+  final Widget icon;
   final Function? onPressed;
   const IconTextButton({
     this.icon = const Icon(Icons.add),
