@@ -1,6 +1,6 @@
 # frontend
 
-A new Flutter project.
+Un' app per registrare i tuoi sogni.
 
 ## Getting Started
 
