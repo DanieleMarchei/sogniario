@@ -90,6 +90,12 @@ final routes = GoRouter(
     }
     
     if(userType == UserType.user){
+
+      bool validUserPath = userRoutesNames.contains(state.fullPath!);
+      if(!validUserPath) {
+        return Routes.homeUser.path;
+      }
+
       if(userDataBox.containsKey("hasGeneralInfo") && userDataBox.containsKey("hasChronotype")) return null;
       
       DateTime? birthdate;
@@ -117,12 +123,7 @@ final routes = GoRouter(
         userDataBox.put("hasChronotype", true);
       }
       
-      bool validUserPath = userRoutesNames.contains(state.fullPath!);
-      if(validUserPath) {
-        return null;
-      }else{
-        return Routes.homeUser.path;
-      }
+      return null;
     }
 
     // in any other case, return to login
