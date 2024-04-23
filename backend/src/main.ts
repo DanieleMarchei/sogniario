@@ -1,9 +1,23 @@
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import * as fs from "fs";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  console.log(process.cwd());
+  //Production
+  const httpsOptions = {
+    key: fs.readFileSync(process.cwd() + "/src/cert/sognario_unicam_it.key"),
+    cert: fs.readFileSync(
+      process.cwd() + "/src/cert/sognario_unicam_it_cert.cer"
+    ),
+  };
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+  });
+
+  //development
+  //const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle("Sognario API description")
