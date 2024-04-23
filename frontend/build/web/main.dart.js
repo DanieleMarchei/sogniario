@@ -94475,7 +94475,9 @@ break}else{q="/home_researcher"
 s=1
 break}s=g===B.B3?3:4
 break
-case 3:i=$.yJ()
+case 3:if(!B.b.p($.aQl(),b.f)){q="/home_user"
+s=1
+break}i=$.yJ()
 if(!i.f)A.R(A.eV("Box has already been closed."))
 i=i.e
 i===$&&A.b()
@@ -94523,11 +94525,10 @@ case 10:if(d==null){$.yJ().vg(["hasChronotype"])
 q="/chronotype"
 s=1
 break}else{k=$.yJ()
-k.CC(A.au(["hasChronotype",!0],j,k.$ti.c))}if(B.b.p($.aQl(),b.f)){q=null
+k.CC(A.au(["hasChronotype",!0],j,k.$ti.c))}q=null
 s=1
-break}else{q="/home_user"
-s=1
-break}case 4:q="/"
+break
+case 4:q="/"
 s=1
 break
 case 1:return A.G(q,r)
