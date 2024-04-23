@@ -204,6 +204,8 @@ class MultilineInputField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final bool autoFocus;
   late final TextEditingController controller;
+  late final ScrollController scrollController;
+  final FocusNode? focusNode;
 
   MultilineInputField(
       {this.labelText,
@@ -214,12 +216,20 @@ class MultilineInputField extends StatefulWidget {
       this.keyboardType,
       this.textInputAction,
       this.autoFocus = false,
+      this.focusNode,
       controller,
+      scrollController,
       super.key}){
         if(controller == null){
           this.controller = TextEditingController();
         }else{
           this.controller = controller;
+        }
+
+        if(controller == null){
+          this.scrollController = ScrollController();
+        }else{
+          this.scrollController = scrollController;
         }
       }
 
@@ -230,17 +240,21 @@ class MultilineInputField extends StatefulWidget {
 class _MultilineInputFieldState extends State<MultilineInputField> {
 
   late TextEditingController controller;
+  late ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
     controller = widget.controller;
+    scrollController = widget.scrollController;
   }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      focusNode: widget.focusNode,
       controller: controller,
+      scrollController: scrollController,
       autofocus: widget.autoFocus,
       onChanged: widget.onChanged,
       maxLines: widget.maxLines,

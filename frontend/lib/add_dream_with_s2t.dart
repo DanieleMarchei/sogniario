@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/questions.dart';
@@ -54,6 +55,8 @@ class AddDreamWithS2T extends StatefulWidget {
 
 class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
   DreamData dream = DreamData();
+  final dreamKey = GlobalKey();
+
   late List<QuestionWithDirection> dreamQuestions;
 
   @override
@@ -61,6 +64,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
     super.initState();
     dreamQuestions = [
         AddDreamWithS2TText(
+          key: dreamKey,
           onTextChanged: (value) {
             setState(() {
               dream.dreamText = value;
@@ -125,7 +129,7 @@ class AddDreamWithS2TText extends QuestionWithDirection {
   State<AddDreamWithS2TText> createState() => _AddDreamWithS2TTextState();
 }
 
-
+// continuos s2t from https://gist.github.com/jsrimr/09af9516ee1c5907453635b03ce885ae
 class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS2TText> {
   late String text;
   String? textError;
@@ -133,33 +137,31 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
   @override
   bool get wantKeepAlive => true;
 
-  bool _hasSpeech = false;
-  double level = 0.0;
-  double minSoundLevel = 50000;
-  double maxSoundLevel = -50000;
   String _currentLocaleId = '';
+  bool _speechAvailable = false;
+  String _lastWords = '';
+  String _currentWords = '';
+  bool stoppedByUser = false;
 
   final SpeechToText speech = SpeechToText();
   TextEditingController dreamController = TextEditingController();
+  ScrollController dreamScrollController = ScrollController();
 
   Future<void> initSpeechState() async {
-    var hasSpeech = await speech.initialize(
-        onError: errorListener,
+    _speechAvailable = await speech.initialize(
         onStatus: statusListener,
-        debugLogging: true,
+        debugLogging: false,
         finalTimeout: Duration(milliseconds: 100)
       );
     
-    if (hasSpeech) {
+    if (_speechAvailable) {
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale?.localeId ?? '';
     }
 
     if (!mounted) return;
 
-    setState(() {
-      _hasSpeech = hasSpeech;
-    });
+    setState(() {});
   }
 
   @override
@@ -167,12 +169,71 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     super.initState();
     initSpeechState();
     text = '';
+    stoppedByUser = false;
+  }
+  
+  void statusListener(String status) async {
+    print((status, stoppedByUser));
+    // print(mounted);
+    // if (!mounted) return;
+    if (status == "done" && !stoppedByUser) {
+      if (_currentWords.isNotEmpty) {
+        setState(() {
+          _lastWords += " $_currentWords";
+          _currentWords = "";
+        });
+      } else {
+        // wait 50 mil seconds and try again
+        await Future.delayed(Duration(milliseconds: 50));
+      }
+      await _startListening();
+    }
   }
 
   void resetErrorText() {
     setState(() {
       textError = null;
     });
+  }
+
+  Future _startListening() async {
+    await _stopListening();
+    await Future.delayed(const Duration(milliseconds: 50));
+    speech.listen(
+        onResult: _onSpeechResult,
+        listenFor: const Duration(minutes: 5),
+        // pauseFor: const Duration(seconds: 5),
+        localeId: _currentLocaleId,
+        listenOptions: SpeechListenOptions(
+          // listenMode: ListenMode.confirmation,
+          cancelOnError: false,
+          partialResults: true,
+        )
+    );
+
+    if (!mounted) return;
+
+    setState(() {});
+  }
+
+    /// listen method.
+  Future _stopListening() async {
+    if (!mounted) return;
+  
+    setState(() {});
+    await speech.stop();
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _currentWords = result.recognizedWords;
+      dreamController.text = "$_lastWords $_currentWords";
+      dreamScrollController.animateTo(
+        dreamScrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300), curve: Curves.ease);
+    });
+    if (widget.onTextChanged != null) widget.onTextChanged!(dreamController.text);
+
   }
 
   bool validate() {
@@ -201,6 +262,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     double screenHeight = MediaQuery.of(context).size.height;
 
     double screenWidth = MediaQuery.of(context).size.width;
+
     bool isMobile = !kIsWeb;
 
     FloatingActionButton recordBtn = FloatingActionButton(
@@ -209,9 +271,11 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
       tooltip: speech.isListening ? "Premi per interrompere la trascrizione." : "Premi per trascrivere il tuo sogno.",
       onPressed: () {
         if(speech.isListening){
-          cancelListening();
+          stoppedByUser = true;
+          _stopListening();
         }else{
-          startListening();
+          stoppedByUser = false;
+          _startListening();
         }
       },
       child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
@@ -230,7 +294,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
       glowColor: Colors.red,
       duration: const Duration(seconds: 2),
       repeat: true,
-      child: _hasSpeech ? recordBtn : recordBtnNoSpeech
+      child: _speechAvailable ? recordBtn : recordBtnNoSpeech
     );
     
     return Column(
@@ -238,6 +302,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
               SizedBox(height: screenHeight * 0.01,),
               MultilineInputField(
                 controller: dreamController,
+                scrollController: dreamScrollController,
                 labelText: "Racconta il tuo sogno",
                 maxLines: 10,
                 keyboardType: TextInputType.multiline,
@@ -255,9 +320,9 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
               if(isMobile)...{
                 SizedBox(height: screenHeight * 0.01,),
                 Text(
-                  "💡 Suggerimento: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
+                  "⚠️ Avviso: ricontrolla che il testo registrato sia corretto!",
                   style: TextStyle(
-                    color: Colors.grey.shade700,
+                    color: Colors.grey.shade900,
                     fontSize: 12
                   ),
                 ),
@@ -270,69 +335,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
   }
 
 
-    void startListening() {
-    speech.listen(
-        onResult: resultListener,
-        listenFor: const Duration(minutes: 5),
-        pauseFor: const Duration(seconds: 5),
-        localeId: _currentLocaleId,
-        onSoundLevelChange: soundLevelListener,
-        listenOptions: SpeechListenOptions(
-          listenMode: ListenMode.confirmation,
-          cancelOnError: false,
-          partialResults: true,
-        )
-    );
 
-    setState(() {});
-  }
-
-  void cancelListening() {
-    speech.cancel();
-    setState(() {
-      level = 0.0;
-    });
-    setState(() {});
-  }
-
-  void resultListener(SpeechRecognitionResult result) {
-
-    if (result.finalResult) {
-      setState(() {
-        if (dreamController.text.endsWith(' ')) {
-          dreamController.text += result.recognizedWords;
-        } else {
-          dreamController.text += ' ' + result.recognizedWords;
-        }
-      });
-      print(result.recognizedWords);
-      if (widget.onTextChanged != null) widget.onTextChanged!(dreamController.text);
-
-    }
-  }
-
-  void soundLevelListener(double level) {
-    minSoundLevel = min(minSoundLevel, level);
-    maxSoundLevel = max(maxSoundLevel, level);
-
-    setState(() {
-      this.level = level;
-    });
-  }
-
-  void errorListener(SpeechRecognitionError error) {
-    setState(() {});
-    
-    try {
-      print(error);
-    } catch (Exception) {
-      speech.stop();
-    }
-  }
-
-  void statusListener(String status) {
-    setState(() {});
-  }
   
 
 }
