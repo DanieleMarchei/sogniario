@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox('tokens');
+  await Hive.openBox('userData');
   runApp(Frontend());
 }
 
@@ -40,6 +41,7 @@ class Frontend extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routerConfig: routes,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

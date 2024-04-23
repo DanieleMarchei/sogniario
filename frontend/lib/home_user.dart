@@ -21,7 +21,7 @@ class HomeUser extends StatelessWidget {
     print("jwt? ${doIHaveJwt()}");
 
     var exitFunc = () async {
-      deleteJwt();
+      deleteJwtAndUserInfo();
       context.goNamed(Routes.login.name);
     };
 

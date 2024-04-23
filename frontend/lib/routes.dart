@@ -12,6 +12,10 @@ import 'package:frontend/manage_users.dart';
 import 'package:frontend/psqi.dart';
 import 'package:frontend/utils.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
+
+var userDataBox = Hive.box('userData');
+
 
 class MyPageTransition extends CustomTransitionPage{
   MyPageTransition(key, child): super(
@@ -67,31 +71,62 @@ final routes = GoRouter(
   initialLocation: Routes.login.path,
   redirect: (context, state) async {
     var userType = getMyUserType();
-    if(userType == UserType.notLogged && state.fullPath == Routes.login.path){
-      return null;
+    
+    if(userType == UserType.notLogged){
+      if(state.fullPath == Routes.login.path) {
+        return null;
+      }else{
+        return Routes.login.path;
+      }
     }
 
-    if(userType == UserType.notLogged && state.fullPath != Routes.login.path) return Routes.login.path;
-
-    if(userType == UserType.researcher && !researchRoutesNames.contains(state.fullPath!)) return Routes.homeResearcher.path;
-
-    // these should be cached
-
-    DateTime? birthdate;
-    Sex? sex;
-    (birthdate, sex) = await getMyGeneralInfo();
-
-    if(userType == UserType.user && (birthdate == null || sex == null)) return Routes.generalInfo.path;
-
-    ChronoTypeData? chrono = await getMyChronotype();
-
-    if(userType == UserType.user && chrono == null) return Routes.chronotype.path;
+    if(userType == UserType.researcher){
+      bool validResearcherPath = researchRoutesNames.contains(state.fullPath!);
+      if(validResearcherPath){
+        return null;
+      }else{
+        return Routes.homeResearcher.path;
+      }
+    }
     
-    if(userType == UserType.user && !userRoutesNames.contains(state.fullPath!)) return Routes.homeUser.path;
+    if(userType == UserType.user){
+      if(userDataBox.containsKey("hasGeneralInfo") && userDataBox.containsKey("hasChronotype")) return null;
+      
+      DateTime? birthdate;
+      Sex? sex;
+      try{
+        (birthdate, sex) = await getMyGeneralInfo();
 
+      }catch(error){
+        return Routes.login.path;
+      }
 
+      if(birthdate == null || sex == null) {
+        userDataBox.delete("hasGeneralInfo");
+        return Routes.generalInfo.path;
+      }else{
+        userDataBox.put("hasGeneralInfo", true);
+      }
 
-    return null;
+      ChronoTypeData? chrono = await getMyChronotype();
+
+      if(chrono == null) {
+        userDataBox.delete("hasChronotype");
+        return Routes.chronotype.path;
+      }else{
+        userDataBox.put("hasChronotype", true);
+      }
+      
+      bool validUserPath = userRoutesNames.contains(state.fullPath!);
+      if(validUserPath) {
+        return null;
+      }else{
+        return Routes.homeUser.path;
+      }
+    }
+
+    // in any other case, return to login
+    return Routes.login.path;
 
   },
   routes: [
