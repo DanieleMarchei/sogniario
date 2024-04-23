@@ -150,7 +150,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
   Future<void> initSpeechState() async {
     _speechAvailable = await speech.initialize(
         onStatus: statusListener,
-        debugLogging: true,
+        debugLogging: false,
         finalTimeout: Duration(milliseconds: 100)
       );
     
@@ -171,10 +171,11 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     text = '';
     stoppedByUser = false;
   }
-
+  
   void statusListener(String status) async {
-    if (!mounted) return;
-
+    print((status, stoppedByUser));
+    // print(mounted);
+    // if (!mounted) return;
     if (status == "done" && !stoppedByUser) {
       if (_currentWords.isNotEmpty) {
         setState(() {
@@ -319,9 +320,9 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
               if(isMobile)...{
                 SizedBox(height: screenHeight * 0.01,),
                 Text(
-                  "💡 Suggerimento per una migliore esperienza: se disponibile, puoi trascrivere il tuo sogno a voce utilizzando il microfono della tua tastiera!",
+                  "⚠️ Avviso: ricontrolla che il testo registrato sia corretto!",
                   style: TextStyle(
-                    color: Colors.grey.shade700,
+                    color: Colors.grey.shade900,
                     fontSize: 12
                   ),
                 ),
