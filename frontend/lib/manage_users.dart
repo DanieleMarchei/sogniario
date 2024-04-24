@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/api.dart';
@@ -515,7 +516,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   Widget visualize(BuildContext context) {
     return SimpleDialog(
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        Text(tmpUser!.username),
+        FittedBox(child: Text(tmpUser!.username, style: TextStyle(fontSize: 18),), fit: BoxFit.scaleDown,),
         const Spacer(),
         IconButton(
             onPressed: () {
@@ -555,7 +556,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   Widget edit(BuildContext context) {
     return SimpleDialog(
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        Text(tmpUser!.username),
+                FittedBox(child: Text(tmpUser!.username, style: TextStyle(fontSize: 18),), fit: BoxFit.scaleDown,),
         const Spacer(),
         IconButton(
             onPressed: () {
