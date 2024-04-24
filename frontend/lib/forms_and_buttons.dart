@@ -35,13 +35,16 @@ class IconTextButton extends StatelessWidget {
   final String text;
   final Widget icon;
   final Function? onPressed;
+  final Color? backgroundColor;
+  final Color foregroundColor;
   const IconTextButton({
     this.icon = const Icon(Icons.add),
     this.text = '', 
-    this.onPressed, 
-    Key? key
-  })
-  : super(key: key);
+    this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor = Colors.black, 
+    super.key
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +57,10 @@ class IconTextButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        elevation: 10,
+        shadowColor: Colors.black
       ),
       child: Center(
         child: Row(

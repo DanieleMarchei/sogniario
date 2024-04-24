@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/utils.dart';
 
 class CircleDecoration extends StatelessWidget {
@@ -49,7 +50,7 @@ class ScaffoldWithCircles extends Scaffold {
     super.onEndDrawerChanged,
     super.bottomNavigationBar,
     super.bottomSheet,
-    super.backgroundColor,
+    backgroundColor,
     super.resizeToAvoidBottomInset,
     super.primary = true,
     super.drawerDragStartBehavior = DragStartBehavior.start,
@@ -60,10 +61,29 @@ class ScaffoldWithCircles extends Scaffold {
     super.drawerEnableOpenDragGesture = true,
     super.endDrawerEnableOpenDragGesture = true,
     super.restorationId,
-  }) : super(body: getCircles(context, body));
+  }) : super(
+    body: getCircles(context, body),
+    backgroundColor: backgroundColor ?? (getMyUserType() == UserType.researcher ? Colors.orange.shade50 : Colors.blue.shade50)
+  );
 }
 
 Stack getCircles(BuildContext context, body){
+  UserType userType = getMyUserType();
+  late MaterialColor color;
+  switch (userType) {
+    case UserType.notLogged:
+    case UserType.user:
+      color = Colors.blue;      
+      break;
+    
+    case UserType.researcher:
+      color = Colors.orange;
+      break;
+
+    default:
+      color = Colors.green;
+      break;
+  }
   double screenWidth = MediaQuery.of(context).size.width;
   double screenHeight = MediaQuery.of(context).size.height;
   bool showDesktopLayout = screenWidth > widthConstraint;
@@ -76,9 +96,9 @@ Stack getCircles(BuildContext context, body){
             height: 250,
             width: 250,
             offset: Offset(-1, -1),
-            shadow: Colors.blue.shade600,
-            gradientOne: Colors.blue.shade200.withOpacity(0.4),
-            gradientTwo: Colors.blue.shade100,
+            shadow: color.shade600,
+            gradientOne: color.shade200.withOpacity(0.4),
+            gradientTwo: color.shade100,
           ),
         ),
         Positioned(
@@ -88,9 +108,9 @@ Stack getCircles(BuildContext context, body){
             height: 150,
             width: 200,
             offset: Offset(1, 1),
-            shadow: Colors.blue.shade800,
-            gradientOne: Colors.blue.shade100,
-            gradientTwo: Colors.blue.shade200.withOpacity(0.6),
+            shadow: color.shade800,
+            gradientOne: color.shade100,
+            gradientTwo: color.shade200.withOpacity(0.6),
           ),
         ),
         Positioned(
@@ -100,9 +120,9 @@ Stack getCircles(BuildContext context, body){
             height: 200,
             width: 200,
             offset: Offset(2, 2),
-            shadow: Colors.blue.shade700,
-            gradientOne: Colors.blue.shade100.withOpacity(0.4),
-            gradientTwo: Colors.blue.shade200,
+            shadow: color.shade700,
+            gradientOne: color.shade100.withOpacity(0.4),
+            gradientTwo: color.shade200,
           ),
         ),
         if(showDesktopLayout)...{
@@ -113,9 +133,9 @@ Stack getCircles(BuildContext context, body){
               height: 200,
               width: 200,
               offset: Offset(1, 2),
-              shadow: Colors.blue.shade700,
-              gradientOne: Colors.blue.shade200,
-              gradientTwo: Colors.blue.shade100.withOpacity(0.4),
+              shadow: color.shade700,
+              gradientOne: color.shade200,
+              gradientTwo: color.shade100.withOpacity(0.4),
             ),
           ),
           Positioned(
@@ -125,9 +145,9 @@ Stack getCircles(BuildContext context, body){
               height: 200,
               width: 200,
               offset: Offset(2, 0),
-              shadow: Colors.blue.shade700,
-              gradientOne: Colors.blue.shade100.withOpacity(0.4),
-              gradientTwo: Colors.blue.shade100,
+              shadow: color.shade700,
+              gradientOne: color.shade100.withOpacity(0.4),
+              gradientTwo: color.shade100,
             ),
           ),
         },

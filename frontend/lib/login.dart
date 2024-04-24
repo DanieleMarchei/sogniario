@@ -134,6 +134,20 @@ class _LoginState extends State<Login> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
+
+    var userLoginBtn = IconTextButton(
+                                    icon: const Icon(Icons.person),
+                                    text: 'Entra come utente',
+                                    onPressed: submitUser,
+                                    backgroundColor: Colors.blue.shade400,
+                                  );
+    var researcherLoginBtn = IconTextButton(
+                                    icon: const Icon(Icons.person_search_rounded),
+                                    text: 'Entra come ricercatore',
+                                    onPressed: submitResearcher,
+                                    backgroundColor: Colors.orange.shade400,
+                                  );
+
     return PopScope(
       canPop: false,
       child: ScaffoldWithCircles(
@@ -148,7 +162,7 @@ class _LoginState extends State<Login> {
                       children: [
                         Column(
                           children: [
-                            SizedBox(height: 25),
+                            const SizedBox(height: 25),
                             SizedBox(
                               height: 100,
                               child: Row(children: [
@@ -156,7 +170,7 @@ class _LoginState extends State<Login> {
                                   child: Image.asset('assets/unicam_logo.png', 
                                   scale: 0.5,
                                   ),),
-                                Spacer(),
+                                const Spacer(),
                                 Expanded(
                                   child: Image.asset('assets/bsrl_logo.png', 
                                   scale: 1, 
@@ -175,8 +189,8 @@ class _LoginState extends State<Login> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: 10,),
-                          SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
+                          const SizedBox(height: 10,),
+                          const SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
                           SizedBox(height: screenHeight * .05),
                           InputField(
                             onChanged: (value) {
@@ -211,45 +225,29 @@ class _LoginState extends State<Login> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: IconTextButton(
-                                    icon: const Icon(Icons.person),
-                                    text: 'Entra come utente',
-                                    onPressed: submitUser,
-                                  ),
+                                  child: userLoginBtn,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10,
                                 ),
                                 Expanded(
-                                  child: IconTextButton(
-                                    icon: const Icon(Icons.person_search_rounded),
-                                    text: 'Entra come ricercatore',
-                                    onPressed: submitResearcher,
-                                  ),
+                                  child: researcherLoginBtn
                                 ),
                               ],
                             ),
                           } else ...{
-                            IconTextButton(
-                              icon: const Icon(Icons.person),
-                              text: 'Entra come utente',
-                              onPressed: submitUser,
-                            ),
-                            SizedBox(
+                            userLoginBtn,
+                            const SizedBox(
                               height: 10,
                             ),
-                            IconTextButton(
-                              icon: const Icon(Icons.person_search_rounded),
-                              text: 'Entra come ricercatore',
-                              onPressed: submitResearcher,
-                            ),
+                            researcherLoginBtn
                           },
                           if (kIsWeb) ...{
-                            SizedBox(
+                            const SizedBox(
                               height: 50,
                             ),
                             IconTextButton(
-                              icon: askToWait ? CircularProgressIndicator() : const Icon(Icons.android),
+                              icon: askToWait ? const CircularProgressIndicator() : const Icon(Icons.android),
                               text: "Scarica l'app (Android)",
                               onPressed: () async {
                                 setState(() {

@@ -63,7 +63,7 @@ class HomeResearcher extends StatelessWidget {
                                 Spacer(),
                                 IconTextButton(
                                   icon: Icon(Icons.logout),
-                                  text: "Esci",
+                                  text: "Esci  ",
                                   onPressed: exitFunc
                                 )
                               }

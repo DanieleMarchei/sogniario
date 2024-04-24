@@ -61,11 +61,13 @@ class _ManageUsersState extends State<ManageUsers> {
           return a.username.compareTo(b.username);
         });
         return Scaffold(
+          backgroundColor: Colors.orange.shade50,
           floatingActionButton: showMobileLayout
               ? FloatingActionButton(
                   onPressed: onPressedAddUser,
                   tooltip: "Aggiungi utente",
                   child: const Icon(Icons.person_add_alt_1_rounded),
+                  backgroundColor: Colors.orange.shade300,
                 )
               : null,
           appBar: AppBar(
@@ -182,7 +184,16 @@ class _UserCardWidgetState extends State<UserCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(color: Colors.orange),
+        decoration: BoxDecoration(
+          color: Colors.orange,
+          boxShadow: [BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: Offset(0, 10),
+            blurRadius: 10,
+            spreadRadius: 5
+          )],
+          borderRadius: BorderRadius.circular(10)
+        ),
         margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         child: widget.showMobileLayout ? mobileLayout(context) : desktopLayout(context)
