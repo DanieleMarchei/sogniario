@@ -4,7 +4,9 @@ import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
+import 'package:go_router/go_router.dart';
 
 const List<String> answersHowMany = [
   "Non durante l'ultimo mese.",
@@ -364,7 +366,9 @@ class _PSQIState extends State<PSQI> {
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
                       text: "Torna alla home",
-                      onPressed: () => Navigator.pushNamed(context, "/home_user"),
+                      onPressed: () {
+                        context.goNamed(Routes.homeUser.name);
+                      },
                     ),
                   ]
                 )

@@ -95,7 +95,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
     var responsiveReport = ResponsiveReport(
       questionWidgets: dreamQuestions,
       title: "Racconta un sogno",
-      homeButtonTooltip: "Vuoi annullare il racconto di questo sognio e tornare alla schermata principale?",
+      homeButtonTooltip: "Vuoi annullare il racconto di questo sogno e tornare alla schermata principale?",
       onSubmitted: () async {
         await addDream(dream);
         context.goNamed(Routes.homeUser.name);

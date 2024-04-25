@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
-import 'package:frontend/home_user.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
@@ -65,6 +64,7 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
             builder: (context) {
               return AlertDialog(
                   title: Text("Tornare indietro?"),
+                  insetPadding: EdgeInsets.all(16),
                   content: Text(widget.homeButtonTooltip!, textAlign: TextAlign.justify,),
                   actions: <Widget>[
                     TextButton(
