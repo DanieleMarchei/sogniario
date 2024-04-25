@@ -377,6 +377,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
 
   Widget delete(BuildContext context) {
     return AlertDialog(
+      insetPadding: EdgeInsets.all(16),
       content: Container(
         height: 100,
         child: Column(
@@ -430,6 +431,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   Widget create(BuildContext context) {
 
     return SimpleDialog(
+      insetPadding: EdgeInsets.all(16),
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         Text(widget.showMobileLayout ? "Aggiungi\nutente" : "Aggiungi utente"),
         const Spacer(),
@@ -515,6 +517,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
 
   Widget visualize(BuildContext context) {
     return SimpleDialog(
+      insetPadding: EdgeInsets.all(16),
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         FittedBox(child: Text(tmpUser!.username, style: TextStyle(fontSize: 18),), fit: BoxFit.scaleDown,),
         const Spacer(),
@@ -555,6 +558,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
 
   Widget edit(BuildContext context) {
     return SimpleDialog(
+      insetPadding: EdgeInsets.all(16),
       title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                 FittedBox(child: Text(tmpUser!.username, style: TextStyle(fontSize: 18),), fit: BoxFit.scaleDown,),
         const Spacer(),
