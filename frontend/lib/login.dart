@@ -218,7 +218,7 @@ class _LoginState extends State<Login> {
                             textInputAction: TextInputAction.next,
                           ),
                           SizedBox(
-                            height: screenHeight * .075,
+                            height: screenHeight * .03,
                           ),
                           if (loginError != null) Text(loginError!),
                           if (isScreenWide) ...{
