@@ -51,7 +51,7 @@ class ScaffoldWithCircles extends Scaffold {
     super.bottomNavigationBar,
     super.bottomSheet,
     backgroundColor,
-    super.resizeToAvoidBottomInset,
+    super.resizeToAvoidBottomInset = false,
     super.primary = true,
     super.drawerDragStartBehavior = DragStartBehavior.start,
     super.extendBody = false,
@@ -62,20 +62,22 @@ class ScaffoldWithCircles extends Scaffold {
     super.endDrawerEnableOpenDragGesture = true,
     super.restorationId,
   }) : super(
-    body: getCircles(context, body),
-    backgroundColor: backgroundColor ?? (getMyUserType() == UserType.researcher ? Colors.orange.shade50 : Colors.blue.shade50)
-  );
+            body: getCircles(context, body),
+            backgroundColor: backgroundColor ??
+                (getMyUserType() == UserType.researcher
+                    ? Colors.orange.shade50
+                    : Colors.blue.shade50));
 }
 
-Stack getCircles(BuildContext context, body){
+Stack getCircles(BuildContext context, body) {
   UserType userType = getMyUserType();
   late MaterialColor color;
   switch (userType) {
     case UserType.notLogged:
     case UserType.user:
-      color = Colors.blue;      
+      color = Colors.blue;
       break;
-    
+
     case UserType.researcher:
       color = Colors.orange;
       break;
@@ -87,71 +89,71 @@ Stack getCircles(BuildContext context, body){
   double screenWidth = MediaQuery.of(context).size.width;
   double screenHeight = MediaQuery.of(context).size.height;
   bool showDesktopLayout = screenWidth > widthConstraint;
+  List<Positioned> circles = [
+    Positioned(
+      top: -50,
+      left: screenWidth / 4 - 25,
+      child: CircleDecoration(
+        height: 250,
+        width: 250,
+        offset: Offset(-1, -1),
+        shadow: color.shade600,
+        gradientOne: color.shade200.withOpacity(0.4),
+        gradientTwo: color.shade100,
+      ),
+    ),
+    Positioned(
+      bottom: -10,
+      right: -50,
+      child: CircleDecoration(
+        height: 150,
+        width: 200,
+        offset: Offset(1, 1),
+        shadow: color.shade800,
+        gradientOne: color.shade100,
+        gradientTwo: color.shade200.withOpacity(0.6),
+      ),
+    ),
+    Positioned(
+      bottom: screenHeight / 4,
+      left: -50,
+      child: CircleDecoration(
+        height: 200,
+        width: 200,
+        offset: Offset(2, 2),
+        shadow: color.shade700,
+        gradientOne: color.shade100.withOpacity(0.4),
+        gradientTwo: color.shade200,
+      ),
+    ),
+    if (showDesktopLayout) ...{
+      Positioned(
+        bottom: screenHeight / 4 - 150,
+        left: screenWidth / 2,
+        child: CircleDecoration(
+          height: 200,
+          width: 200,
+          offset: Offset(1, 2),
+          shadow: color.shade700,
+          gradientOne: color.shade200,
+          gradientTwo: color.shade100.withOpacity(0.4),
+        ),
+      ),
+      Positioned(
+        bottom: screenHeight / 2 + 100,
+        left: screenWidth / 2 + 250,
+        child: CircleDecoration(
+          height: 200,
+          width: 200,
+          offset: Offset(2, 0),
+          shadow: color.shade700,
+          gradientOne: color.shade100.withOpacity(0.4),
+          gradientTwo: color.shade100,
+        ),
+      ),
+    },
+  ];
   return Stack(
-      children: [
-        Positioned(
-          top: -50,
-          left: screenWidth / 4 - 25,
-          child: CircleDecoration(
-            height: 250,
-            width: 250,
-            offset: Offset(-1, -1),
-            shadow: color.shade600,
-            gradientOne: color.shade200.withOpacity(0.4),
-            gradientTwo: color.shade100,
-          ),
-        ),
-        Positioned(
-          bottom: -10,
-          right: -50,
-          child: CircleDecoration(
-            height: 150,
-            width: 200,
-            offset: Offset(1, 1),
-            shadow: color.shade800,
-            gradientOne: color.shade100,
-            gradientTwo: color.shade200.withOpacity(0.6),
-          ),
-        ),
-        Positioned(
-          bottom: screenHeight / 4,
-          left: -50,
-          child: CircleDecoration(
-            height: 200,
-            width: 200,
-            offset: Offset(2, 2),
-            shadow: color.shade700,
-            gradientOne: color.shade100.withOpacity(0.4),
-            gradientTwo: color.shade200,
-          ),
-        ),
-        if(showDesktopLayout)...{
-          Positioned(
-            bottom: screenHeight / 4 - 150,
-            left: screenWidth / 2,
-            child: CircleDecoration(
-              height: 200,
-              width: 200,
-              offset: Offset(1, 2),
-              shadow: color.shade700,
-              gradientOne: color.shade200,
-              gradientTwo: color.shade100.withOpacity(0.4),
-            ),
-          ),
-          Positioned(
-            bottom: screenHeight / 2 + 100,
-            left: screenWidth / 2 + 250,
-            child: CircleDecoration(
-              height: 200,
-              width: 200,
-              offset: Offset(2, 0),
-              shadow: color.shade700,
-              gradientOne: color.shade100.withOpacity(0.4),
-              gradientTwo: color.shade100,
-            ),
-          ),
-        },
-        body
-      ],
-    );
+    children: [...circles, body],
+  );
 }
