@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/questions.dart';
 import 'package:frontend/responsive_report.dart';
@@ -216,6 +217,11 @@ List<QA> questions = [
   throw Exception("Error during the calcualtion of the chronotype.");
 }
 
+enum ChronoTypePageState{
+  info,
+  report,
+  score
+}
 
 class ChronoType extends StatefulWidget {
   const ChronoType({super.key});
@@ -226,7 +232,7 @@ class ChronoType extends StatefulWidget {
 class _ChronoTypeState extends State<ChronoType> {
   ChronoTypeData chronoType = ChronoTypeData();
   late List<QuestionWithDirection> chronoTypeQuestions;
-  bool showScore = false;
+  ChronoTypePageState pageState = ChronoTypePageState.info;
 
   @override
   void initState() {
@@ -254,14 +260,57 @@ class _ChronoTypeState extends State<ChronoType> {
 
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return !showScore
-        ? ResponsiveReport(
+    switch (pageState) {
+      case ChronoTypePageState.info:
+        return ScaffoldWithCircles(
+          context: context,
+          body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                child: Column(
+                  children: [
+                    SizedBox(height: 40,),
+                    const Text(
+                      "Questionario sul cronotipo",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 40,),
+                    Container(
+                      width: 500,
+                      child: const Text(
+                        "Il cronotipo si riferisce alla predisposizione individuale che determina se una persona è naturalmente più attiva durante le ore del giorno (fenotipo mattiniero) o durante le ore della sera (fenotipo serale).",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 40,),
+                    FormButton(
+                      text: "Continua",
+                      onPressed: () {
+                        setState(() {
+                          pageState = ChronoTypePageState.report;
+                        });
+                      },
+                    ),
+                  ]
+                )
+              )
+          )
+        );
+      
+      case ChronoTypePageState.report:
+      return ResponsiveReport(
             questionWidgets: chronoTypeQuestions,
             title: "Cronotipo",
             onSubmitted: () async{
               await addMyChronotype(chronoType);
               setState(()  {
-                showScore = true;
+                pageState = ChronoTypePageState.score;
               });
             }, 
             unansweredQuestions: () { 
@@ -270,8 +319,11 @@ class _ChronoTypeState extends State<ChronoType> {
                 if(chronoType.report[i] == null) uq.add(i);
               }
               return uq;
-            },)
-        : Scaffold(
+            },);
+
+      case ChronoTypePageState.score:
+        return ScaffoldWithCircles(
+            context: context,
             body: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Center(
@@ -333,7 +385,7 @@ class _ChronoTypeState extends State<ChronoType> {
                     ),
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
-                      text: "Iniziamo!",
+                      text: "Continua",
                       onPressed: () => context.goNamed(Routes.homeUser.name),
                     ),
                   ],
@@ -342,6 +394,9 @@ class _ChronoTypeState extends State<ChronoType> {
               
             ),
           );
+
+    }
+
   }
 }
 

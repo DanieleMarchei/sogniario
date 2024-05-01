@@ -28,10 +28,13 @@ class HomeResearcher extends StatelessWidget {
         future: getMyResearcher(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Container(
+            return ScaffoldWithCircles(
+              body: Container(
               child: const Center(
                 child: CircularProgressIndicator(),
               ),
+            ),
+              context: context
             );
           }
 

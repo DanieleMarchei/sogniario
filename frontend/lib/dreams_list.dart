@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/decorations.dart';
 import 'package:frontend/forms_and_buttons.dart';

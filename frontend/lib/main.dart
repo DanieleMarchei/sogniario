@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:frontend/api.dart';
 import 'package:frontend/routes.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -32,7 +34,12 @@ class Frontend extends StatelessWidget {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 12.0
-        );
+          );
+          UserType userType = getMyUserType();
+          ModalRoute? modalRoute = ModalRoute.of(context);
+          if(modalRoute != null){
+            print(modalRoute);
+          }
         }
     });
     return MaterialApp.router(
