@@ -1,4 +1,4 @@
-#Fri Apr 26 17:49:59 CEST 2024
+#Mon May 20 16:51:29 CEST 2024
 base.0=/home/daniele/Scrivania/sogniario/frontend/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex
