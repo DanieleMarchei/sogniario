@@ -66,7 +66,7 @@ class _MultipleChoiceQuestionState extends QuestionWithDirectionState<MultipleCh
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Flexible(child: Text(widget.question,),),
+        Text(widget.question,),
         widget.direction == Axis.horizontal ? Spacer() : SizedBox(),
         ...Iterable<int>.generate(widget.answers.length).map(
                 (int idx) => Flexible(
@@ -148,7 +148,8 @@ class SelectIntQuestion extends QuestionWithDirection{
   final String text;
   final int maxValue;
   final int minValue;
-  final void Function(int)? onSelected;
+  final void Function(int, int)? onSelected;
+  final List<String> options;
   
   SelectIntQuestion(
     {
@@ -160,6 +161,7 @@ class SelectIntQuestion extends QuestionWithDirection{
       super.direction,
       super.canChangeDirection,
       this.onSelected,
+      this.options = const ["Minuti"]
     });
 
   @override
@@ -182,6 +184,7 @@ class _SelectIntQuestionState extends QuestionWithDirectionState<SelectIntQuesti
             minValue: widget.minValue,
             maxValue: widget.maxValue,
             onSelectedInteger: widget.onSelected,
+            options: widget.options,
           )
         ],
       );

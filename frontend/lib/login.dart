@@ -32,7 +32,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     // if (doIHaveJwt()) {
-    //   tokenBox.delete("jwt");
+    //   tokenBox.delete(HiveBoxes.jwt.label);
     // }
     username = '';
     password = '';
@@ -109,17 +109,12 @@ class _LoginState extends State<Login> {
         context.goNamed(Routes.generalInfo.name);
         // Navigator.pushNamed(context, "/general_info");
       } else {
-        ChronoTypeData? chronotype = await getMyChronotype();
-        if (chronotype == null) {
-          context.goNamed(Routes.chronotype.name);
-          // Navigator.pushNamed(context, "/chronotype");
-        } else {
           context.goNamed(Routes.homeUser.name);
           // Navigator.pushNamed(context, "/home_user");
-        }
       }
     }
   }
+  
 
   void submitResearcher() async {
     if (await validate(isValidLoginResearcher)) {

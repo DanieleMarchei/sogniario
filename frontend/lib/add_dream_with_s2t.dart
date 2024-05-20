@@ -16,35 +16,31 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 
 List<QA> questions = [
-  QA(question: "Come giudichi il contenuto emotivo del sogno?", answers: [
-    "Non emotivo.",
-    "Parzialmente emotivo.",
-    "Nella media.",
-    "Emotivo.",
-    "Molto emotivo."
+  QA(question: "Come valuti la valenza emotiva del sogno?", answers: [
+    "Molto negativa",
+    "Piuttosto negativa",
+    "Neutra",
+    "Piuttosto positiva",
+    "Molto positiva"
   ]),
-  QA(question: "Eri coscente che stavi sognando?", answers: ["Si.", "No."]),
-  QA(question: "Avevi il controllo del sogno?", answers: [
-    "Nessun controllo.",
-    "Riuscivo a controllare solo alcune cose.",
-    "Controllo totale."
+  QA(question: "Come valuti l’intensità emotiva del sogno?", answers: [
+    "Molto debole",
+    "Piuttosto debole",
+    "Né debole né forte",
+    "Piuttosto forte",
+    "Molto forte"
   ]),
-  QA(question: "Quanto tempo pensi sia passato nel tuo sogno?", answers: [
-    "Pochi secondi.",
-    "Qualche minuto.",
-    "Qualche ora.",
-    "Qualche giorno."
+  // TODO: chiedere quali risposte vanno messe
+  QA(question: "Quanto eri consapevole di star sognando?", answers: [
+    "Per niente consapevole", 
+    "Poco consapevole",
+    "Molto consapevole"
+    ]),
+  QA(question: "Quanto controllo volontario avevi sul contenuto e sullo svolgimento del sogno?", answers: [
+    "Nessun controllo",
+    "Parziale controllo",
+    "Completo controllo"
   ]),
-  QA(question: "Quanto hai dormito?", answers: [
-    "Meno di 6 ore.",
-    "6 - 7 ore.",
-    "7 - 8 ore.",
-    "8 - 9 ore.",
-    "Più di 9 ore."
-  ]),
-  QA(
-      question: "Come giudichi la qualità del sonno?",
-      answers: ["Molto scarsa.", "Scarsa.", "Buona.", "Molto buona."]),
 ];
 
 class AddDreamWithS2T extends StatefulWidget {
@@ -71,7 +67,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
             });
           },
         ),
-      ...List<MultipleChoiceQuestion>.generate(questions.length, (index) {
+      ...List.generate(questions.length, (index) {
         var q = questions[index].question;
         var a = questions[index].answers;
         var s = questions[index].scores;
@@ -86,6 +82,39 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
         );
         return mcq;
       }),
+      ...[
+        SelectIntQuestion(
+          question: "Quanto tempo pensi sia trascorso nel tuo sogno?",
+          text: "Tempo: ",
+          options: const ["Minuti", "Ore", "Giorni"],
+          onSelected: (idxAnswer, idxOption) {
+            setState(() {
+              dream.report[4] = idxAnswer;
+              dream.report[5] = idxOption;
+            });
+          },
+        ),
+        SelectIntQuestion(
+          question: "Quante ore hai dormito?",
+          text: "Tempo: ",
+          options: const ["Ore"],
+          onSelected: (idxAnswer, idxOption) {
+            setState(() {
+              dream.report[6] = idxAnswer;
+              dream.report[7] = idxOption;
+            });
+          },
+        ),
+        MultipleChoiceQuestion(
+          question: "Come giudichi la qualità del sonno?",
+          answers: ["Molto scarsa", "Scarsa", "Buona", "Molto buona"],
+          onSelected: (value) {
+            setState(() {
+              dream.report[8] = value + 1;
+            });
+          },
+        ),
+      ]
     ];
   }
 

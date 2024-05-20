@@ -3,6 +3,16 @@ import 'package:flutter/material.dart';
 double widthConstraint = 1080;
 double halfWidthConstraint = widthConstraint / 2;
 
+enum HiveBoxes{
+  jwt(label: "jwt"),
+  hasGeneralInfo(label: "hasGeneralInfo"),
+  hasChronotype(label: "hasChronotype");
+
+  const HiveBoxes({required this.label});
+  final String label;
+
+}
+
 String timeOfDaytoString(TimeOfDay tod) {
   String addLeadingZeroIfNeeded(int value) {
     if (value < 10) {
@@ -37,7 +47,7 @@ class QA {
 
 class DreamData {
   String dreamText = "";
-  List<int?> report = List<int?>.generate(6, (index) => null);
+  List<int?> report = List<int?>.generate(9, (index) => null);
   DateTime? createdAt;
 
   @override
@@ -59,7 +69,7 @@ double mapValueFromInterval(double value, List<(double, double, double)> interva
 class PSQIData {
   List<dynamic> report = List<dynamic>.generate(19, (index) => null);
   String? optionalText;
-
+  DateTime? compiled_date;
 
   @override
   String toString() {

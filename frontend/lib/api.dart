@@ -20,10 +20,19 @@ var tokenBox = Hive.box('tokens');
 var userDataBox = Hive.box('userData');
 
 bool doIHaveJwt(){
-  if(!tokenBox.containsKey("jwt")) return false;
-  bool validJwt = !JwtDecoder.isExpired(tokenBox.get("jwt"));
+  if(!tokenBox.containsKey(HiveBoxes.jwt.label)) return false;
+  bool validJwt = !JwtDecoder.isExpired(tokenBox.get(HiveBoxes.jwt.label));
   return validJwt;
 }
+
+bool doIHaveChronotype(){
+  return userDataBox.containsKey(HiveBoxes.hasChronotype.label);
+}
+
+bool doIHaveGeneralInfo(){
+  return userDataBox.containsKey(HiveBoxes.hasGeneralInfo.label);
+}
+
 
 enum UserType {
   admin,
@@ -35,17 +44,17 @@ enum UserType {
 UserType getMyUserType(){
   if(!doIHaveJwt()) return UserType.notLogged;
 
-  var token = JwtDecoder.decode(tokenBox.get("jwt"));
+  var token = JwtDecoder.decode(tokenBox.get(HiveBoxes.jwt.label));
   if(![0,1,2].contains(token["type"])) return UserType.notLogged;
 
   return UserType.values[token["type"]];
 
 }
 
-void deleteJwtAndUserInfo(){
-  tokenBox.delete("jwt");
-  userDataBox.delete("hasGeneralInfo");
-  userDataBox.delete("hasChronotype");
+void deleteJwtAndUserData(){
+  tokenBox.delete(HiveBoxes.jwt.label);
+  userDataBox.delete(HiveBoxes.hasGeneralInfo.label);
+  userDataBox.delete(HiveBoxes.hasChronotype.label);
 }
 
 
@@ -110,7 +119,7 @@ class HttpRequest {
     includeDeletedRows = false
   }) {
     if(useIdInJwt || tableName.needJwt){
-      this.jwt = tokenBox.get("jwt");
+      this.jwt = tokenBox.get(HiveBoxes.jwt.label);
     }
 
     this.search = Map<String, dynamic>.from(search ?? {});
@@ -183,7 +192,7 @@ String jwtHeader(String jwt){
 }
 
 Map<String, dynamic> myJwtData(){
-  return JwtDecoder.decode(tokenBox.get("jwt"));
+  return JwtDecoder.decode(tokenBox.get(HiveBoxes.jwt.label));
 }
 
 UserData _jsonToUser(Map<String, dynamic> json){
@@ -221,6 +230,26 @@ ChronoTypeData _jsonToChronotype(Map<String, dynamic> json){
   return chronotype;
 }
 
+PSQIData _jsonToPSQI(Map<String, dynamic> json){
+  PSQIData psqi = PSQIData();
+    for (var i = 1; i <= 19; i++) {
+    psqi.report[i-1] = json["q$i"]; 
+  }
+  psqi.optionalText = json["q15_text"];
+  psqi.compiled_date = DateTime.parse(json["compiled_date"]);
+  return psqi;
+
+}
+
+List<PSQIData> _jsonToPSQIs(List<Map<String, dynamic>> json){
+  List<PSQIData> psqis = [];
+  for (var j in json) {
+    psqis.add(_jsonToPSQI(j));
+  }
+  
+  return psqis;
+}
+
 Future<bool> isValidLoginUser(String username, String password) async{
 
   var response = await HttpRequest(
@@ -237,7 +266,7 @@ Future<bool> isValidLoginUser(String username, String password) async{
 
   var jsonResponse = convert.jsonDecode(response.body);
   String? token = jsonResponse["access_token"];
-  tokenBox.put("jwt", token!);
+  tokenBox.put(HiveBoxes.jwt.label, token!);
 
   return true;
 }
@@ -258,7 +287,7 @@ Future<bool> isValidLoginResearcher(String username, String password) async{
 
   var jsonResponse = convert.jsonDecode(response.body);
   String? token = jsonResponse["access_token"];
-  tokenBox.put("jwt", token!);
+  tokenBox.put(HiveBoxes.jwt.label, token!);
 
   return true;
 }
@@ -491,6 +520,22 @@ Future<ChronoTypeData?> getMyChronotype() async {
   if(jsonResponse.isEmpty) return null;
 
   return _jsonToChronotype(jsonResponse[0]);
+}
+
+Future<List<PSQIData>> getMyPSQIs() async {
+
+  var response = await HttpRequest(
+    tableName: TableName.user,
+    requestType: RequestType.get,
+    joinWith: TableName.psqi,
+    useIdInJwt: true
+    ).exec();
+
+  var body = convert.jsonDecode(response.body)["psqis"];
+  var jsonResponse = body as List<dynamic>;
+  List<PSQIData> psqis = jsonResponse.map((e) => _jsonToPSQI(e)).toList();
+
+  return psqis;
 }
 
 

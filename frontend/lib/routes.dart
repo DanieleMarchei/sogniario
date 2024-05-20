@@ -96,7 +96,7 @@ final routes = GoRouter(
         return Routes.homeUser.path;
       }
 
-      if(userDataBox.containsKey("hasGeneralInfo") && userDataBox.containsKey("hasChronotype")) return null;
+      if (doIHaveGeneralInfo()) return null;
       
       DateTime? birthdate;
       Sex? sex;
@@ -108,20 +108,20 @@ final routes = GoRouter(
       }
 
       if(birthdate == null || sex == null) {
-        userDataBox.delete("hasGeneralInfo");
+        userDataBox.delete(HiveBoxes.hasGeneralInfo.label);
         return Routes.generalInfo.path;
       }else{
-        userDataBox.put("hasGeneralInfo", true);
+        userDataBox.put(HiveBoxes.hasGeneralInfo.label, true);
       }
 
-      ChronoTypeData? chrono = await getMyChronotype();
+      // ChronoTypeData? chrono = await getMyChronotype();
 
-      if(chrono == null) {
-        userDataBox.delete("hasChronotype");
-        return Routes.chronotype.path;
-      }else{
-        userDataBox.put("hasChronotype", true);
-      }
+      // if(chrono == null) {
+      //   userDataBox.delete(HiveBoxes.hasChronotype.label);
+      //   return Routes.chronotype.path;
+      // }else{
+      //   userDataBox.put(HiveBoxes.hasChronotype.label, true);
+      // }
       
       return null;
     }

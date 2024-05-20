@@ -68,7 +68,8 @@ class _ManageUsersState extends State<ManageUsers> {
                   onPressed: onPressedAddUser,
                   tooltip: "Aggiungi utente",
                   child: const Icon(Icons.person_add_alt_1_rounded),
-                  backgroundColor: Colors.orange.shade300,
+                  // backgroundColor: Colors.orange.shade300,
+                  backgroundColor: Colors.white,
                 )
               : null,
           appBar: AppBar(

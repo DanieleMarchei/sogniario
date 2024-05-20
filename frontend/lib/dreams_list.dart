@@ -88,11 +88,15 @@ class DreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String day = "${dream.createdAt!.day}/${dream.createdAt!.month}/${dream.createdAt!.year}";
+    String min = "${dream.createdAt!.minute}";
+    if (dream.createdAt!.minute < 10) min = "0" + min;
+    String time = "${dream.createdAt!.hour}:${min}";
     return Card(
       color: Colors.blue.shade100,
       child: ExpansionTile(
         title: Text(
-          "${dream.createdAt!.day}/${dream.createdAt!.month}/${dream.createdAt!.year}",
+          "${day} - ${time}"
         ),
         children: <Widget>[
           Padding(

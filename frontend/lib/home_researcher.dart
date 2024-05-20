@@ -20,7 +20,7 @@ class HomeResearcher extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 
     var exitFunc = () async {
-      deleteJwtAndUserInfo();
+      deleteJwtAndUserData();
       context.goNamed(Routes.login.name);
     };
 

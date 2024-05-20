@@ -50,7 +50,7 @@ class ScaffoldWithCircles extends Scaffold {
     super.onEndDrawerChanged,
     super.bottomNavigationBar,
     super.bottomSheet,
-    backgroundColor,
+    Color backgroundColor = Colors.white,
     super.resizeToAvoidBottomInset = false,
     super.primary = true,
     super.drawerDragStartBehavior = DragStartBehavior.start,
@@ -63,10 +63,8 @@ class ScaffoldWithCircles extends Scaffold {
     super.restorationId,
   }) : super(
             body: getCircles(context, body),
-            backgroundColor: backgroundColor ??
-                (getMyUserType() == UserType.researcher
-                    ? Colors.orange.shade50
-                    : Colors.blue.shade50));
+            backgroundColor: backgroundColor
+          );
 }
 
 Stack getCircles(BuildContext context, body) {
@@ -96,7 +94,7 @@ Stack getCircles(BuildContext context, body) {
       child: CircleDecoration(
         height: 250,
         width: 250,
-        offset: Offset(-1, -1),
+        offset: const Offset(-1, -1),
         shadow: color.shade600,
         gradientOne: color.shade200.withOpacity(0.4),
         gradientTwo: color.shade100,
@@ -108,7 +106,7 @@ Stack getCircles(BuildContext context, body) {
       child: CircleDecoration(
         height: 150,
         width: 200,
-        offset: Offset(1, 1),
+        offset: const Offset(1, 1),
         shadow: color.shade800,
         gradientOne: color.shade100,
         gradientTwo: color.shade200.withOpacity(0.6),
@@ -120,7 +118,7 @@ Stack getCircles(BuildContext context, body) {
       child: CircleDecoration(
         height: 200,
         width: 200,
-        offset: Offset(2, 2),
+        offset: const Offset(2, 2),
         shadow: color.shade700,
         gradientOne: color.shade100.withOpacity(0.4),
         gradientTwo: color.shade200,
@@ -133,7 +131,7 @@ Stack getCircles(BuildContext context, body) {
         child: CircleDecoration(
           height: 200,
           width: 200,
-          offset: Offset(1, 2),
+          offset: const Offset(1, 2),
           shadow: color.shade700,
           gradientOne: color.shade200,
           gradientTwo: color.shade100.withOpacity(0.4),
@@ -145,7 +143,7 @@ Stack getCircles(BuildContext context, body) {
         child: CircleDecoration(
           height: 200,
           width: 200,
-          offset: Offset(2, 0),
+          offset: const Offset(2, 0),
           shadow: color.shade700,
           gradientOne: color.shade100.withOpacity(0.4),
           gradientTwo: color.shade100,

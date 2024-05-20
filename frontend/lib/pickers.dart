@@ -49,12 +49,14 @@ class _DatePickerState extends State<DatePickerButton> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool showMobileLayout = screenWidth < 850;
     return OutlinedButton(
       onPressed: () {
-        if (kIsWeb) {
-          showDesktop(context);
-        } else {
+        if (showMobileLayout) {
           showMobile(context);
+        } else {
+          showDesktop(context);
         }
       },
       child: Text(selectedValue.any((element) => element == null)
@@ -65,6 +67,9 @@ class _DatePickerState extends State<DatePickerButton> {
   }
 
   void showDesktop(BuildContext conrtext) {
+    List<int?> originalValue = List.from(selectedValue);
+    List<int?> tmpValue = List.from(selectedValue);
+
     setState(() {
       if(selectedValue.any((element) => element == null)){
         selectedValue = [null, null, null];
@@ -95,7 +100,7 @@ class _DatePickerState extends State<DatePickerButton> {
                         decoration: InputDecoration(
                           label: Text("Giorno"),
                         ),
-                        value: selectedValue[0],
+                        value: originalValue[0],
                         items: days.map<DropdownMenuItem<int>>((int i) {
                           return DropdownMenuItem<int>(
                             value: i,
@@ -106,7 +111,7 @@ class _DatePickerState extends State<DatePickerButton> {
                         }).toList(),
                         onChanged: (int? value) {
                           setState(() {
-                            selectedValue[0] = value!;
+                            tmpValue[0] = value!;
                           });
                         },
                       ),
@@ -117,7 +122,7 @@ class _DatePickerState extends State<DatePickerButton> {
                         decoration: InputDecoration(
                           label: Text("Mese"),
                         ),
-                        value: selectedValue[1],
+                        value: originalValue[1],
                         items: months.map<DropdownMenuItem<int>>(((String, String, int) m_i) {
                           return DropdownMenuItem<int>(
                             value: m_i.$3,
@@ -128,7 +133,7 @@ class _DatePickerState extends State<DatePickerButton> {
                         }).toList(),
                         onChanged: (int? value) {
                           setState(() {
-                            selectedValue[1] = value!;
+                            tmpValue[1] = value!;
                           });
                         },
                       ),
@@ -139,7 +144,7 @@ class _DatePickerState extends State<DatePickerButton> {
                         decoration: InputDecoration(
                           label: Text("Anno"),
                         ),
-                        value: selectedValue[2],
+                        value: originalValue[2],
                         items: years.map<DropdownMenuItem<int>>((int i) {
                           return DropdownMenuItem<int>(
                             value: i,
@@ -150,7 +155,7 @@ class _DatePickerState extends State<DatePickerButton> {
                         }).toList(),
                         onChanged: (int? value) {
                           setState(() {
-                            selectedValue[2] = value!;
+                            tmpValue[2] = value!;
                           });
                         },
                       ),
@@ -165,7 +170,7 @@ class _DatePickerState extends State<DatePickerButton> {
                       child: const Text('Cancella'),
                       onPressed: () {
                         setState(() {
-                          selectedValue = [null, null, null];
+                          selectedValue = originalValue;
                         });
                         context.pop();
                       },
@@ -173,7 +178,7 @@ class _DatePickerState extends State<DatePickerButton> {
                     TextButton(
                       child: Text('Conferma'),
                       onPressed: () {
-                        if(selectedValue.any((element) => element == null)){
+                        if(tmpValue.any((element) => element == null)){
                           Fluttertoast.showToast(
                             msg: "Data non valida!",
                             toastLength: Toast.LENGTH_SHORT,
@@ -186,8 +191,9 @@ class _DatePickerState extends State<DatePickerButton> {
                           return;
                         }
 
-                        DateTime selected = DateTime(selectedValue[2]!, selectedValue[1]!, selectedValue[0]!);
-                        if(selected.year != selectedValue[2] || selected.month != selectedValue[1] || selected.day != selectedValue[0]){
+                        DateTime selected = DateTime(tmpValue[2]!, tmpValue[1]!, tmpValue[0]!);
+                        // selected != tmpValue iff the date was invalid (like 31 feb)
+                        if(selected.year != tmpValue[2] || selected.month != tmpValue[1] || selected.day != tmpValue[0]){
                           Fluttertoast.showToast(
                             msg: "Data non valida!",
                             toastLength: Toast.LENGTH_SHORT,
@@ -213,6 +219,10 @@ class _DatePickerState extends State<DatePickerButton> {
                           );
                           return;
                         }
+
+                        setState(() {
+                          selectedValue = tmpValue;
+                        });
                         
                         if (widget.onSelectedDate != null) {
                           widget.onSelectedDate!(selected);
@@ -248,7 +258,7 @@ class _DatePickerState extends State<DatePickerButton> {
             value[0] + (picker.adapter as DateTimePickerAdapter).yearBegin;
         DateTime selected = DateTime(year, month, day);
         setState(() {
-          selectedValue = [year, month, day];
+          selectedValue = [day, month, year];
         });
         if (widget.onSelectedDate != null) widget.onSelectedDate!(selected);
       },
@@ -319,22 +329,26 @@ class IntegerPickerButton extends StatefulWidget {
       this.maxValue = 120,
       this.increment = 1,
       this.onSelectedInteger,
-      this.helpText = "Seleziona"});
+      this.helpText = "Seleziona",
+      this.options = const ["Minuti"]
+      });
 
   final String text;
   final String helpText;
   final int minValue;
   final int maxValue;
   final int increment;
-  final void Function(int)? onSelectedInteger;
-
+  final void Function(int, int)? onSelectedInteger;
+  final List<String> options;
   @override
   State<IntegerPickerButton> createState() => _IntegerPickerButtonState();
 }
 
 class _IntegerPickerButtonState extends State<IntegerPickerButton> {
   int? selectedValue;
-  int? tmpSelected;
+  int? selectedOption;
+  String? tmpSelected;
+  String? tmpOption;
 
   late var data;
 
@@ -343,23 +357,31 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
     super.initState();
     data = [
       List.generate((widget.maxValue - widget.minValue) ~/ widget.increment + 1,
-          (index) => index * (widget.increment) + widget.minValue),
+          (index) => index * (widget.increment) + widget.minValue).map((e) => e.toString()).toList(),
     ];
+    if(widget.options.length > 1){
+      data.add(widget.options);
+    }
     tmpSelected = data[0][0];
+    if(widget.options.length == 1){
+      tmpOption = widget.options[0];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool showMobileLayout = screenWidth < 850;
     return OutlinedButton(
       onPressed: () {
-        if (kIsWeb) {
+        if (showMobileLayout) {
           showDesktop(context);
         } else {
           showMobile(context);
         }
       },
-      child: Text(selectedValue != null
-          ? '${widget.text}${selectedValue}'
+      child: Text(selectedValue != null && selectedOption != null
+          ? '${widget.text}${selectedValue} ${widget.options[selectedOption!]}'
           : '${widget.helpText}'),
     );
   }
@@ -369,16 +391,18 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
       adapter: PickerDataAdapter<String>(pickerData: data, isArray: true),
       changeToFirst: false,
       hideHeader: true,
+      title: Text(widget.options.length > 1 ? "Seleziona" : widget.options[0]),
       confirmText: 'Conferma',
       cancelText: "Cancella",
-      title: const Text("Minuti"),
       backgroundColor: const Color.fromARGB(255, 238, 232, 244),
       onConfirm: (Picker picker, List value) {
         setState(() {
+          print(picker.getSelectedValues());
           selectedValue = int.parse(picker.getSelectedValues()[0]);
+          selectedOption = widget.options.indexOf(picker.getSelectedValues()[1]) + 1;
         });
         if (widget.onSelectedInteger != null)
-          widget.onSelectedInteger!(selectedValue!);
+          widget.onSelectedInteger!(selectedValue!, selectedOption!);
       },
     ).showDialog(context);
   }
@@ -405,26 +429,48 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
                   children: [
                     SizedBox(
                       width: 200,
-                      child: DropdownButtonFormField<int>(
+                      child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
-                          label: Text("Minuti"),
+                          label: Text(widget.options.length > 1 ? "Tempo" : widget.options[0]),
                         ),
                         value: tmpSelected,
-                        items: data[0].map<DropdownMenuItem<int>>((int i) {
-                          return DropdownMenuItem<int>(
+                        items: data[0].map<DropdownMenuItem<String>>((String i) {
+                          return DropdownMenuItem<String>(
                             value: i,
-                            child: Text(
-                              "$i",
-                            ),
+                            child: Text("$i"),
                           );
                         }).toList(),
-                        onChanged: (int? value) {
+                        onChanged: (String? value) {
                           setState(() {
                             tmpSelected = value!;
                           });
+
                         },
                       ),
                     ),
+                    if(widget.options.length > 1)...{
+                      SizedBox(width: 5,),
+                      SizedBox(
+                        width: 200,
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            label: Text("Minuti/Ore/Giorni"),
+                          ),
+                          value: tmpOption,
+                          items: data[1].map<DropdownMenuItem<String>>((String i) {
+                            return DropdownMenuItem<String>(
+                              value: i,
+                              child: Text("$i"),
+                            );
+                          }).toList(),
+                          onChanged: (String? value) {
+                            setState(() {
+                              tmpOption = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    }
                   ],
                 ),
               ),
@@ -440,11 +486,36 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
                     TextButton(
                       child: Text('Conferma'),
                       onPressed: () {
+                        if(tmpSelected == null || tmpOption == null){
+                          Fluttertoast.showToast(
+                            msg: "Tutti i campi devono essere compilati.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 12.0
+                          );
+                          return;
+                        }
+                        if(widget.options.length > 1 && tmpOption == null){
+                          Fluttertoast.showToast(
+                            msg: "Tutti i campi devono essere compilati.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 12.0
+                          );
+                          return;
+                        }
                         setState(() {
-                          selectedValue = tmpSelected;
+                          selectedValue = int.parse(tmpSelected!);
+                          selectedOption = widget.options.indexOf(tmpOption!);
                         });
                         if (widget.onSelectedInteger != null) {
-                          widget.onSelectedInteger!(selectedValue!);
+                          widget.onSelectedInteger!(selectedValue!, selectedOption!);
                         }
                         context.pop();
                       },

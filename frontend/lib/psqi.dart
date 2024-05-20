@@ -9,22 +9,22 @@ import 'package:frontend/utils.dart';
 import 'package:go_router/go_router.dart';
 
 const List<String> answersHowMany = [
-  "Non durante l'ultimo mese.",
-  "Meno di una volta a settimana.",
-  "Una o due volte a settimana.",
-  "Tre o più volte a settimana."
+  "Non durante l'ultimo mese",
+  "Meno di una volta a settimana",
+  "Una o due volte a settimana",
+  "Tre o più volte a settimana"
 ];
 const List<String> answersQuality = [
-  "Molto buona.",
-  "Abbastanza buona.",
-  "Abbastanza cattiva.",
-  "Molto cattiva."
+  "Molto buona",
+  "Abbastanza buona",
+  "Abbastanza cattiva",
+  "Molto cattiva"
 ];
 const List<String> answersHowMuch = [
-  "Per niente.",
-  "Poco.",
-  "Abbastanza.",
-  "Molto."
+  "Per niente",
+  "Poco",
+  "Abbastanza",
+  "Molto"
 ];
 
 class PSQI extends StatefulWidget {
@@ -60,7 +60,7 @@ class _PSQIState extends State<PSQI> {
             "Nell' ultimo mese, di solito, quanto tempo (in minuti) hai impiegato ad addormentarti?",
         text: "Minuti : ",
         maxValue: 120,
-        onSelected: (int i) {
+        onSelected: (int i, int option) {
           setState(() {
             psqi.report[1] = i;
           });
