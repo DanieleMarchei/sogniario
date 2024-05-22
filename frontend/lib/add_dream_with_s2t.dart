@@ -30,12 +30,11 @@ List<QA> questions = [
     "Piuttosto forte",
     "Molto forte"
   ]),
-  // TODO: chiedere quali risposte vanno messe
   QA(question: "Quanto eri consapevole di star sognando?", answers: [
-    "Per niente consapevole", 
-    "Poco consapevole",
-    "Molto consapevole"
-    ]),
+    "Per nulla consapevole", 
+    "Parzialmente consapevole",
+    "Completamente consapevole"
+  ]),
   QA(question: "Quanto controllo volontario avevi sul contenuto e sullo svolgimento del sogno?", answers: [
     "Nessun controllo",
     "Parziale controllo",
