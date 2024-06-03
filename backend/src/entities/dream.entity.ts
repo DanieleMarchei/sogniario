@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -18,11 +19,11 @@ export class Dream {
   text: string;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   last_edit: Date;
 
   @ApiProperty()
@@ -58,7 +59,7 @@ export class Dream {
   sleep_quality: number;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   compiled_date: Date;
 
   @ApiProperty({ type: () => User })

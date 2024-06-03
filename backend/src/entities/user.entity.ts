@@ -49,7 +49,7 @@ export class User {
   sex: Gender;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
 
   @ApiProperty()
@@ -57,7 +57,7 @@ export class User {
   first_access: boolean;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   last_edit: Date;
 
   @ApiProperty()

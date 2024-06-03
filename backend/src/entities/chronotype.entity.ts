@@ -82,7 +82,7 @@ export class Chronotype {
   q19: number;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   compiled_date: Date;
 
   @ApiProperty({ type: () => User })

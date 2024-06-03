@@ -26,11 +26,11 @@ export class Researcher {
   type: UserType;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
 
   @ApiProperty()
-  @Column({ default: new Date() })
+  @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   last_edit: Date;
 
   @ApiProperty()
