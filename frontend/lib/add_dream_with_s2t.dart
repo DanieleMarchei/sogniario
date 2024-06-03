@@ -144,7 +144,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
         context.goNamed(Routes.homeUser.name);
       }, unansweredQuestions: () { 
         List<int> uq = [];
-        if(dream.dreamText.split(" ").length < 3){
+        if(dream.dreamText.split(" ").length < 1){
           uq.add(0);
         }
         for (var i = 0; i < dream.report.length; i++) {
@@ -289,9 +289,9 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
       return false;
     }
     RegExp whiteSpaces = RegExp(r'\s+', multiLine: true);
-    if (text.trim().split(whiteSpaces).length <= 2) {
+    if (text.trim().split(whiteSpaces).length < 1) {
       setState(() {
-        textError = 'Testo troppo corto. Scrivi almeno due parole.';
+        textError = 'Testo troppo corto. Scrivi almeno una parola.';
       });
       return false;
     }
