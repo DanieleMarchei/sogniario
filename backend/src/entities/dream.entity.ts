@@ -3,11 +3,10 @@ import {
   Column,
   Entity,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "./user.entity";
-import { defaultIfEmpty } from "rxjs";
+import { IPostgresInterval } from "postgres-interval";
 @Entity()
 export class Dream {
   @ApiProperty()
@@ -42,9 +41,9 @@ export class Dream {
   @Column({ default: 0 })
   control: number;
 
-  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
-  @Column({ default: 0 })
-  percived_elapsed_time: number;
+  @ApiProperty()
+  @Column({ type: 'interval' })
+  percived_elapsed_time: IPostgresInterval;
 
   @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
   @Column({ default: 0 })
@@ -61,4 +60,5 @@ export class Dream {
   @ApiProperty({ type: () => User })
   @ManyToOne(() => User, (user) => user.dreams)
   user: User;
+  
 }

@@ -22,6 +22,10 @@ export class UserService extends TypeOrmCrudService<User> {
     return this.repo.save(user);
   }
 
+  async saveUser(user: User){
+    return this.repo.save(user);
+  }
+
   async downloadDreams(organizationId) {
     var JSZip = require("jszip");
     let zip = new JSZip();

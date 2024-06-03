@@ -20,4 +20,8 @@ export class ResearcherService extends TypeOrmCrudService<Researcher> {
     researcher.password = await bcrypt.hash(researcher.password, 10);
     return this.repo.save(researcher);
   }
+
+  async saveResearcher(researcher:Researcher){
+    return this.repo.save(researcher);
+  }
 }

@@ -1,10 +1,12 @@
 import { Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { SignInDto } from "./DTO/signIn.dto";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiSecurity, ApiTags } from "@nestjs/swagger";
 import { Public } from "./auth.decorator";
 import { User } from "src/entities/user.entity";
 import { Researcher } from "src/entities/researcher.entity";
+import { ResetPasswordDto } from "./DTO/resetPassword.dto";
+import { ResetPasswordUserDto } from "./DTO/resetPasswordUser.dto";
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
@@ -38,5 +40,18 @@ export class AuthController {
   @Post("register/researcher")
   signUp(@Body() signUpDto: Researcher) {
     return this.authService.signUpResearcher(signUpDto);
+  }
+  @ApiSecurity("bearer")
+  @HttpCode(HttpStatus.OK)
+  @Post("reset-password/user")
+  resetPasswordUser(@Body() resetDto: ResetPasswordUserDto) {
+    return this.authService.resetPasswordUser(resetDto);
+  }
+
+  @ApiSecurity("bearer")
+  @HttpCode(HttpStatus.OK)
+  @Post("reset-password/researcher")
+  resetPasswordResearcher(@Body() resetDto: ResetPasswordDto) {
+    return this.authService.resetPasswordResearcher(resetDto);
   }
 }

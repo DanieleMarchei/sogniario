@@ -9,6 +9,8 @@ import { JwtService } from "@nestjs/jwt";
 import { User } from "src/entities/user.entity";
 import { ResearcherService } from "src/Researcher/researcher.service";
 import { Researcher } from "src/entities/researcher.entity";
+import { ResetPasswordDto } from "./DTO/resetPassword.dto";
+import { ResetPasswordUserDto } from "./DTO/resetPasswordUser.dto";
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,45 @@ export class AuthService {
     private researcerService: ResearcherService,
     private jwtService: JwtService
   ) {}
+
+
+async resetPasswordUser(resetPassword : ResetPasswordUserDto){
+  const bcrypt = require("bcrypt");
+
+  const user = await this.usersService.findOne({
+    where: { username: resetPassword.username, deleted: false },
+  });
+
+  if (!user) {
+    throw new UnauthorizedException();
+  }
+
+  let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
+
+  user.password = newPassword;
+  return this.usersService.saveUser(user);
+
+}
+
+async resetPasswordResearcher(resetPassword : ResetPasswordDto){
+  const bcrypt = require("bcrypt");
+
+  const researcher = await this.researcerService.findOne({
+    where: { username: resetPassword.username, deleted: false },
+  });
+
+  if (!researcher || !(await bcrypt.compare(resetPassword.old_password, researcher.password))) {
+    throw new UnauthorizedException();
+  }
+
+  let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
+
+  researcher.password = newPassword;
+  return this.researcerService.saveResearcher(researcher);
+
+}
+
+
 
   async signInUser(
     username: string,
@@ -28,6 +69,7 @@ export class AuthService {
       where: { username: username, deleted: false },
       relations: ['organization']
     });
+
     if (!user || !(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException();
     }
