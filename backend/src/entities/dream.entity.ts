@@ -33,11 +33,15 @@ export class Dream {
   @Column({ default: 0 })
   emotional_content: number;
 
-  @ApiProperty()
-  @Column({ default: false })
-  conscious: boolean;
-
   @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @Column({ default: 0 })
+  emotional_intensity: number;
+
+  @ApiProperty({ minimum: 0, maximum: 2, default: 0 })
+  @Column({ default: 0 })
+  concious: number;
+
+  @ApiProperty({ minimum: 0, maximum: 2, default: 0 })
   @Column({ default: 0 })
   control: number;
 
@@ -45,7 +49,7 @@ export class Dream {
   @Column({ type: 'interval' })
   percived_elapsed_time: IPostgresInterval;
 
-  @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
+  @ApiProperty({ minimum: 0, default: 0 })
   @Column({ default: 0 })
   sleep_time: number;
 
