@@ -47,7 +47,7 @@ class QA {
 
 class DreamData {
   String dreamText = "";
-  List<int?> report = List<int?>.generate(9, (index) => null);
+  List<dynamic> report = List<dynamic>.generate(9, (index) => null);
   DateTime? createdAt;
 
   @override
@@ -176,6 +176,19 @@ enum Sex {
   notSpecified(label: "Non specificato", id: 2);
 
   const Sex({required this.label, required this.id});
+  final String label;
+  final int id;
+}
+
+enum Time {
+  seconds(label: "Secondi", id: 0),
+  minutes(label: "Minuti", id: 1),
+  hours(label: "Ore", id: 2),
+  days(label: "Giorni", id: 3),
+  months(label: "Mesi", id: 4),
+  years(label: "Anni", id: 5);
+
+  const Time({required this.label, required this.id});
   final String label;
   final int id;
 }

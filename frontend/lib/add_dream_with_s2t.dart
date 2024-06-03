@@ -85,11 +85,27 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
         SelectIntQuestion(
           question: "Quanto tempo pensi sia trascorso nel tuo sogno?",
           text: "Tempo: ",
-          options: const ["Minuti", "Ore", "Giorni"],
-          onSelected: (idxAnswer, idxOption) {
+          options: [Time.minutes.label, Time.hours.label, Time.days.label],
+          onSelected: (answer, idxOption) {
             setState(() {
-              dream.report[4] = idxAnswer;
-              dream.report[5] = idxOption;
+              Time t = [Time.minutes, Time.hours, Time.days][idxOption];
+              late Duration d;
+              switch (t) {
+                case Time.minutes:
+                  d = Duration(minutes: answer);
+                  break;
+                
+                case Time.hours:
+                  d = Duration(hours: answer);
+                  break;
+
+                case Time.days:
+                  d = Duration(days: answer);
+                  break;
+
+                default:
+              }
+              dream.report[4] = d;
             });
           },
         ),
@@ -97,10 +113,9 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
           question: "Quante ore hai dormito?",
           text: "Tempo: ",
           options: const ["Ore"],
-          onSelected: (idxAnswer, idxOption) {
+          onSelected: (answer, idxOption) {
             setState(() {
-              dream.report[6] = idxAnswer;
-              dream.report[7] = idxOption;
+              dream.report[5] = Duration(hours: answer);
             });
           },
         ),
@@ -309,7 +324,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
       child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
     );
 
-    FloatingActionButton recordBtnNoSpeech = FloatingActionButton(
+    FloatingActionButton recordBtnNoSpeech = const FloatingActionButton(
       shape: CircleBorder(),
       backgroundColor:  Colors.grey,
       tooltip: "Trascrizione audio non disponibile.",
@@ -360,6 +375,12 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
           
             ],
           );
+  }
+
+  @override
+  void dispose() {
+    _stopListening();
+    super.dispose();
   }
 
 

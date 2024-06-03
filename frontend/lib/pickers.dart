@@ -375,9 +375,9 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
     return OutlinedButton(
       onPressed: () {
         if (showMobileLayout) {
-          showDesktop(context);
-        } else {
           showMobile(context);
+        } else {
+          showDesktop(context);
         }
       },
       child: Text(selectedValue != null && selectedOption != null
@@ -399,7 +399,7 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
         setState(() {
           print(picker.getSelectedValues());
           selectedValue = int.parse(picker.getSelectedValues()[0]);
-          selectedOption = widget.options.indexOf(picker.getSelectedValues()[1]) + 1;
+          selectedOption = widget.options.indexOf(picker.getSelectedValues()[1]);
         });
         if (widget.onSelectedInteger != null)
           widget.onSelectedInteger!(selectedValue!, selectedOption!);

@@ -46,7 +46,7 @@ class _PSQIState extends State<PSQI> {
       // 1
       SelectHourQuestion(
         question:
-            "Nell' ultimo mese, di solito, a che ora sei andato a dormire la sera?",
+            "Nell' ultimo mese, di solito, a che ora sei andato/a a letto la sera?",
         onSelected: (TimeOfDay t) {
           setState(() {
             psqi.report[0] = t;
@@ -57,7 +57,7 @@ class _PSQIState extends State<PSQI> {
       // 2
       SelectIntQuestion(
         question:
-            "Nell' ultimo mese, di solito, quanto tempo (in minuti) hai impiegato ad addormentarti?",
+            "Nell' ultimo mese, di solito, quanto tempo (in minuti) hai impiegato ad addormentarti ogni notte?",
         text: "Minuti : ",
         maxValue: 120,
         onSelected: (int i, int option) {
@@ -70,7 +70,7 @@ class _PSQIState extends State<PSQI> {
       // 3
       SelectHourQuestion(
         question:
-            "Nell' ultimo mese, di solito, a che ora ti sei alzato al mattino?",
+            "Nell' ultimo mese, di solito, a che ora ti sei alzato/a al mattino?",
         onSelected: (TimeOfDay t) {
           setState(() {
             psqi.report[2] = t;
@@ -80,7 +80,7 @@ class _PSQIState extends State<PSQI> {
 
       // 4A
       SelectTwoIntsQuestion(
-        question: "Nell' ultimo mese, quante ore hai dormito effettivamente per notte?",
+        question: "Nell' ultimo mese, quante ore hai dormito effettivamente per notte? (potrebbero essere diverse dal numero di ore passate a letto)",
         text1: "ore",
         text2: "minuti",
         minValue1: 4,
