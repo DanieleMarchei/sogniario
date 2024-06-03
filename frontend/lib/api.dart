@@ -11,10 +11,11 @@ import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
 // String authority = "localhost:3000";
-String authority = "sogniario.unicam.it/api";
-// String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
+// String authority = "sogniario.unicam.it/api";
+String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
 // String authority = "192.168.115.2:3000";
-String server = "https://$authority";
+// String server = "https://$authority";
+String server = "http://$authority";
 
 var tokenBox = Hive.box('tokens');
 var userDataBox = Hive.box('userData');
@@ -75,6 +76,9 @@ enum TableName {
   authRegisterUser(label: "auth/register/user", needJwt: false, deletable: false),
   authLoginResearcher(label: "auth/login/researcher", needJwt: false, deletable: false),
   authRegisterResearcher(label: "auth/register/researcher", needJwt: false, deletable: false),
+
+  authResetPasswordUser(label: "auth/reset-password/user", needJwt: true, deletable: false),
+  authResetPasswordResearcher(label: "auth/reset-password/researcher", needJwt: true, deletable: false),
 
   chronotype(label: "chronotype", needJwt: true, deletable: false),
   dream(label: "dream", needJwt: true, deletable: false),
@@ -184,6 +188,19 @@ class HttpRequest {
 extension ResponseSucceeded on http.Response {
   bool get success {
     return 200 <= statusCode && statusCode <= 299;
+  }
+}
+
+extension DurationPostgres on Duration {
+  String get asPostgresString {
+    List<String> ps = [];
+    if(inDays != 0) ps.add("$inDays days");
+    if(inHours.remainder(24) != 0) ps.add("${inHours.remainder(24)} hours");
+    if(inMinutes.remainder(60) != 0) ps.add("${inMinutes.remainder(60)} minutes");
+    if(inSeconds.remainder(60) != 0) ps.add("${inSeconds.remainder(60)} seconds");
+
+    return ps.join(" ");
+
   }
 }
 
@@ -383,14 +400,14 @@ Future<bool> updateUserGeneralInfo(int id, Sex sex, DateTime birthdate) async {
   return response.success;
 }
 
-Future<bool> updateUserPassword(int id, String password) async {
+Future<bool> updateUserPassword(String username, String password) async {
 
   var response = await HttpRequest(
-    tableName: TableName.user,
-    id: id, 
-    requestType: RequestType.patch,
+    tableName: TableName.authResetPasswordUser,
+    requestType: RequestType.post,
     body: {
-      "password": password,
+      "username": username,
+      "new_password": password,
     },
   ).exec();
 
@@ -545,11 +562,12 @@ Future<bool> addDream(DreamData dream) async {
   var body = {
     "text": dream.dreamText,
     "emotional_content": dream.report[0],
-    "concious": dream.report[1] == 1,
-    "control": dream.report[2],
-    "percived_elapsed_time": dream.report[3],
-    "sleep_time": dream.report[4],
-    "sleep_quality": dream.report[5],
+    "emotional_intensity": dream.report[1],
+    "concious": dream.report[2],
+    "control": dream.report[3],
+    "percived_elapsed_time": (dream.report[4] as Duration).asPostgresString,
+    "sleep_time": (dream.report[5] as Duration).inHours,
+    "sleep_quality": dream.report[6],
     "user": id
   };
 
@@ -683,3 +701,4 @@ Future<void> downloadAndroidApp() async {
 
   return;
 }
+

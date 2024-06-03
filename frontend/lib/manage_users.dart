@@ -623,7 +623,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
             child: FormButton(
           text: "Modifica",
           onPressed: (widget.user == tmpUser || tmpUser!.password.isEmpty) ? null :() async {
-            bool updated = await updateUserPassword(tmpUser!.id, tmpUser!.password);
+            bool updated = await updateUserPassword(tmpUser!.username, tmpUser!.password);
             if(!updated){
               Fluttertoast.showToast(
                 msg: "Modifica non riuscita.",

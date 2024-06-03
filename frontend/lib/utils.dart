@@ -38,7 +38,7 @@ class QA {
     List<int>? scores
     }){
       if(scores == null){
-        this.scores = List<int>.generate(answers.length, (index) => index + 1);
+        this.scores = List<int>.generate(answers.length, (index) => index);
       }else{
         this.scores = scores;
       }
@@ -47,7 +47,7 @@ class QA {
 
 class DreamData {
   String dreamText = "";
-  List<dynamic> report = List<dynamic>.generate(9, (index) => null);
+  List<dynamic> report = List<dynamic>.generate(7, (index) => null);
   DateTime? createdAt;
 
   @override

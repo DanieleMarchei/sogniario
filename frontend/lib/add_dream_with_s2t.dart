@@ -124,7 +124,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
           answers: ["Molto scarsa", "Scarsa", "Buona", "Molto buona"],
           onSelected: (value) {
             setState(() {
-              dream.report[8] = value + 1;
+              dream.report[6] = value;
             });
           },
         ),
@@ -291,7 +291,7 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     RegExp whiteSpaces = RegExp(r'\s+', multiLine: true);
     if (text.trim().split(whiteSpaces).length <= 2) {
       setState(() {
-        textError = 'Testo troppo corto. Scrivi almeno tre parole.';
+        textError = 'Testo troppo corto. Scrivi almeno due parole.';
       });
       return false;
     }
