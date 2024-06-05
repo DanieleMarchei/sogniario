@@ -52,7 +52,7 @@ export class Dream {
 
   @ApiProperty({ minimum: 0, default: 0 })
   @Column({ default: 0 })
-  sleep_time: number;
+  hours_of_sleep: number;
 
   @ApiProperty({ minimum: 0, maximum: 4, default: 0 })
   @Column({ default: 0 })

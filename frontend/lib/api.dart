@@ -230,7 +230,7 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   dream.report[1] = json["conscious"] ? 1 : 2;
   dream.report[2] = json["control"];
   dream.report[3] = json["percived_elapsed_time"];
-  dream.report[4] = json["sleep_time"];
+  dream.report[4] = json["hours_of_sleep"];
   dream.report[5] = json["sleep_quality"];
   dream.createdAt = json["created_at"] != null ? DateTime.parse(json["created_at"]) : null;
 
@@ -651,7 +651,7 @@ Future<bool> addDream(DreamData dream) async {
     "concious": dream.report[2],
     "control": dream.report[3],
     "percived_elapsed_time": (dream.report[4] as Duration).asPostgresString,
-    "sleep_time": (dream.report[5] as Duration).inHours,
+    "hours_of_sleep": (dream.report[5] as Duration).inHours,
     "sleep_quality": dream.report[6],
     "user": id
   };
