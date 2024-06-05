@@ -12,11 +12,11 @@ import "package:universal_html/html.dart" as html;
 
 // String server = "http://localhost:3000";
 // String authority = "localhost:3000";
-// String authority = "sogniario.unicam.it/api";
-String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
+String authority = "sogniario.unicam.it/api";
+// String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
 // String authority = "192.168.115.2:3000";
-// String server = "https://$authority";
-String server = "http://$authority";
+String server = "https://$authority";
+// String server = "http://$authority";
 
 var tokenBox = Hive.box('tokens');
 var userDataBox = Hive.box('userData');
