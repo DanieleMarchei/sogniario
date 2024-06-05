@@ -6,19 +6,19 @@ import * as fs from "fs";
 async function bootstrap() {
   console.log(process.cwd());
   //Production
-  const httpsOptions = {
-    key: fs.readFileSync(process.cwd() + "/src/cert/sognario_unicam_it.key"),
-    cert: fs.readFileSync(
-      process.cwd() + "/src/cert/sognario_unicam_it_cert.cer"
-    ),
-  };
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions,
-  });
+  // const httpsOptions = {
+  //   key: fs.readFileSync(process.cwd() + "/src/cert/sognario_unicam_it.key"),
+  //   cert: fs.readFileSync(
+  //     process.cwd() + "/src/cert/sognario_unicam_it_cert.cer"
+  //   ),
+  // };
+  // const app = await NestFactory.create(AppModule, {
+  //   httpsOptions,
+  // });
 
   
   //development
-  // const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle("Sognario API description")

@@ -10,13 +10,10 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
 
-// String server = "http://localhost:3000";
-// String authority = "localhost:3000";
-String authority = "sogniario.unicam.it/api";
-// String authority = kIsWeb ? "localhost:3000" : "10.0.2.2:3000";
-// String authority = "192.168.115.2:3000";
-String server = "https://$authority";
-// String server = "http://$authority";
+bool isDevelopment = true;
+
+String authority = isDevelopment ? (kIsWeb ? "localhost:3000" : "10.0.2.2:3000") : "sogniario.unicam.it/api";
+String server = isDevelopment ? "http://$authority" : "https://$authority";
 
 var tokenBox = Hive.box('tokens');
 var userDataBox = Hive.box('userData');
@@ -260,7 +257,10 @@ PSQIData _jsonToPSQI(Map<String, dynamic> json){
   psqi.minutesToFallAsleep = json["q2"];
   psqi.timeWokeUp = TimeOfDay.fromDateTime(formatHm.parse(json["q3"]));
   
-  psqi.timeAsleep = Duration(hours: json["q4"]["hours"], minutes: json["q4"]["minutes"]);
+  int h = json["q4"].containsKey("hours") ? json["q4"]["hours"]! : 0;
+  int m = json["q4"].containsKey("minutes") ? json["q4"]["minutes"]! : 0;
+  int s = json["q4"].containsKey("seconds") ? json["q4"]["seconds"]! : 0;
+  psqi.timeAsleep = Duration(hours: h, minutes: m, seconds: s);
 
   psqi.notFallAsleepWithin30Minutes = json["q5a"];
   psqi.wakeUpWithoutFallingAsleepAgain = json["q5b"];

@@ -399,7 +399,11 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
         setState(() {
           print(picker.getSelectedValues());
           selectedValue = int.parse(picker.getSelectedValues()[0]);
-          selectedOption = widget.options.indexOf(picker.getSelectedValues()[1]);
+          if(widget.options.length == 1){
+            selectedOption = widget.options.indexOf(widget.options[0]);
+          }else{
+            selectedOption = widget.options.indexOf(picker.getSelectedValues()[1]);
+          }
         });
         if (widget.onSelectedInteger != null)
           widget.onSelectedInteger!(selectedValue!, selectedOption!);
