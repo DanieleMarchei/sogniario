@@ -10,7 +10,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
 
-bool isDevelopment = true;
+bool isDevelopment = false;
 
 String authority = isDevelopment ? (kIsWeb ? "localhost:3000" : "10.0.2.2:3000") : "sogniario.unicam.it/api";
 String server = isDevelopment ? "http://$authority" : "https://$authority";
