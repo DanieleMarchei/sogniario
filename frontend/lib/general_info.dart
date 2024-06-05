@@ -106,7 +106,7 @@ class _GeneralInfoState extends State<GeneralInfo> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                        title: Text("Canellare le modifiche?"),
+                                        title: Text("Cancellare le modifiche?"),
                                         insetPadding: EdgeInsets.all(16),
                                         content: Text("Tutte le modifiche saranno cancellate. Tornare alla schermata iniziale?", textAlign: TextAlign.justify,),
                                         actions: <Widget>[
@@ -135,7 +135,10 @@ class _GeneralInfoState extends State<GeneralInfo> {
                   tooltip: "Torna alla pagina iniziale",
                 ),
               ) 
-          : null;
+          : AppBar(
+              backgroundColor: Colors.blue,
+              title: Text("I tuoi dati")
+          );
 
         return ScaffoldWithCircles(
           context: context,
