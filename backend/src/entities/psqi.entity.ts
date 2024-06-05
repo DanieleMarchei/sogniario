@@ -1,31 +1,76 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
+import { IPostgresInterval } from "postgres-interval";
 @Entity()
 export class Psqi {
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
-  @Column()
-  q1: Date;
+  @ApiProperty({ type: 'time'})
+  @Column({type: "time"})
+  q1: string;
 
   @ApiProperty({ type: "number" })
   @Column()
   q2: number;
 
+  @ApiProperty({ type: 'time'})
+  @Column({type: "time" })
+  q3: string;
+
   @ApiProperty()
+  @Column({ type: 'interval' })
+  q4: IPostgresInterval;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
-  q3: Date;
+  q5a: number;
 
-  @ApiProperty({ type: "float" })
-  @Column("float")
-  q4: number;
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5b: number;
 
-  @ApiProperty({ type: "float" })
-  @Column("float")
-  q5: number;
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5c: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5d: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5e: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5f: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5g: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5h: number;
+
+  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
+  @Column()
+  q5i: number;
+
+  @ApiProperty({ type: "boolean" })
+  @Column()
+  q5j: boolean;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  q5j_text: String;
+
+  @ApiProperty({ type: "number", nullable : true })
+  @Column({ nullable: true })
+  q5j_frequency: number;
 
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
@@ -42,50 +87,6 @@ export class Psqi {
   @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
   @Column()
   q9: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q10: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q11: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q12: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q13: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q14: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q15: number;
-
-  @ApiProperty()
-  @Column({ nullable: true })
-  q15_text: String;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q16: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q17: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q18: number;
-
-  @ApiProperty({ type: "number", minimum: 0, maximum: 3 })
-  @Column()
-  q19: number;
 
   @ApiProperty()
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })

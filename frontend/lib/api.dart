@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/utils.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
@@ -249,11 +250,38 @@ ChronoTypeData _jsonToChronotype(Map<String, dynamic> json){
 
 PSQIData _jsonToPSQI(Map<String, dynamic> json){
   PSQIData psqi = PSQIData();
-    for (var i = 1; i <= 19; i++) {
-    psqi.report[i-1] = json["q$i"]; 
-  }
-  psqi.optionalText = json["q15_text"];
+
   psqi.compiled_date = DateTime.parse(json["compiled_date"]);
+
+  // List<int> todTimeToBed = (json["q1"] as String).split(":").map((e) => int.parse(e)).toList();
+  final formatHm = DateFormat.Hm();
+  psqi.timeToBed = TimeOfDay.fromDateTime(formatHm.parse(json["q1"]));
+
+  psqi.minutesToFallAsleep = json["q2"];
+  psqi.timeWokeUp = TimeOfDay.fromDateTime(formatHm.parse(json["q3"]));
+  
+  psqi.timeAsleep = Duration(hours: json["q4"]["hours"], minutes: json["q4"]["minutes"]);
+
+  psqi.notFallAsleepWithin30Minutes = json["q5a"];
+  psqi.wakeUpWithoutFallingAsleepAgain = json["q5b"];
+  psqi.goToTheBathroom = json["q5c"];
+  psqi.notBreethingCorrectly = json["q5d"];
+  psqi.coughOrSnort = json["q5e"];
+  psqi.tooCold = json["q5f"];
+  psqi.tooHot = json["q5g"];
+  psqi.badDreams = json["q5h"];
+  psqi.havingPain = json["q5i"];
+
+  psqi.otherProblems = json["q5j"];
+  psqi.optionalText = json["q5j_text"];
+  psqi.otherProblemsFrequency = json["q5j_frequency"];
+
+  psqi.sleepQuality = json["q6"];
+  psqi.drugs = json["q7"];
+  psqi.difficultiesBeingAwake = json["q8"];
+  psqi.enoughEnergies = json["q9"];
+
+
   return psqi;
 
 }
@@ -493,22 +521,79 @@ Future<bool> addMyChronotype(ChronoTypeData chronotype) async{
 }
 
 
+// Future<bool> addMyPSQIOld(PSQIData psqi) async{
+//   Map<String, dynamic> body = {};
+//   for (var i = 0; i < 19; i++) {
+//     late var value;
+//     if(psqi.report[i] is TimeOfDay){
+//       TimeOfDay tod = psqi.report[i] as TimeOfDay;
+//       DateTime date = DateTime.utc(1, 1, 1, tod.hour, tod.minute);
+//       value = date.toIso8601String();
+//     }else{
+//       value = psqi.report[i];
+//     }
+    
+//     body["q${i+1}"] = value;
+//   }
+
+//   body["q15_text"] = psqi.optionalText;
+
+//   int id = myJwtData()["sub"];
+//   body["user"] = id;
+
+//   var response = await HttpRequest(
+//     tableName: TableName.psqi,
+//     requestType: RequestType.post,
+//     body: body
+//   ).exec();
+
+//   return response.success;
+// }
+
 Future<bool> addMyPSQI(PSQIData psqi) async{
   Map<String, dynamic> body = {};
-  for (var i = 0; i < 19; i++) {
-    late var value;
-    if(psqi.report[i] is TimeOfDay){
-      TimeOfDay tod = psqi.report[i] as TimeOfDay;
-      DateTime date = DateTime.utc(1, 1, 1, tod.hour, tod.minute);
-      value = date.toIso8601String();
-    }else{
-      value = psqi.report[i];
-    }
-    
-    body["q${i+1}"] = value;
-  }
+  body["q1"] = timeOfDaytoString(psqi.timeToBed!);
+  body["q2"] = psqi.minutesToFallAsleep;
+  body["q3"] = timeOfDaytoString(psqi.timeWokeUp!);
+  body["q4"] = psqi.timeAsleep!.asPostgresString;
 
-  body["q15_text"] = psqi.optionalText;
+  body["q5a"] = psqi.notFallAsleepWithin30Minutes;
+  body["q5b"] = psqi.wakeUpWithoutFallingAsleepAgain;
+  body["q5c"] = psqi.goToTheBathroom;
+  body["q5d"] = psqi.notBreethingCorrectly;
+  body["q5e"] = psqi.coughOrSnort;
+  body["q5f"] = psqi.tooCold;
+  body["q5g"] = psqi.tooHot;
+  body["q5h"] = psqi.badDreams;
+  body["q5i"] = psqi.havingPain;
+
+  body["q5j"] = psqi.otherProblems;
+  body["q5j_text"] = psqi.optionalText;
+  body["q5j_frequency"] = psqi.otherProblemsFrequency;
+
+  body["q6"] = psqi.sleepQuality;
+  body["q7"] = psqi.drugs;
+  body["q8"] = psqi.difficultiesBeingAwake;
+  body["q9"] = psqi.enoughEnergies;
+
+  // body["q1"] = timeOfDaytoString(psqi.timeToBed!);
+  // body["q2"] = psqi.minutesToFallAsleep;
+  // body["q3"] = timeOfDaytoString(psqi.timeWokeUp!);
+  // body["q4"] = psqi.timeAsleep!.asPostgresString;
+  // body["q5"] = psqi.notFallAsleepWithin30Minutes;
+  // body["q6"] = psqi.wakeUpWithoutFallingAsleepAgain;
+  // body["q7"] = psqi.goToTheBathroom;
+  // body["q8"] = psqi.notBreethingCorrectly;
+  // body["q9"] = psqi.coughOrSnort;
+  // body["q10"] = psqi.tooCold;
+  // body["q11"] = psqi.tooHot;
+  // body["q12"] = psqi.badDreams;
+  // body["q13"] = psqi.havingPain;
+  // body["q13text"] = psqi.optionalText;
+  // body["q14"] = psqi.sleepQuality;
+  // body["q15"] = psqi.drugs;
+  // body["q16"] = psqi.difficultiesBeingAwake;
+  // body["q17"] = psqi.enoughEnergies;
 
   int id = myJwtData()["sub"];
   body["user"] = id;

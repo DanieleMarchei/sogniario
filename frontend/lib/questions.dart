@@ -285,7 +285,7 @@ class SpecifyIfYesQuestion extends QuestionWithDirection{
 class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYesQuestion>{
 
 
-  List<String> no_yes = ["No.", "Si."];
+  List<String> no_yes = ["No", "Si"];
   String? _firstQuestionAnswer;
   int? idxFirstQuestion;
   String? _optionalAnswer1;
@@ -310,13 +310,9 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
                     title: GestureDetector(
                       onTap: () {
                         setState(() {
-                          _firstQuestionAnswer = widget.answers[idx];
+                          _firstQuestionAnswer = no_yes[idx];
                           idxFirstQuestion = idx;
-                          if (_firstQuestionAnswer == no_yes[1]){
-                            idxOptionalAnswer2 = 0;
-                            _optionalAnswer2 = widget.answers[idxOptionalAnswer2!];
-                          }
-                          else{
+                          if (_firstQuestionAnswer == no_yes[0]){
                             _optionalAnswer2 = null;
                             idxOptionalAnswer2 = null;
                           }
@@ -338,11 +334,7 @@ class _SpecifyIfYesQuestionState extends QuestionWithDirectionState<SpecifyIfYes
                         setState(() {
                           _firstQuestionAnswer = value!;
                           idxFirstQuestion = idx;
-                          if (_firstQuestionAnswer == no_yes[1]){
-                            idxOptionalAnswer2 = 0;
-                            _optionalAnswer2 = widget.answers[idxOptionalAnswer2!];
-                          }
-                          else{
+                          if (_firstQuestionAnswer == no_yes[0]){
                             _optionalAnswer2 = null;
                             idxOptionalAnswer2 = null;
                           }

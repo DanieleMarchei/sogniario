@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
 import 'package:frontend/pickers.dart';
@@ -49,7 +50,7 @@ class _PSQIState extends State<PSQI> {
             "Nell' ultimo mese, di solito, a che ora sei andato/a a letto la sera?",
         onSelected: (TimeOfDay t) {
           setState(() {
-            psqi.report[0] = t;
+            psqi.timeToBed = t;
           });
         },
       ),
@@ -58,11 +59,11 @@ class _PSQIState extends State<PSQI> {
       SelectIntQuestion(
         question:
             "Nell' ultimo mese, di solito, quanto tempo (in minuti) hai impiegato ad addormentarti ogni notte?",
-        text: "Minuti : ",
+        text: "",
         maxValue: 120,
         onSelected: (int i, int option) {
           setState(() {
-            psqi.report[1] = i;
+            psqi.minutesToFallAsleep = i;
           });
         },
       ),
@@ -73,7 +74,7 @@ class _PSQIState extends State<PSQI> {
             "Nell' ultimo mese, di solito, a che ora ti sei alzato/a al mattino?",
         onSelected: (TimeOfDay t) {
           setState(() {
-            psqi.report[2] = t;
+            psqi.timeWokeUp = t;
           });
         },
       ),
@@ -89,23 +90,7 @@ class _PSQIState extends State<PSQI> {
         increment2: 5,
         onSelected: (int i1, int i2) {
           setState(() {
-            psqi.report[3] = i1 + i2 / 100;
-          });
-        },
-      ),
-
-      // 4B
-      SelectTwoIntsQuestion(
-        question: "Quante ore hai passato nel letto?",
-        text1: "ore",
-        text2: "minuti",
-        minValue1: 4,
-        maxValue1: 14,
-        maxValue2: 55,
-        increment2: 5,
-        onSelected: (int i1, int i2) {
-          setState(() {
-            psqi.report[4] = i1 + i2 / 100;
+            psqi.timeAsleep = Duration(hours: i1, minutes: i2);
           });
         },
       ),
@@ -113,11 +98,11 @@ class _PSQIState extends State<PSQI> {
       // 5A
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di non riuscire ad addormentarti entro 30 minuti?",
+            "Nell' ultimo mese, quanto spesso ti capita di non riuscire ad addormentarti entro 30 minuti?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[5] = i;
+            psqi.notFallAsleepWithin30Minutes = i;
           });
         },
       ),
@@ -125,11 +110,11 @@ class _PSQIState extends State<PSQI> {
       // 5B
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di svegliarti nel mezzo della notte o al mettino presto senza riaddormentarsi?",
+            "Nell' ultimo mese, quanto spesso ti capita di svegliarti nel mezzo della notte o al mettino presto senza riaddormentarsi?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[6] = i;
+            psqi.wakeUpWithoutFallingAsleepAgain = i;
           });
         },
       ),
@@ -137,11 +122,11 @@ class _PSQIState extends State<PSQI> {
       // 5C
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di alzarti nel mezzo della notte per andare in bagno?",
+            "Nell' ultimo mese, quanto spesso ti capita di alzarti nel mezzo della notte per andare in bagno?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[7] = i;
+            psqi.goToTheBathroom = i;
           });
         },
       ),
@@ -149,11 +134,11 @@ class _PSQIState extends State<PSQI> {
       // 5D
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di non riuscire a respirare bene?",
+            "Nell' ultimo mese, quanto spesso ti capita di non riuscire a respirare bene?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[8] = i;
+            psqi.notBreethingCorrectly = i;
           });
         },
       ),
@@ -161,11 +146,11 @@ class _PSQIState extends State<PSQI> {
       // 5E
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di tossire o russare forte?",
+            "Nell' ultimo mese, quanto spesso ti capita di tossire o russare forte?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[9] = i;
+            psqi.coughOrSnort = i;
           });
         },
       ),
@@ -173,11 +158,11 @@ class _PSQIState extends State<PSQI> {
       // 5F
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di sentire troppo freddo?",
+            "Nell' ultimo mese, quanto spesso ti capita di sentire troppo freddo?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[10] = i;
+            psqi.tooCold = i;
           });
         },
       ),
@@ -185,11 +170,11 @@ class _PSQIState extends State<PSQI> {
       // 5G
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di sentire troppo caldo?",
+            "Nell' ultimo mese, quanto spesso ti capita di sentire troppo caldo?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[11] = i;
+            psqi.tooHot = i;
           });
         },
       ),
@@ -197,11 +182,11 @@ class _PSQIState extends State<PSQI> {
       // 5H
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di fare brutti sogni?",
+            "Nell' ultimo mese, quanto spesso ti capita di fare brutti sogni?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[12] = i;
+            psqi.badDreams = i;
           });
         },
       ),
@@ -209,37 +194,50 @@ class _PSQIState extends State<PSQI> {
       // 5I
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese quanto frequentemente ti capita di avere dolori?",
+            "Nell' ultimo mese, quanto spesso ti capita di avere dolori?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[13] = i;
+            psqi.havingPain = i;
           });
         },
       ),
 
       // 5J
       SpecifyIfYesQuestion(
-        question1: "Qualche altro problema può aver disturbato il tuo sonno?",
+        question1: "C'è qualche altro problema che può aver disturbato il tuo sonno?",
         question2:
-            "Quanto spesso hai avuto problemi a dormire per questo motivo?",
-        answers: answersHowMany.sublist(1),
+            "E quanto spesso hai avuto problemi a dormire per questo motivo?",
+        answers: answersHowMany,
         onSelected: (bool b, String? s, int? i2) {
           setState(() {
-            psqi.report[14] = [null, 0, 1, 2].indexOf(i2);
+            psqi.otherProblems = b;
             psqi.optionalText = s;
+            psqi.otherProblemsFrequency = i2;
           });
         },
+      ),
+
+      // 9
+      MultipleChoiceQuestion(
+        question:
+            "Nell' ultimo mese, come valuti complessivamente la qualità del tuo sonno?",
+        answers: answersQuality,
+        onSelected: (int i) {
+          setState(() {
+            psqi.sleepQuality = i;
+          });
+        }
       ),
 
       // 6
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese, quanto spesso hai preso farmaci (prescritti dal medico o meno) per facilitare il sonno?",
+            "Nell' ultimo mese, quanto spesso hai preso farmaci (prescritti dal medico o meno) per aiutarti a dormire?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[15] = i;
+            psqi.drugs = i;
           });
         }
       ),
@@ -247,11 +245,11 @@ class _PSQIState extends State<PSQI> {
       // 7
       MultipleChoiceQuestion(
         question:
-            "Nell' ultimo mese, quanto spesso hai avuto difficoltà a rimanere sveglio alla guida, durante i pasti, o nel corso di attività sociali?",
+            "Nell' ultimo mese, quanto spesso hai avuto difficoltà a rimanere sveglio/a alla guida o nel corso di attività sociali?",
         answers: answersHowMany,
         onSelected: (int i) {
           setState(() {
-            psqi.report[16] = i;
+            psqi.difficultiesBeingAwake = i;
           });
         }
       ),
@@ -263,22 +261,12 @@ class _PSQIState extends State<PSQI> {
         answers: answersHowMuch,
         onSelected: (int i) {
           setState(() {
-            psqi.report[17] = i;
+            psqi.enoughEnergies = i;
           });
         }
       ),
 
-      // 9
-      MultipleChoiceQuestion(
-        question:
-            "Nell' ultimo mese, come valuti complessivamente la qualità del tuo sonno?",
-        answers: answersQuality,
-        onSelected: (int i) {
-          setState(() {
-            psqi.report[18] = i;
-          });
-        }
-      ),
+
     ];
 
     // psqi.report[0] = (psqiQuestions[0] as WithInitialValue).initialValue;
@@ -322,21 +310,82 @@ class _PSQIState extends State<PSQI> {
       homeButtonTooltip: "Vuoi annullare la compilazione del PSQI e tornare alla schermata principale?",
       title: "PSQI", 
       onSubmitted: () async {
-        await addMyPSQI(psqi);
+        bool success = await addMyPSQI(psqi);
+        if(!success){
+          Fluttertoast.showToast(
+            msg: "Errore: impossibile inviare il questionario.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 12.0);
+        }
         setState(() {
           showScore = true;
         });
       },
       unansweredQuestions: () { 
         List<int> uq = [];
-        for (var i = 0; i < psqi.report.length; i++) {
-          if(psqi.report[i] == null) uq.add(i);
+        if(psqi.timeToBed == null){
+          uq.add(0);
+        }
+        if(psqi.minutesToFallAsleep == null){
+          uq.add(1);
+        }
+        if(psqi.timeWokeUp == null){
+          uq.add(2);
+        }
+        if(psqi.timeAsleep == null){
+          uq.add(3);
+        }
+        if(psqi.notFallAsleepWithin30Minutes == null){
+          uq.add(4);
+        }
+        if(psqi.wakeUpWithoutFallingAsleepAgain == null){
+          uq.add(5);
+        }
+        if(psqi.goToTheBathroom == null){
+          uq.add(6);
+        }
+        if(psqi.notBreethingCorrectly == null){
+          uq.add(7);
+        }
+        if(psqi.coughOrSnort == null){
+          uq.add(8);
+        }
+        if(psqi.tooCold == null){
+          uq.add(9);
+        }
+        if(psqi.tooHot == null){
+          uq.add(10);
+        }
+        if(psqi.badDreams == null){
+          uq.add(11);
+        }
+        if(psqi.havingPain == null){
+          uq.add(12);
         }
 
-        if(!uq.contains(14) && psqi.report[14] != 0){
-          if(psqi.optionalText == null || psqi.optionalText!.split(" ").length < 1){
-            uq.add(14);
+        if(psqi.otherProblems == null){
+          uq.add(13);
+        }else{
+          if(psqi.otherProblems! && (psqi.optionalText == null || psqi.optionalText!.isEmpty || psqi.otherProblemsFrequency == null)){
+            uq.add(13);
           }
+        }
+        
+        if(psqi.sleepQuality == null){
+          uq.add(14);
+        }
+        if(psqi.drugs == null){
+          uq.add(15);
+        }
+        if(psqi.difficultiesBeingAwake == null){
+          uq.add(16);
+        }
+        if(psqi.enoughEnergies == null){
+          uq.add(17);
         }
 
         return uq;

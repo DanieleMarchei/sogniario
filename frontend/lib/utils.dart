@@ -67,32 +67,59 @@ double mapValueFromInterval(double value, List<(double, double, double)> interva
 }
 
 class PSQIData {
-  List<dynamic> report = List<dynamic>.generate(19, (index) => null);
-  String? optionalText;
-  DateTime? compiled_date;
 
-  @override
-  String toString() {
-    return report.toString();
+  TimeOfDay? timeToBed;
+  int? minutesToFallAsleep;
+  TimeOfDay? timeWokeUp;
+  Duration? timeAsleep;
+
+  int? notFallAsleepWithin30Minutes;
+  int? wakeUpWithoutFallingAsleepAgain;
+  int? goToTheBathroom;
+  int? notBreethingCorrectly;
+  int? coughOrSnort;
+  int? tooCold;
+  int? tooHot;
+  int? badDreams;
+  int? havingPain;
+
+  bool? otherProblems;
+  String? optionalText;
+  int? otherProblemsFrequency;
+
+  int? sleepQuality;
+  int? drugs;
+  int? difficultiesBeingAwake;
+  int? enoughEnergies;
+
+  DateTime? compiled_date;
+  
+  Duration? get hoursInBed {
+    if(timeToBed == null || timeWokeUp == null) return null;
+
+    DateTime d1 = DateTime(2020, 1, 1, timeToBed!.hour, timeToBed!.minute);
+    DateTime d2 = DateTime(2020, 1, 2, timeWokeUp!.hour, timeWokeUp!.minute);
+
+    return d2.difference(d1);
   }
 
   double score(){
     double ninf = double.negativeInfinity;
     double inf = double.infinity;
     // #9 score
-    double c1 = (report.last as int).toDouble();
+    double c1 = sleepQuality!.toDouble();
 
     // #2 Score (<=15min (0), 16-30min (1), 31-60 min (2), >60min (3))
     // + #5a Score (if sum is equal 0=0; 1-2=1; 3-4=2; 5-6=3) 
     late double c2;
-    late double two = mapValueFromInterval((report[1] as int).toDouble(), [
+    late double two = mapValueFromInterval(minutesToFallAsleep!.toDouble(), [
       (ninf, 15, 0),
       (16, 30, 1),
       (31, 60, 2),
       (60, inf, 3),
     ]);
 
-    double fiveA = (report[5] as int).toDouble();
+    double fiveA = notFallAsleepWithin30Minutes!.toDouble();
     c2 = mapValueFromInterval(fiveA + two, [
       (0, 0, 0),
       (1, 2, 1),
@@ -103,8 +130,8 @@ class PSQIData {
 
     // #4 Score (>7(0), 6-7 (1), 5-6 (2), <5 (3)
     double c3;
-    double hoursAsleep = report[3];
-    c3 = mapValueFromInterval(hoursAsleep, [
+    double hoursOfSleep = timeAsleep!.inHours + timeAsleep!.inMinutes.remainder(60);
+    c3 = mapValueFromInterval(hoursOfSleep.toDouble(), [
       (7.05, inf, 0), // 7.05 instead of 7.1 just to be on the safe side. Comparing floats is tricky
       (6, 7, 1),
       (5, 6, 2),
@@ -115,8 +142,8 @@ class PSQIData {
     // (total # of hours asleep)/(total # of hours in bed) x 100
     // >85%=0, 75%-84%=1, 65%-74%=2, <65%=3
     double c4;
-    double hoursInBed = report[4];
-    double fraction = (hoursAsleep / hoursInBed) * 100;
+    double hib = hoursInBed!.inHours + hoursInBed!.inMinutes.remainder(60);
+    double fraction = (hoursOfSleep / hib) * 100;
     c4 = mapValueFromInterval(fraction, [
       (85, inf, 0),
       (75, 84, 1),
@@ -126,9 +153,16 @@ class PSQIData {
 
     // Sum of Scores #5b to #5j (0=0; 1-9=1; 10-18=2; 19-27=3).
     double c5;
-    int sumBtoJ = report
-                     .sublist(6, 15)
-                     .reduce((value, element) => value + element);
+    int opf = otherProblemsFrequency ?? 0;
+    int sumBtoJ = wakeUpWithoutFallingAsleepAgain! + 
+                  goToTheBathroom! + 
+                  notBreethingCorrectly! + 
+                  coughOrSnort! + 
+                  tooCold! + 
+                  tooHot! + 
+                  badDreams! + 
+                  havingPain! + 
+                  opf;
     c5 = mapValueFromInterval(sumBtoJ.toDouble(), [
       (0, 0, 0),
       (1, 9, 1),
@@ -137,11 +171,11 @@ class PSQIData {
     ]);
 
     // #6 Score
-    double c6 = (report[15] as int).toDouble();
+    double c6 = drugs!.toDouble();
 
     // #7 Score + #8 Score (0=0; 1-2=1; 3-4=2; 5-6=3)
     double c7;
-    double sum7and8 = (report[16] as int).toDouble() + report[17];
+    double sum7and8 = difficultiesBeingAwake!.toDouble() + enoughEnergies!.toDouble();
     c7 = mapValueFromInterval(sum7and8, [
       (0, 0, 0),
       (1, 2, 1),
