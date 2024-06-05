@@ -227,7 +227,7 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   DreamData dream = DreamData();
   dream.dreamText = json["text"];
   dream.report[0] = json["emotional_content"];
-  dream.report[1] = json["conscious"] ? 1 : 2;
+  dream.report[1] = json["conscious"];
   dream.report[2] = json["control"];
   dream.report[3] = json["percived_elapsed_time"];
   dream.report[4] = json["hours_of_sleep"];
