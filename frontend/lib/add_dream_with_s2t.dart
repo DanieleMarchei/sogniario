@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frontend/api.dart';
 import 'package:frontend/forms_and_buttons.dart';
@@ -14,6 +16,10 @@ import 'package:go_router/go_router.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:record/record.dart';
+import 'package:web_socket_channel/status.dart' as status;
+import 'dart:convert';
 
 List<QA> questions = [
   QA(question: "Come valuti la valenza emotiva del sogno?", answers: [
@@ -31,15 +37,18 @@ List<QA> questions = [
     "Molto forte"
   ]),
   QA(question: "Quanto eri consapevole di star sognando?", answers: [
-    "Per nulla consapevole", 
+    "Per nulla consapevole",
     "Parzialmente consapevole",
     "Completamente consapevole"
   ]),
-  QA(question: "Quanto controllo volontario avevi sul contenuto e sullo svolgimento del sogno?", answers: [
-    "Nessun controllo",
-    "Parziale controllo",
-    "Completo controllo"
-  ]),
+  QA(
+      question:
+          "Quanto controllo volontario avevi sul contenuto e sullo svolgimento del sogno?",
+      answers: [
+        "Nessun controllo",
+        "Parziale controllo",
+        "Completo controllo"
+      ]),
 ];
 
 class AddDreamWithS2T extends StatefulWidget {
@@ -50,7 +59,7 @@ class AddDreamWithS2T extends StatefulWidget {
 
 class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
   DreamData dream = DreamData();
-  final dreamKey = GlobalKey();
+  final dreamKey = GlobalKey<AddDreamWithS2TTextState>();
 
   late List<QuestionWithDirection> dreamQuestions;
 
@@ -58,14 +67,14 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
   void initState() {
     super.initState();
     dreamQuestions = [
-        AddDreamWithS2TText(
-          key: dreamKey,
-          onTextChanged: (value) {
-            setState(() {
-              dream.dreamText = value;
-            });
-          },
-        ),
+      AddDreamWithS2TText(
+        key: dreamKey,
+        onTextChanged: (value) {
+          setState(() {
+            dream.dreamText = value;
+          });
+        },
+      ),
       ...List.generate(questions.length, (index) {
         var q = questions[index].question;
         var a = questions[index].answers;
@@ -85,6 +94,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
         SelectIntQuestion(
           question: "Quanto tempo pensi sia trascorso nel tuo sogno?",
           text: "Tempo: ",
+          minValue: 1,
           options: [Time.minutes.label, Time.hours.label, Time.days.label],
           onSelected: (answer, idxOption) {
             setState(() {
@@ -94,7 +104,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
                 case Time.minutes:
                   d = Duration(minutes: answer);
                   break;
-                
+
                 case Time.hours:
                   d = Duration(hours: answer);
                   break;
@@ -134,21 +144,32 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
 
   @override
   Widget build(BuildContext context) {
-
     var responsiveReport = ResponsiveReport(
       questionWidgets: dreamQuestions,
       title: "Racconta un sogno",
-      homeButtonTooltip: "Vuoi annullare il racconto di questo sogno e tornare alla schermata principale?",
+      homeButtonTooltip:
+          "Vuoi annullare il racconto di questo sogno e tornare alla schermata principale?",
+      onPageChanged: (pageNumber) async {
+        print(pageNumber);
+        if (pageNumber != 1) {
+          await dreamKey.currentState?._stopRecording();
+        }
+      },
+      onExit: () async{
+        await dreamKey.currentState?._closeConnection();
+      },
       onSubmitted: () async {
+        await dreamKey.currentState?._closeConnection();
         await addDream(dream);
         context.goNamed(Routes.homeUser.name);
-      }, unansweredQuestions: () { 
+      },
+      unansweredQuestions: () {
         List<int> uq = [];
-        if(dream.dreamText.split(" ").length < 1){
+        if (dream.dreamText.split(" ").length < 1) {
           uq.add(0);
         }
         for (var i = 0; i < dream.report.length; i++) {
-          if(dream.report[i] == null) uq.add(i +1);
+          if (dream.report[i] == null) uq.add(i + 1);
         }
 
         return uq;
@@ -157,80 +178,135 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
 
     return responsiveReport;
   }
-  
 }
-
 
 class AddDreamWithS2TText extends QuestionWithDirection {
   final Function? onTextChanged;
 
-  AddDreamWithS2TText({
-    super.key, this.onTextChanged
-  }) : super(canChangeDirection: false, direction: Axis.vertical);
+  AddDreamWithS2TText({super.key, this.onTextChanged})
+      : super(canChangeDirection: false, direction: Axis.vertical);
 
   @override
-  State<AddDreamWithS2TText> createState() => _AddDreamWithS2TTextState();
+  State<AddDreamWithS2TText> createState() => AddDreamWithS2TTextState();
 }
 
-// continuos s2t from https://gist.github.com/jsrimr/09af9516ee1c5907453635b03ce885ae
-class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS2TText> {
-  late String text;
+class AddDreamWithS2TTextState
+    extends QuestionWithDirectionState<AddDreamWithS2TText> {
   String? textError;
 
   @override
   bool get wantKeepAlive => true;
 
-  String _currentLocaleId = '';
-  bool _speechAvailable = false;
-  String _lastWords = '';
-  String _currentWords = '';
-  bool stoppedByUser = false;
+  final AudioRecorder _record = AudioRecorder();
+  bool _isRecording = false;
 
-  final SpeechToText speech = SpeechToText();
+  String _partialText = "";
+  String _finalText = "";
+  String _lastPartialText = "";
+
+  StreamSubscription? subscription;
+  late StreamController<String> _streamController;
+
+  TextSelection selection = TextSelection(baseOffset: 0, extentOffset: 0);
+
+  WebSocketChannel? _channel;
+
   TextEditingController dreamController = TextEditingController();
   ScrollController dreamScrollController = ScrollController();
 
-  Future<void> initSpeechState() async {
-    _speechAvailable = await speech.initialize(
-        onStatus: statusListener,
-        debugLogging: false,
-        finalTimeout: Duration(milliseconds: 100)
-      );
+  void _connectWebSocket() {
+    String protocol = "wss";
+    if(isDevelopment) protocol = "ws";
     
-    if (_speechAvailable) {
-      var systemLocale = await speech.systemLocale();
-      _currentLocaleId = systemLocale?.localeId ?? '';
-    }
-
-    if (!mounted) return;
-
-    setState(() {});
+    String jwt = tokenBox.get(HiveBoxes.jwt.label);
+    _channel = WebSocketChannel.connect(
+      Uri.parse('$protocol://$wsAuthority/?auth=$jwt'),
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    initSpeechState();
-    text = '';
-    stoppedByUser = false;
+    _connectWebSocket();
+    _streamController = StreamController<String>();
+
+    _channel!.stream.listen((message) {
+      _streamController.add(message);
+    });
+    dreamController.addListener(() => widget.onTextChanged!(dreamController.text));
   }
-  
-  void statusListener(String status) async {
-    print((status, stoppedByUser));
-    // print(mounted);
-    // if (!mounted) return;
-    if (status == "done" && !stoppedByUser) {
-      if (_currentWords.isNotEmpty) {
-        setState(() {
-          _lastWords += " $_currentWords";
-          _currentWords = "";
-        });
-      } else {
-        // wait 50 mil seconds and try again
-        await Future.delayed(Duration(milliseconds: 50));
-      }
-      await _startListening();
+
+  Future<void> _startRecording() async {
+    bool hasPermission = await _record.hasPermission();
+    if (!hasPermission) {
+      print('Permission denied.');
+      return;
     }
+
+    // var config = RecordConfig(encoder: AudioEncoder.pcm16bits, sampleRate: 44100, numChannels: 1);
+    var config = const RecordConfig(
+        encoder: AudioEncoder.pcm16bits, sampleRate: 44100, numChannels: 1);
+    // await recordStream(_record, config);
+
+    var stream = await _record.startStream(config);
+    stream.listen((audioBuffer) async {
+      if (!await _record.isRecording()) {
+        return;
+      }
+
+      if (audioBuffer.isNotEmpty && _channel != null) {
+        _channel!.sink.add(audioBuffer);
+      }
+      await Future.delayed(const Duration(milliseconds: 200));
+    });
+
+    subscription ??= _streamController.stream.listen((message) {        
+        var receivedJson = jsonDecode(message);
+        _lastPartialText = _partialText;
+        if (receivedJson.containsKey('partial')) {
+          setState(() {
+            _partialText = receivedJson['partial'];
+            _finalText = "";
+
+          });
+        } else if (receivedJson.containsKey('text')) {
+          setState(() {
+            _partialText = "";
+            _finalText = receivedJson['text'] + " ";
+          });
+        }
+        _updateTextField();
+
+      });
+
+    setState(() {
+      _isRecording = true;
+    });
+  }
+
+
+  void _updateTextField() {
+    final cursorPosition = dreamController.selection.baseOffset;
+    final text = dreamController.text;
+
+    final textToAdd = _finalText != "" ? _finalText : _partialText;
+
+    if (cursorPosition < 0 || cursorPosition > text.length) {
+      // If the cursor position is invalid, place it at the end
+      dreamController.value = dreamController.value.copyWith(
+        text: text + textToAdd,
+        selection: TextSelection.collapsed(offset: (text + textToAdd).length),
+      );
+    } else {
+      final newText = text.substring(0, cursorPosition - _lastPartialText.length) + textToAdd + text.substring(cursorPosition);
+      dreamController.value = dreamController.value.copyWith(
+        text: newText,
+        selection: TextSelection.collapsed(offset: cursorPosition - _lastPartialText.length + textToAdd.length),
+      );
+    }
+
+    // if (widget.onTextChanged != null) widget.onTextChanged!(dreamController.text);
+    // dreamController.text = dreamController.text.trim();
   }
 
   void resetErrorText() {
@@ -239,57 +315,46 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     });
   }
 
-  Future _startListening() async {
-    await _stopListening();
-    await Future.delayed(const Duration(milliseconds: 50));
-    speech.listen(
-        onResult: _onSpeechResult,
-        listenFor: const Duration(minutes: 5),
-        // pauseFor: const Duration(seconds: 5),
-        localeId: _currentLocaleId,
-        listenOptions: SpeechListenOptions(
-          // listenMode: ListenMode.confirmation,
-          cancelOnError: false,
-          partialResults: true,
-        )
-    );
-
-    if (!mounted) return;
-
-    setState(() {});
+  Future<void> _closeConnection() async {
+    if (await _record.isRecording()) {
+      await _stopRecording();
+    }
+    _channel?.sink.close(status.normalClosure);
   }
 
-    /// listen method.
-  Future _stopListening() async {
-    if (!mounted) return;
-  
-    setState(() {});
-    await speech.stop();
-  }
-
-  void _onSpeechResult(SpeechRecognitionResult result) {
+  Future<void> _stopRecording() async {
+    await _record.stop();
+    _partialText = "";
+    _lastPartialText = "";
+    // await subscription!.cancel();
     setState(() {
-      _currentWords = result.recognizedWords;
-      dreamController.text = "$_lastWords $_currentWords";
-      dreamScrollController.animateTo(
-        dreamScrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300), curve: Curves.ease);
+      _isRecording = false;
     });
-    if (widget.onTextChanged != null) widget.onTextChanged!(dreamController.text);
-
   }
+
+  // void _onSpeechResult(SpeechRecognitionResult result) {
+  //   setState(() {
+  //     _currentWords = result.recognizedWords;
+  //     dreamController.text = "$_lastWords $_currentWords";
+  //     dreamScrollController.animateTo(
+  //       dreamScrollController.position.maxScrollExtent,
+  //       duration: Duration(milliseconds: 300), curve: Curves.ease);
+  //   });
+  //   if (widget.onTextChanged != null) widget.onTextChanged!(dreamController.text);
+
+  // }
 
   bool validate() {
     resetErrorText();
 
-    if (text.isEmpty) {
+    if (dreamController.text.isEmpty) {
       setState(() {
         textError = 'Testo non presente';
       });
       return false;
     }
     RegExp whiteSpaces = RegExp(r'\s+', multiLine: true);
-    if (text.trim().split(whiteSpaces).length < 1) {
+    if (dreamController.text.trim().split(whiteSpaces).length < 1) {
       setState(() {
         textError = 'Testo troppo corto. Scrivi almeno una parola.';
       });
@@ -309,40 +374,40 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
     bool isMobile = !kIsWeb;
 
     FloatingActionButton recordBtn = FloatingActionButton(
-      shape: CircleBorder(),
-      backgroundColor: Colors.red,
-      tooltip: speech.isListening ? "Premi per interrompere la trascrizione." : "Premi per trascrivere il tuo sogno.",
-      onPressed: () {
-        if(speech.isListening){
-          stoppedByUser = true;
-          _stopListening();
-        }else{
-          stoppedByUser = false;
-          _startListening();
-        }
-      },
-      child: Icon(speech.isListening ? Icons.mic : Icons.mic_off)
-    );
+        shape: CircleBorder(),
+        backgroundColor: Colors.red,
+        tooltip: _isRecording
+            ? "Premi per interrompere la trascrizione."
+            : "Premi per trascrivere il tuo sogno.",
+        onPressed: () {
+          if (_isRecording) {
+            _stopRecording();
+          } else {
+            _startRecording();
+          }
+        },
+        child: Icon(_isRecording ? Icons.mic : Icons.mic_off));
 
-    FloatingActionButton recordBtnNoSpeech = const FloatingActionButton(
-      shape: CircleBorder(),
-      backgroundColor:  Colors.grey,
-      tooltip: "Trascrizione audio non disponibile.",
-      onPressed: null,
-      child: Icon(Icons.mic_off)
-    );
+    // FloatingActionButton recordBtnNoSpeech = const FloatingActionButton(
+    //   shape: CircleBorder(),
+    //   backgroundColor:  Colors.grey,
+    //   tooltip: "Trascrizione audio non disponibile.",
+    //   onPressed: null,
+    //   child: Icon(Icons.mic_off)
+    // );
 
     AvatarGlow glowRecordBtn = AvatarGlow(
-      animate: speech.isListening,
-      glowColor: Colors.red,
-      duration: const Duration(seconds: 2),
-      repeat: true,
-      child: _speechAvailable ? recordBtn : recordBtnNoSpeech
-    );
-    
+        animate: _isRecording,
+        glowColor: Colors.red,
+        duration: const Duration(seconds: 2),
+        repeat: true,
+        child: recordBtn);
+
     return Column(
             children: [
-              SizedBox(height: screenHeight * 0.01,),
+              SizedBox(
+                height: screenHeight * 0.01,
+              ),
               MultilineInputField(
                 controller: dreamController,
                 scrollController: dreamScrollController,
@@ -353,38 +418,32 @@ class _AddDreamWithS2TTextState extends QuestionWithDirectionState<AddDreamWithS
                 errorText: textError,
                 onChanged: (value) {
                   setState(() {
-                    text = value;
                     resetErrorText();
-                    if (widget.onTextChanged != null) widget.onTextChanged!(value);
+                    if (widget.onTextChanged != null) {
+                      widget.onTextChanged!(value);
+                    }
                   });
                 },
                 autoFocus: false,
               ),
-              if(isMobile)...{
-                SizedBox(height: screenHeight * 0.01,),
-                Text(
-                  "⚠️ Avviso: ricontrolla che il testo registrato sia corretto!",
-                  style: TextStyle(
-                    color: Colors.grey.shade900,
-                    fontSize: 12
-                  ),
-                ),
-              },
-              SizedBox(height: screenHeight * 0.05,),
+              SizedBox(
+                height: screenHeight * 0.01,
+              ),
+              Text(
+                "⚠️ Avviso: ricontrolla che il testo registrato sia corretto!",
+                style: TextStyle(color: Colors.grey.shade900, fontSize: 12),
+              ),
+              SizedBox(
+                height: screenHeight * 0.05,
+              ),
               glowRecordBtn
-          
             ],
           );
   }
 
   @override
   void dispose() {
-    _stopListening();
+    _closeConnection();
     super.dispose();
   }
-
-
-
-  
-
 }

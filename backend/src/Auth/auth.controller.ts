@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
+import { Get, Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { SignInDto } from "./DTO/signIn.dto";
 import { ApiSecurity, ApiTags } from "@nestjs/swagger";
@@ -11,6 +11,7 @@ import { ResetPasswordUserDto } from "./DTO/resetPasswordUser.dto";
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post("login/user")
@@ -53,5 +54,12 @@ export class AuthController {
   @Post("reset-password/researcher")
   resetPasswordResearcher(@Body() resetDto: ResetPasswordDto) {
     return this.authService.resetPasswordResearcher(resetDto);
+  }
+
+  @ApiSecurity("bearer")
+  @HttpCode(HttpStatus.OK)
+  @Get("check-jwt")
+  checkJwt(){
+    return "ok";
   }
 }

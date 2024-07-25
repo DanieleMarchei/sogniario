@@ -18,7 +18,10 @@ class ResponsiveReport extends StatefulWidget {
     required this.onSubmitted,
     required this.unansweredQuestions,
     this.ignoreUnansweredQuestions = false,
-    this.homeButtonTooltip
+    this.homeButtonTooltip,
+    this.onPageChanged,
+    this.onExit
+    
   });
 
   final List<QuestionWithDirection> questionWidgets;
@@ -27,6 +30,8 @@ class ResponsiveReport extends StatefulWidget {
   final List<int> Function()  unansweredQuestions;
   final bool ignoreUnansweredQuestions;
   final String? homeButtonTooltip;
+  final Function(int)? onPageChanged;
+  final Function? onExit;
 
   @override
   State<ResponsiveReport> createState() => _ResponsiveReportState();
@@ -82,7 +87,10 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
                   ],);
               },
             );
-            if(pop) context.goNamed(Routes.homeUser.name);
+            if(pop) {
+              if(widget.onExit != null) widget.onExit!();
+              context.goNamed(Routes.homeUser.name);
+            }
           },
           tooltip: "Torna alla pagina iniziale",
         ),
@@ -175,6 +183,7 @@ class _ResponsiveReportState extends State<ResponsiveReport> {
                 _current = index + 1;
               });
               if(FocusManager.instance.primaryFocus != null) FocusManager.instance.primaryFocus!.unfocus();
+              if(widget.onPageChanged != null) widget.onPageChanged!(_current);
             },
           ),
           carouselController: _controller,

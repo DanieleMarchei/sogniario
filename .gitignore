@@ -8,3 +8,4 @@ backend/.idea/
 backend/server.sh
 backend/dist/
 frontend/.build.sh
+frontend/build/
