@@ -20,7 +20,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Public()
+  @ApiSecurity("bearer")
   @Post("register/user")
   signUpUser(@Body() signUpDto: User) {
     return this.authService.signUpUser(signUpDto);
@@ -37,11 +37,12 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Public()
+  @ApiSecurity("bearer")
   @Post("register/researcher")
   signUp(@Body() signUpDto: Researcher) {
     return this.authService.signUpResearcher(signUpDto);
   }
+
   @ApiSecurity("bearer")
   @HttpCode(HttpStatus.OK)
   @Post("reset-password/user")

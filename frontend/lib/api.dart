@@ -73,9 +73,9 @@ enum RequestType {
 
 enum TableName {
   authLoginUser(label: "auth/login/user", needJwt: false, deletable: false),
-  authRegisterUser(label: "auth/register/user", needJwt: false, deletable: false),
+  authRegisterUser(label: "auth/register/user", needJwt: true, deletable: false),
   authLoginResearcher(label: "auth/login/researcher", needJwt: false, deletable: false),
-  authRegisterResearcher(label: "auth/register/researcher", needJwt: false, deletable: false),
+  authRegisterResearcher(label: "auth/register/researcher", needJwt: true, deletable: false),
 
   authResetPasswordUser(label: "auth/reset-password/user", needJwt: true, deletable: false),
   authResetPasswordResearcher(label: "auth/reset-password/researcher", needJwt: true, deletable: false),
@@ -166,6 +166,8 @@ class HttpRequest {
     String queryUrl = queries.isEmpty ? "" : "?${queries.join("&")}";
 
     var url = Uri.parse('${server}/${tableName.label}$idQuery$queryUrl');
+
+    print(url);
 
     Map<String, String> headers = {};
     if(jwt != null) {
