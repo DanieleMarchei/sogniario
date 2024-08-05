@@ -3,9 +3,9 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"flutter_bootstrap.js": "ac52e7191e2139e822f8742e190ab750",
+const RESOURCES = {"flutter_bootstrap.js": "0e721d3bd2be0ec6495804721be22aea",
 "flutter.js": "383e55f7f3cce5be08fcf1f3881f585c",
-"main.dart.js": "84292ec494e6e6c4b988cdb9a4a32b69",
+"main.dart.js": "4db53d26d182f3e10cae9eafe43b8feb",
 "manifest.json": "1faa69d93fe9516a870e2c0ba45d07e6",
 "icons/Icon-192.png": "60d3f63bf27fdd44ee99a77a093d653a",
 "icons/Icon-maskable-512.png": "9973620063be04973f4e7c079f01ed91",
@@ -38,8 +38,8 @@ const RESOURCES = {"flutter_bootstrap.js": "ac52e7191e2139e822f8742e190ab750",
 "assets/fonts/MaterialIcons-Regular.otf": "5ea0484035793740ad2a7ff720c549e2",
 "assets/assets/unicam_logo.png": "936d572d0e04f064f7d96b56ac17209a",
 "assets/assets/bsrl_logo.png": "a1212c2a1b5901c97569c5680d6f0fb0",
-"index.html": "ad44190c6fce2822454faf09300dd4e3",
-"/": "ad44190c6fce2822454faf09300dd4e3",
+"index.html": "b087b3183848b893a9641c37543d4ac3",
+"/": "b087b3183848b893a9641c37543d4ac3",
 "version.json": "2b521e10dfa0f067561de489a19d6620"};
 // The application shell files that are downloaded before a service worker can
 // start.
