@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/foundation.dart';
@@ -13,9 +12,6 @@ import 'package:frontend/responsive_report.dart';
 import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
 import 'package:go_router/go_router.dart';
-import 'package:speech_to_text/speech_to_text.dart';
-import 'package:speech_to_text/speech_recognition_error.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:record/record.dart';
 import 'package:web_socket_channel/status.dart' as status;
@@ -319,13 +315,18 @@ class AddDreamWithS2TTextState
     if (await _record.isRecording()) {
       await _stopRecording();
     }
+    flushText();
     _channel?.sink.close(status.normalClosure);
+  }
+
+  void flushText(){
+    _partialText = "";
+    _lastPartialText = "";
   }
 
   Future<void> _stopRecording() async {
     await _record.stop();
-    _partialText = "";
-    _lastPartialText = "";
+    flushText();
     // await subscription!.cancel();
     setState(() {
       _isRecording = false;

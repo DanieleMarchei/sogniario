@@ -39,7 +39,7 @@ class ResponsiveReport extends StatefulWidget {
 
 class _ResponsiveReportState extends State<ResponsiveReport> {
   int _current = 1;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
 
   
   @override

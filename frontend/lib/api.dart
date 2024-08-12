@@ -167,8 +167,6 @@ class HttpRequest {
 
     var url = Uri.parse('${server}/${tableName.label}$idQuery$queryUrl');
 
-    print(url);
-
     Map<String, String> headers = {};
     if(jwt != null) {
       headers[HttpHeaders.authorizationHeader] = jwtHeader(jwt!);
