@@ -16,6 +16,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:record/record.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'dart:convert';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 List<QA> questions = [
   QA(question: "Come valuti la valenza emotiva del sogno?", answers: [
@@ -62,6 +63,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     dreamQuestions = [
       AddDreamWithS2TText(
         key: dreamKey,
@@ -146,7 +148,6 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
       homeButtonTooltip:
           "Vuoi annullare il racconto di questo sogno e tornare alla schermata principale?",
       onPageChanged: (pageNumber) async {
-        print(pageNumber);
         if (pageNumber != 1) {
           await dreamKey.currentState?._stopRecording();
         }

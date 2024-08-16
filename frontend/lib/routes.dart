@@ -13,6 +13,7 @@ import 'package:frontend/psqi.dart';
 import 'package:frontend/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 var userDataBox = Hive.box('userData');
 
@@ -71,6 +72,10 @@ final routes = GoRouter(
   initialLocation: Routes.login.path,
   redirect: (context, state) async {
     var userType = getMyUserType();
+
+    if(state.fullPath != Routes.addDream.path){
+      WakelockPlus.disable();
+    }
     
     if(userType == UserType.notLogged){
       if(state.fullPath == Routes.login.path) {

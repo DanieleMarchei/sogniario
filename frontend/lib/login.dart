@@ -99,7 +99,6 @@ class _LoginState extends State<Login> {
 
   void submitUser() async {
     if (await validate(isValidLoginUser)) {
-      print("validate jwt: ${doIHaveJwt()}");
       DateTime? birthdate;
       Sex? sex;
       (birthdate, sex) = await getMyGeneralInfo();

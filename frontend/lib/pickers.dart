@@ -397,7 +397,6 @@ class _IntegerPickerButtonState extends State<IntegerPickerButton> {
       backgroundColor: const Color.fromARGB(255, 238, 232, 244),
       onConfirm: (Picker picker, List value) {
         setState(() {
-          print(picker.getSelectedValues());
           selectedValue = int.parse(picker.getSelectedValues()[0]);
           if(widget.options.length == 1){
             selectedOption = widget.options.indexOf(widget.options[0]);
