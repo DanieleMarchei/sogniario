@@ -253,6 +253,13 @@ class _LoginState extends State<Login> {
                               }
                             ),
                           },
+                          SizedBox(
+                            height: screenHeight * .03,
+                          ),
+                          Text(
+                            "Versione: " + currentVersion,
+                            textAlign: TextAlign.center,
+                          )
                         
                         ]),
                       ],

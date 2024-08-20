@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/api.dart';
+import 'package:frontend/routes.dart';
 import 'package:frontend/utils.dart';
 
 class CircleDecoration extends StatelessWidget {
@@ -68,7 +69,7 @@ class ScaffoldWithCircles extends Scaffold {
 }
 
 Stack getCircles(BuildContext context, body) {
-  UserType userType = getMyUserType();
+  // UserType userType = await getMyUserType();
   late MaterialColor color;
   switch (userType) {
     case UserType.notLogged:

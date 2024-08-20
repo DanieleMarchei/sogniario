@@ -20,9 +20,14 @@ String server = isDevelopment ? "http://$authority" : "https://$authority";
 var tokenBox = Hive.box('tokens');
 var userDataBox = Hive.box('userData');
 
-bool doIHaveJwt(){
+Future<bool> doIHaveJwt() async {
   if(!tokenBox.containsKey(HiveBoxes.jwt.label)) return false;
   bool validJwt = !JwtDecoder.isExpired(tokenBox.get(HiveBoxes.jwt.label));
+  var response = await HttpRequest(
+    tableName: TableName.checkJwt,
+    requestType: RequestType.get)
+  .exec();
+  validJwt &= response.success;
   return validJwt;
 }
 
@@ -42,8 +47,8 @@ enum UserType {
   notLogged
 }
 
-UserType getMyUserType(){
-  if(!doIHaveJwt()) return UserType.notLogged;
+Future<UserType> getMyUserType() async {
+  if(! await doIHaveJwt()) return UserType.notLogged;
 
   var token = JwtDecoder.decode(tokenBox.get(HiveBoxes.jwt.label));
   if(![0,1,2].contains(token["type"])) return UserType.notLogged;
@@ -92,7 +97,9 @@ enum TableName {
   
   organization(label: "Organization", needJwt: true, deletable: false),
 
-  downloadApk(label: "file/apk", needJwt: false, deletable: false);
+  downloadApk(label: "file/apk", needJwt: false, deletable: false),
+
+  checkJwt(label: "auth/check-jwt", needJwt: true, deletable: false);
 
   const TableName({required this.label, required this.needJwt, required this.deletable});
   final String label;

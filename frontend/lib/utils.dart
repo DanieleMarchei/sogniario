@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+String currentVersion = "20 Agosto 2024";
+
 double widthConstraint = 1080;
 double halfWidthConstraint = widthConstraint / 2;
 

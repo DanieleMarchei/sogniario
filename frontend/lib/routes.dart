@@ -16,6 +16,7 @@ import 'package:hive/hive.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 var userDataBox = Hive.box('userData');
+UserType userType = UserType.notLogged;
 
 
 class MyPageTransition extends CustomTransitionPage{
@@ -71,7 +72,7 @@ List<String> userRoutesNames = [
 final routes = GoRouter(
   initialLocation: Routes.login.path,
   redirect: (context, state) async {
-    var userType = getMyUserType();
+    userType = await getMyUserType();
 
     if(state.fullPath != Routes.addDream.path){
       WakelockPlus.disable();

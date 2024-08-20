@@ -86,7 +86,7 @@ class Frontend extends StatelessWidget {
             textColor: Colors.white,
             fontSize: 12.0
           );
-          UserType userType = getMyUserType();
+          // UserType userType = getMyUserType();
           ModalRoute? modalRoute = ModalRoute.of(context);
           if(modalRoute != null){
             print(modalRoute);
