@@ -49,10 +49,25 @@ export class UserService extends TypeOrmCrudService<User> {
         let psqisCSV = this.convertToCSV(user.psqis);
         zip.folder(user.username).file("psqis.csv", psqisCSV);
       }
+      if(user.deleted == false){
+        let personalInfo = this.personalInfoCSV(user);
+        zip.folder(user.username).file("personalInfo.csv", personalInfo);
+      }
     }
     let data = await zip.generateAsync({ type: "uint8array" });
     return data;
   }
+
+  private personalInfoCSV(user : User) : string{
+    let sex = ["MALE", "FEMALE", "NOT_SPECIFIED"][user.sex];
+    return [
+      ["id", "username", "birthdate", "sex"],
+      [user.id, user.username, user.birthdate, sex]
+    ].join("\n");
+
+
+  }
+
   private convertToCSV(arr) {
     const array = [Object.keys(arr[0]) as any[]].concat(arr);
     return array
