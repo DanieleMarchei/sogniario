@@ -241,7 +241,7 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   dream.report[3] = json["percived_elapsed_time"];
   dream.report[4] = json["hours_of_sleep"];
   dream.report[5] = json["sleep_quality"];
-  dream.createdAt = json["created_at"] != null ? DateTime.parse(json["created_at"]) : null;
+  dream.createdAt = json["created_at"] != null ? DateTime.parse(json["created_at"]).toLocal() : null;
 
   return dream;
 }
@@ -257,7 +257,7 @@ ChronoTypeData _jsonToChronotype(Map<String, dynamic> json){
 PSQIData _jsonToPSQI(Map<String, dynamic> json){
   PSQIData psqi = PSQIData();
 
-  psqi.compiled_date = DateTime.parse(json["compiled_date"]);
+  psqi.compiled_date = DateTime.parse(json["compiled_date"]).toLocal();
 
   // List<int> todTimeToBed = (json["q1"] as String).split(":").map((e) => int.parse(e)).toList();
   final formatHm = DateFormat.Hm();
