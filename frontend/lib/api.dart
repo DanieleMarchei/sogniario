@@ -10,7 +10,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
 
-bool isDevelopment = false;
+bool isDevelopment = true;
 
 String wsAuthority = isDevelopment ? (kIsWeb ? "localhost:2700" : "10.0.2.2:2700") : "sogniario.unicam.it:2700";
 
@@ -694,7 +694,7 @@ Future<List<DreamData>> getMyDreams() async {
 List<UserType> allowedToDownload = [UserType.admin, UserType.researcher];
 
 Future<void> downloadDatabaseDesktop() async {
-  if(!allowedToDownload.contains(getMyUserType())) return;
+  if(!allowedToDownload.contains(await getMyUserType())) return;
   if(!kIsWeb) return;
 
   int id = myJwtData()["sub"];

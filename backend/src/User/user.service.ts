@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
 import { User } from "src/entities/user.entity";
 import { Readable } from "stream";
+import PostgresInterval, { IPostgresInterval } from "postgres-interval";
 
 @Injectable()
 export class UserService extends TypeOrmCrudService<User> {
@@ -36,7 +37,6 @@ export class UserService extends TypeOrmCrudService<User> {
     });
 
     for (let user of users) {
-      console.log(user)
       if (user.dreams.length>0) {
         let dreamsCSV = this.convertToCSV(user.dreams);
         zip.folder(user.username).file("dreams.csv", dreamsCSV);
@@ -54,14 +54,35 @@ export class UserService extends TypeOrmCrudService<User> {
     return data;
   }
   private convertToCSV(arr) {
-    const array = [Object.keys(arr[0])].concat(arr);
+    const array = [Object.keys(arr[0]) as any[]].concat(arr);
     return array
-      .map((row) => {
-        return Object.values(row)
-          .map((value) => {
-            return typeof value === "string" ? JSON.stringify(value) : value;
-          })
-          .toString();
+      .map<any>((row, index) => {
+        if(index == 0){
+          return row.map(x => x.toString());
+        }
+        let v = []
+        array[0].forEach(x => {
+          let b = row[x];
+          
+          if(b !== null && typeof b === "object" && b.constructor.name === "PostgresInterval"){
+            b = (b as IPostgresInterval).toPostgres();
+          }
+          v.push(b);
+        });
+        return v.toString();
+        // return Object.values(row)
+        //   .map((value) => {
+        //     if((typeof value) === "string"){
+        //       return value;
+        //     }
+
+        //     // if((typeof value) === "interval"){
+        //     //   return value;
+        //     // }
+            
+        //     return JSON.stringify(value);
+        //   })
+        //   .toString();
       })
       .join("\n");
   }
