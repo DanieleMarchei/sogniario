@@ -12,7 +12,7 @@ import { CreateManyDto, Crud, CrudController, CrudRequest, GetManyDefaultRespons
 import { User } from "src/entities/user.entity";
 import { UserService } from "./user.service";
 import { AuthUser, Public } from "src/Auth/auth.decorator";
-import { CreateType, ProtectAlter, ProtectCreateUser, Roles } from "src/Auth/roles.decorator";
+import { CreateType, ProtectAlter, ProtectCreateUser, ProtectDelete, Roles } from "src/Auth/roles.decorator";
 import { DownloadDto } from "./DTO/download.dto";
 import { UserType } from "src/entities/user_type.enum";
 import { protectByRole } from "src/Auth/roles.util";
@@ -110,6 +110,7 @@ export class UserController implements CrudController<User> {
 
   @Override()
   @Roles(UserType.ADMIN, UserType.RESEARCHER)
+  @ProtectDelete()
   async deleteOne(@ParsedRequest() req: CrudRequest): Promise<void | User> {
     return this.base.deleteOneBase(req);
   }
