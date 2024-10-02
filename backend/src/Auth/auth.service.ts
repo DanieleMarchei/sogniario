@@ -11,51 +11,71 @@ import { ResearcherService } from "src/Researcher/researcher.service";
 import { Researcher } from "src/entities/researcher.entity";
 import { ResetPasswordDto } from "./DTO/resetPassword.dto";
 import { ResetPasswordUserDto } from "./DTO/resetPasswordUser.dto";
+import { AdminService } from "src/Admin/admin.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UserService,
     private researcerService: ResearcherService,
+    private adminService: AdminService,
     private jwtService: JwtService
   ) {}
 
 
-async resetPasswordUser(resetPassword : ResetPasswordUserDto){
-  const bcrypt = require("bcrypt");
+  async resetPasswordUser(resetPassword : ResetPasswordUserDto){
+    const bcrypt = require("bcrypt");
 
-  const user = await this.usersService.findOne({
-    where: { username: resetPassword.username, deleted: false },
-  });
+    const user = await this.usersService.findOne({
+      where: { username: resetPassword.username, deleted: false },
+    });
 
-  if (!user) {
-    throw new UnauthorizedException();
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
+
+    user.password = newPassword;
+    return this.usersService.saveUser(user);
+
   }
 
-  let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
+  async resetPasswordResearcher(resetPassword : ResetPasswordDto){
+    const bcrypt = require("bcrypt");
 
-  user.password = newPassword;
-  return this.usersService.saveUser(user);
+    const researcher = await this.researcerService.findOne({
+      where: { username: resetPassword.username, deleted: false },
+    });
 
-}
+    if (!researcher || !(await bcrypt.compare(resetPassword.old_password, researcher.password))) {
+      throw new UnauthorizedException();
+    }
 
-async resetPasswordResearcher(resetPassword : ResetPasswordDto){
-  const bcrypt = require("bcrypt");
+    let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
 
-  const researcher = await this.researcerService.findOne({
-    where: { username: resetPassword.username, deleted: false },
-  });
+    researcher.password = newPassword;
+    return this.researcerService.saveResearcher(researcher);
 
-  if (!researcher || !(await bcrypt.compare(resetPassword.old_password, researcher.password))) {
-    throw new UnauthorizedException();
   }
 
-  let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
+  async resetPasswordAdmin(resetPassword : ResetPasswordDto){
+    const bcrypt = require("bcrypt");
 
-  researcher.password = newPassword;
-  return this.researcerService.saveResearcher(researcher);
+    const admin = await this.adminService.findOne({
+      where: { username: resetPassword.username, deleted: false },
+    });
 
-}
+    if (!admin || !(await bcrypt.compare(resetPassword.old_password, admin.password))) {
+      throw new UnauthorizedException();
+    }
+
+    let newPassword = await bcrypt.hash(resetPassword.new_password, 10);
+
+    admin.password = newPassword;
+    return this.adminService.saveAdmin(admin);
+
+  }
 
 
 
@@ -101,6 +121,30 @@ async resetPasswordResearcher(resetPassword : ResetPasswordDto){
       username: researcher.username,
       type: researcher.type,
       organization: researcher.organization.id
+    };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+
+  async signInAdmin(
+    username: string,
+    pass: string
+  ): Promise<{ access_token: string }> {
+    const bcrypt = require("bcrypt");
+
+    const admin = await this.adminService.findOne({
+      where: { username: username, deleted: false }
+    });
+    
+    if (!admin || !(await bcrypt.compare(pass, admin.password))) {
+      throw new UnauthorizedException();
+    }
+    
+    const payload = {
+      sub: admin.id,
+      username: admin.username,
+      type: admin.type
     };
     return {
       access_token: await this.jwtService.signAsync(payload),

@@ -458,18 +458,19 @@ Future<List<UserData>> getAllUsersOfMyOrganization() async {
   var response = await HttpRequest(
     tableName: TableName.organization,
     requestType: RequestType.get,
-    search: {
-      "id": organizationId,
-    },
+    id: organizationId,
+    // search: {
+    //   "id": organizationId,
+    // },
     joinWith: TableName.user
 
   ).exec();
 
-  var jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
+  var jsonResponse = convert.jsonDecode(response.body);
   
-  if(jsonResponse.isEmpty) return [];
+  if(jsonResponse["users"].isEmpty) return [];
 
-  var jsonUsers = jsonResponse[0]["users"] as List<dynamic>;
+  var jsonUsers = jsonResponse["users"] as List<dynamic>;
   return jsonUsers.map((json) => _jsonToUser(json)).toList();
 }
 

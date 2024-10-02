@@ -19,7 +19,7 @@ export class User {
   id: number;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   username: string;
 
   @ApiProperty()

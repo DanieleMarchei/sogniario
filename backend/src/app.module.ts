@@ -17,6 +17,8 @@ import { OrganizationModule } from "./Organization/organization.module";
 import { Researcher } from "./entities/researcher.entity";
 import { ResearcherModule } from "./Researcher/researcher.module";
 import { FileController } from "./Downloads/downloads.controller";
+import { Admin } from "./entities/admin.entity";
+import { AdminModule } from "./Admin/admin.module";
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { FileController } from "./Downloads/downloads.controller";
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Dream, Chronotype, Psqi, Organization, Researcher],
+      entities: [User, Dream, Chronotype, Psqi, Organization, Researcher, Admin],
       synchronize: true,
     }),
     JwtModule.register({
@@ -45,6 +47,7 @@ import { FileController } from "./Downloads/downloads.controller";
     AuthModule,
     OrganizationModule,
     ResearcherModule,
+    AdminModule
   ],
   controllers: [FileController],
   providers: [],
