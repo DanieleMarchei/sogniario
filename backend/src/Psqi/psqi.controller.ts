@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common";
+import { Controller, UnauthorizedException } from "@nestjs/common";
 import { ApiSecurity, ApiTags } from "@nestjs/swagger";
 import { CreateManyDto, Crud, CrudController, CrudRequest, Override, ParsedBody, ParsedRequest, GetManyDefaultResponse } from "@nestjsx/crud";
 import { PsqiService } from "./psqi.service";
@@ -58,7 +58,12 @@ export class PsqiController implements CrudController<Psqi> {
     if(userType == UserType.USER || userType == UserType.RESEARCHER){
 
         let q = await protectByRole(req, user, this.service, "Psqi");
-        return await q.execute();
+        let result = await q.execute();
+        if(result.length !== 1){
+          throw new UnauthorizedException();
+        }
+
+        return result[0];
 
     }
     return this.base.getOneBase(req);

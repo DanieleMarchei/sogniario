@@ -4,7 +4,7 @@ import { AppModule } from "./app.module";
 import * as fs from "fs";
 
 async function bootstrap() {
-  console.log(process.cwd());
+  // console.log(process.cwd());
   //Production
   // const httpsOptions = {
   //   key: fs.readFileSync(process.cwd() + "/src/cert/sognario_unicam_it.key"),

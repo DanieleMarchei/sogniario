@@ -359,7 +359,15 @@ Future<(DateTime?, Sex?)> getMyGeneralInfo() async {
   var jsonResponse = convert.jsonDecode(response.body);
 
   DateTime? birthdate = jsonResponse["birthdate"] != null ? DateTime.parse(jsonResponse["birthdate"]) : null;
-  Sex? sex = jsonResponse["sex"] != null ? Sex.values[jsonResponse["sex"]] : null;
+  dynamic sexInfo = jsonResponse["sex"];
+  late int sexId;
+  try {
+    sexId = int.parse(sexInfo);
+  } catch (e) {
+    sexId = jsonResponse["sex"];
+  }
+
+  Sex? sex = jsonResponse["sex"] != null ? Sex.values[sexId] : null;
 
   return (birthdate, sex);
 
@@ -736,7 +744,7 @@ enum MobileDBDownloadState {
 
 
 Future<(File, MobileDBDownloadState)?> downloadDatabaseMobile() async {
-  if(!allowedToDownload.contains(getMyUserType())) return null;
+  if(!allowedToDownload.contains(await getMyUserType())) return null;
 
   UserData user = await getMyResearcher();
   String fileName = "sogniario (${user.organizationName}) - ${DateTime.now()}.zip";
@@ -755,7 +763,7 @@ Future<(File, MobileDBDownloadState)?> downloadDatabaseMobile() async {
 }
 
 Future<MobileDBDownloadState?> downloadDatabaseMobileConfirmed(File file) async {
-  if(!allowedToDownload.contains(getMyUserType())) return null;
+  if(!allowedToDownload.contains(await getMyUserType())) return null;
 
   int organizationId = myJwtData()["organization"];
   var response = await HttpRequest(

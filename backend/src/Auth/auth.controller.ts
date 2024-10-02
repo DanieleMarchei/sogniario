@@ -82,15 +82,16 @@ export class AuthController {
     if(user.type === UserType.RESEARCHER){
       let targetUser = await this.userService.findOne({
         where: {
-          username: resetDto.username
+          username: resetDto.username,
+          deleted: false
         }
       });
+
       
       if(targetUser === undefined){
         throw new UnauthorizedException();
       }
-
-      if(targetUser.organization !== user.organization){
+      if(targetUser.organization.id !== user.organization){
         throw new UnauthorizedException();
       }
       
@@ -107,7 +108,8 @@ export class AuthController {
     if(user.type === UserType.RESEARCHER){
       let targetUser = await this.researcherService.findOne({
         where: {
-          username: resetDto.username
+          username: resetDto.username,
+          deleted: false
         }
       });
       
@@ -115,7 +117,7 @@ export class AuthController {
         throw new UnauthorizedException();
       }
 
-      if(targetUser.id !== user.id){
+      if(targetUser.id !== user.sub){
         throw new UnauthorizedException();
       }
       

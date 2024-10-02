@@ -41,7 +41,8 @@ export class ResearcherController implements CrudController<Researcher> {
 
       let targetResearcher = await this.service.findOne({
         where: {
-          id: requestedId
+          id: requestedId,
+          deleted: false
         }
       });
       
@@ -49,7 +50,7 @@ export class ResearcherController implements CrudController<Researcher> {
         throw new UnauthorizedException();
       }
 
-      if(targetResearcher.id !== user.id){
+      if(targetResearcher.id !== user.sub){
         throw new UnauthorizedException();
       }
       

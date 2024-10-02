@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common";
+import { Controller, UnauthorizedException } from "@nestjs/common";
 import { ApiSecurity, ApiTags } from "@nestjs/swagger";
 import { ChronotypeService } from "./chronotype.service";
 import { Chronotype } from "src/entities/chronotype.entity";
@@ -58,7 +58,12 @@ export class ChronotypeController implements CrudController<Chronotype> {
     if(userType == UserType.USER || userType == UserType.RESEARCHER){
 
         let q = await protectByRole(req, user, this.service, "Chronotype");
-        return await q.execute();
+        let result = await q.execute();
+        if(result.length !== 1){
+          throw new UnauthorizedException();
+        }
+
+        return result[0];
 
     }
 

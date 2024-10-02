@@ -69,13 +69,28 @@ export class UserController implements CrudController<User> {
   @Override()
   @Roles(UserType.ADMIN, UserType.RESEARCHER, UserType.USER)
   async getOne(@ParsedRequest() req: CrudRequest, @AuthUser() user : any): Promise<User> {
-    let userType = user.type;
-    
-    if(userType == UserType.USER || userType == UserType.RESEARCHER){
+    if(user.type === UserType.USER || user.type === UserType.RESEARCHER){
+      let requestedId = req.parsed.paramsFilter[0].value;
 
-        let q = await protectByRole(req, user, this.service, "User");
-        return await q.execute();
+      let targetUser = await this.service.findOne({
+        where: {
+          id: requestedId,
+          deleted: false
+        }
+      });
+      
+      if(targetUser === undefined){
+        throw new UnauthorizedException();
+      }
+      
+      if(user.type === UserType.USER && targetUser.id !== user.sub){
+        throw new UnauthorizedException();
+      }
 
+      if(user.type === UserType.RESEARCHER && targetUser.organization.id !== user.organization){
+        throw new UnauthorizedException();
+      }      
+      
     }
     return this.base.getOneBase(req);
   }

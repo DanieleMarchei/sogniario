@@ -62,7 +62,12 @@ export class DreamController implements CrudController<Dream> {
     if(userType == UserType.USER || userType == UserType.RESEARCHER){
 
         let q = await protectByRole(req, user, this.service, "Dream");
-        return await q.execute();
+        let result = await q.execute();
+        if(result.length !== 1){
+          throw new UnauthorizedException();
+        }
+
+        return result[0];
 
     }
     return this.base.getOneBase(req);
