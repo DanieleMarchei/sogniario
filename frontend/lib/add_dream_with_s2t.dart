@@ -207,7 +207,9 @@ class AddDreamWithS2TTextState
   TextSelection selection = TextSelection(baseOffset: 0, extentOffset: 0);
 
   WebSocketChannel? _channel;
-  bool enableRecordBtn = true;
+  int? s2tErrorState = null;
+  List<String> s2tErrors = ["Errore nella connessione con il server di trascrizione. Riporvare più tardi.",
+                            "Sogniario non ha il permesso di accedere al microfono. Fornire l'autorizzazione e riprovare."];
 
   TextEditingController dreamController = TextEditingController();
   ScrollController dreamScrollController = ScrollController();
@@ -234,22 +236,22 @@ class AddDreamWithS2TTextState
     },
     onError: (err) {
       setState(() {
-        enableRecordBtn = false;
+        s2tErrorState = 0;
       });
     }
     );
     dreamController.addListener(() => widget.onTextChanged!(dreamController.text));
+
   }
 
   Future<void> _startRecording() async {
     bool hasPermission = await _record.hasPermission();
     if (!hasPermission) {
       setState(() {
-        enableRecordBtn = false;
+        s2tErrorState = 1;
       });
       return;
     }
-
     // var config = RecordConfig(encoder: AudioEncoder.pcm16bits, sampleRate: 44100, numChannels: 1);
     var config = const RecordConfig(
         encoder: AudioEncoder.pcm16bits, sampleRate: 44100, numChannels: 1);
@@ -387,11 +389,11 @@ class AddDreamWithS2TTextState
 
     FloatingActionButton recordBtn = FloatingActionButton(
         shape: CircleBorder(),
-        backgroundColor: enableRecordBtn ?Colors.red : Colors.grey,
-        tooltip: enableRecordBtn ? (_isRecording
+        backgroundColor: s2tErrorState == null ?Colors.red : Colors.grey,
+        tooltip: s2tErrorState == null ? (_isRecording
             ? "Premi per interrompere la trascrizione."
-            : "Premi per trascrivere il tuo sogno.") : "Trascrizione audio non disponibile",
-        onPressed: enableRecordBtn ? () {
+            : "Premi per trascrivere il tuo sogno.") : s2tErrors[s2tErrorState!],
+        onPressed: s2tErrorState == null ? () {
           if (_isRecording) {
             _stopRecording();
           } else {

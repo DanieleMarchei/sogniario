@@ -142,7 +142,7 @@ class _LoginState extends State<Login> {
                                   );
 
     return FutureBuilder(
-      future: isTimeToCheckVersion() ? isAppUpToDate() : Future(() => null),
+      future: isTimeToCheckVersion() ? isAppUpToDate() : Future(() => true),
       builder: (context, snapshot) { 
         if (snapshot.hasData) {
           if(snapshot.data == false){
