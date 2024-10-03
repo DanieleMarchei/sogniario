@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import * as fs from "fs";
+import helmet from "helmet";
 
 async function bootstrap() {
   // console.log(process.cwd());
@@ -19,6 +20,8 @@ async function bootstrap() {
   
   //development
   const app = await NestFactory.create(AppModule);
+  
+  app.use(helmet());
 
   const config = new DocumentBuilder()
     .setTitle("Sognario API description")
