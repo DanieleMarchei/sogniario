@@ -207,6 +207,7 @@ class AddDreamWithS2TTextState
   TextSelection selection = TextSelection(baseOffset: 0, extentOffset: 0);
 
   WebSocketChannel? _channel;
+  bool enableRecordBtn = true;
 
   TextEditingController dreamController = TextEditingController();
   ScrollController dreamScrollController = ScrollController();
@@ -219,6 +220,7 @@ class AddDreamWithS2TTextState
     _channel = WebSocketChannel.connect(
       Uri.parse('$protocol://$wsAuthority/?auth=$jwt'),
     );
+    
   }
 
   @override
@@ -229,14 +231,22 @@ class AddDreamWithS2TTextState
 
     _channel!.stream.listen((message) {
       _streamController.add(message);
-    });
+    },
+    onError: (err) {
+      setState(() {
+        enableRecordBtn = false;
+      });
+    }
+    );
     dreamController.addListener(() => widget.onTextChanged!(dreamController.text));
   }
 
   Future<void> _startRecording() async {
     bool hasPermission = await _record.hasPermission();
     if (!hasPermission) {
-      print('Permission denied.');
+      setState(() {
+        enableRecordBtn = false;
+      });
       return;
     }
 
@@ -377,17 +387,17 @@ class AddDreamWithS2TTextState
 
     FloatingActionButton recordBtn = FloatingActionButton(
         shape: CircleBorder(),
-        backgroundColor: Colors.red,
-        tooltip: _isRecording
+        backgroundColor: enableRecordBtn ?Colors.red : Colors.grey,
+        tooltip: enableRecordBtn ? (_isRecording
             ? "Premi per interrompere la trascrizione."
-            : "Premi per trascrivere il tuo sogno.",
-        onPressed: () {
+            : "Premi per trascrivere il tuo sogno.") : "Trascrizione audio non disponibile",
+        onPressed: enableRecordBtn ? () {
           if (_isRecording) {
             _stopRecording();
           } else {
             _startRecording();
           }
-        },
+        } : null,
         child: Icon(_isRecording ? Icons.mic : Icons.mic_off));
 
     // FloatingActionButton recordBtnNoSpeech = const FloatingActionButton(
