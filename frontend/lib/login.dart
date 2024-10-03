@@ -124,7 +124,6 @@ class _LoginState extends State<Login> {
 
   @override 
   Widget build(BuildContext context) {
-    isAppUpToDate();
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
@@ -142,130 +141,156 @@ class _LoginState extends State<Login> {
                                     backgroundColor: Colors.orange.shade400,
                                   );
 
-    return PopScope(
-      canPop: false,
-      child: ScaffoldWithCircles(
-        context: context,
-        body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Center(
-                child: ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                        width: min(screenWidth, halfWidthConstraint)),
-                    child: Stack(
-                      children: [
-                        Column(
+    return FutureBuilder(
+      future: isTimeToCheckVersion() ? isAppUpToDate() : Future(() => null),
+      builder: (context, snapshot) { 
+        if (snapshot.hasData) {
+          if(snapshot.data == false){
+            Future( () => showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: const Text("Aggiorna Sogniario"),
+                  insetPadding: const EdgeInsets.all(16),
+                  content: const Text("Una nuova versione di Sogniario è disponibile!\n Ti preghiamo di aggiornare l'app prima di continuare.", textAlign: TextAlign.justify,),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Ok'),
+                      onPressed: () {
+                        context.pop(true);
+                      },
+                    ),
+                  ],);
+              },
+            ));
+          }
+        }
+        return PopScope(
+          canPop: false,
+          child: ScaffoldWithCircles(
+            context: context,
+            body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Center(
+                    child: ConstrainedBox(
+                        constraints: BoxConstraints.tightFor(
+                            width: min(screenWidth, halfWidthConstraint)),
+                        child: Stack(
                           children: [
-                            const SizedBox(height: 25),
-                            SizedBox(
-                              height: 100,
-                              child: Row(children: [
-                                Expanded(
-                                  child: Image.asset('assets/unicam_logo.png', 
-                                  scale: 0.5,
-                                  ),),
-                                const Spacer(),
-                                Expanded(
-                                  child: Image.asset('assets/bsrl_logo.png', 
-                                  scale: 1, 
-                                  fit: BoxFit.contain,),),
-                              ],),
-                            ),
-                          ],
-                        ),
-                        ListView(children: [                        
-                          SizedBox(height: screenHeight * .2),
-                          const Text(
-                            'Sogniario',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10,),
-                          const SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
-                          SizedBox(height: screenHeight * .05),
-                          InputField(
-                            onChanged: (value) {
-                              setState(() {
-                                username = value;
-                              });
-                            },
-                            labelText: 'Username',
-                            errorText: usernameError,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            autoFocus: true,
-                          ),
-                          SizedBox(height: screenHeight * .025),
-                          InputField(
-                            onChanged: (value) {
-                              setState(() {
-                                password = value;
-                              });
-                            },
-                            labelText: 'Password',
-                            errorText: passwordError,
-                            toggleObscure: true,
-                            obscureText: true,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          SizedBox(
-                            height: screenHeight * .03,
-                          ),
-                          if (loginError != null) Text(loginError!),
-                          if (isScreenWide) ...{
-                            Row(
+                            Column(
                               children: [
-                                Expanded(
-                                  child: userLoginBtn,
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: researcherLoginBtn
+                                const SizedBox(height: 25),
+                                SizedBox(
+                                  height: 100,
+                                  child: Row(children: [
+                                    Expanded(
+                                      child: Image.asset('assets/unicam_logo.png', 
+                                      scale: 0.5,
+                                      ),),
+                                    const Spacer(),
+                                    Expanded(
+                                      child: Image.asset('assets/bsrl_logo.png', 
+                                      scale: 1, 
+                                      fit: BoxFit.contain,),),
+                                  ],),
                                 ),
                               ],
                             ),
-                          } else ...{
-                            userLoginBtn,
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            researcherLoginBtn
-                          },
-                          if (kIsWeb) ...{
-                            const SizedBox(
-                              height: 50,
-                            ),
-                            IconTextButton(
-                              icon: askToWait ? const CircularProgressIndicator() : const Icon(Icons.android),
-                              text: "Scarica l'app (Android)",
-                              onPressed: () async {
-                                setState(() {
-                                  askToWait = true;
-                                });
-                                await downloadAndroidApp();
-                                setState(() {
-                                  askToWait = false;
-                                });
-                              }
-                            ),
-                          },
-                          SizedBox(
-                            height: screenHeight * .03,
-                          ),
-                          Text(
-                            "Versione: " + currentVersion,
-                            textAlign: TextAlign.center,
-                          )
-                        
-                        ]),
-                      ],
-                    )))),
-      ),
+                            ListView(children: [                        
+                              SizedBox(height: screenHeight * .2),
+                              const Text(
+                                'Sogniario',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 10,),
+                              const SelectableText("Sogniario è una applicazione mobile sviluppata dall'Università di Camerino per registrare e catalogare i sogni.", textAlign: TextAlign.center,),
+                              SizedBox(height: screenHeight * .05),
+                              InputField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    username = value;
+                                  });
+                                },
+                                labelText: 'Username',
+                                errorText: usernameError,
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.next,
+                                autoFocus: true,
+                              ),
+                              SizedBox(height: screenHeight * .025),
+                              InputField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    password = value;
+                                  });
+                                },
+                                labelText: 'Password',
+                                errorText: passwordError,
+                                toggleObscure: true,
+                                obscureText: true,
+                                textInputAction: TextInputAction.next,
+                              ),
+                              SizedBox(
+                                height: screenHeight * .03,
+                              ),
+                              if (loginError != null) Text(loginError!),
+                              if (isScreenWide) ...{
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: userLoginBtn,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: researcherLoginBtn
+                                    ),
+                                  ],
+                                ),
+                              } else ...{
+                                userLoginBtn,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                researcherLoginBtn
+                              },
+                              if (kIsWeb) ...{
+                                const SizedBox(
+                                  height: 50,
+                                ),
+                                IconTextButton(
+                                  icon: askToWait ? const CircularProgressIndicator() : const Icon(Icons.android),
+                                  text: "Scarica l'app (Android)",
+                                  onPressed: () async {
+                                    setState(() {
+                                      askToWait = true;
+                                    });
+                                    await downloadAndroidApp();
+                                    setState(() {
+                                      askToWait = false;
+                                    });
+                                  }
+                                ),
+                              },
+                              SizedBox(
+                                height: screenHeight * .03,
+                              ),
+                              Text(
+                                "Versione: " + currentVersion,
+                                textAlign: TextAlign.center,
+                              )
+                            
+                            ]),
+                          ],
+                        )))),
+          ),
+        );
+      }
     );
   }
 }

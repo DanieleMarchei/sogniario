@@ -789,6 +789,8 @@ Future<bool?> isAppUpToDate() async {
     requestType: RequestType.get
   ).exec();
 
+  userDataBox.put(HiveBoxes.lastTimeCheckedVersion.label, DateTime.now());
+
   return response.body == currentVersion;
 }
 

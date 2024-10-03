@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 String currentVersion = "20 Agosto 2024";
 
@@ -8,7 +9,8 @@ double halfWidthConstraint = widthConstraint / 2;
 enum HiveBoxes{
   jwt(label: "jwt"),
   hasGeneralInfo(label: "hasGeneralInfo"),
-  hasChronotype(label: "hasChronotype");
+  hasChronotype(label: "hasChronotype"),
+  lastTimeCheckedVersion(label: "lastTimeCheckedVersion");
 
   const HiveBoxes({required this.label});
   final String label;
@@ -271,3 +273,13 @@ class UserData {
 
 }
 
+var userDataBox = Hive.box('userData');
+
+bool isTimeToCheckVersion(){
+  DateTime? lastTimeChecked = userDataBox.get(HiveBoxes.lastTimeCheckedVersion.label);
+
+  if(lastTimeChecked == null) return true;
+
+  Duration difference = DateTime.now().difference(lastTimeChecked);
+  return difference.inDays >= 10;
+}

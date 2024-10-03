@@ -25,7 +25,10 @@ class HomeResearcher extends StatelessWidget {
     };
 
     return FutureBuilder(
-        future: getMyResearcher(),
+        future: Future.wait([
+          isTimeToCheckVersion() ? isAppUpToDate() : Future(() => true),
+          getMyResearcher()
+        ]),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return ScaffoldWithCircles(
@@ -38,7 +41,27 @@ class HomeResearcher extends StatelessWidget {
             );
           }
 
-          UserData user = snapshot.data!;
+          if(snapshot.data![0] == false){
+            Future( () => showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: const Text("Aggiorna Sogniario"),
+                  insetPadding: const EdgeInsets.all(16),
+                  content: const Text("Una nuova versione di Sogniario è disponibile!\n Ti preghiamo di aggiornare l'app prima di continuare.", textAlign: TextAlign.justify,),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Ok'),
+                      onPressed: () {
+                        context.pop(true);
+                      },
+                    ),
+                  ],);
+              },
+            ));
+          }
+
+          UserData user = snapshot.data![1] as UserData;
 
           return ScaffoldWithCircles(
             context: context,

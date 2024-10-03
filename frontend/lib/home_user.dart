@@ -90,22 +90,45 @@ class HomeUser extends StatelessWidget {
 
 
     return FutureBuilder(
-      future: showChronotypePsqiButtons(),
+      future: Future.wait([
+        isTimeToCheckVersion() ? isAppUpToDate() : Future(() => true),
+        showChronotypePsqiButtons()
+      ]),
       builder: (context, snapshot) {
 
-          if (!snapshot.hasData) {
-            return ScaffoldWithCircles(
-              body: Container(
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+        if (!snapshot.hasData) {
+          return ScaffoldWithCircles(
+            body: Container(
+            child: const Center(
+              child: CircularProgressIndicator(),
             ),
-              context: context
-            );
-          }
+          ),
+            context: context
+          );
+        }
+
+        if(snapshot.data![0] == false){
+          Future( () => showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: const Text("Aggiorna Sogniario"),
+                insetPadding: const EdgeInsets.all(16),
+                content: const Text("Una nuova versione di Sogniario è disponibile!\n Ti preghiamo di aggiornare l'app prima di continuare.", textAlign: TextAlign.justify,),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Ok'),
+                    onPressed: () {
+                      context.pop(true);
+                    },
+                  ),
+                ],);
+            },
+          ));
+        }
 
         bool showChronoBtn, showPsqiAlert;
-        (showChronoBtn, showPsqiAlert) = snapshot.data!;
+        (showChronoBtn, showPsqiAlert) = snapshot.data![1] as (bool, bool);
 
         return ScaffoldWithCircles(
               context: context,
@@ -151,7 +174,7 @@ class HomeUser extends StatelessWidget {
                                         context.goNamed(Routes.infoAndPrivacy.name)
                                       }),
                               if(!kIsWeb)...{
-                                SizedBox(height: 100,),
+                                SizedBox(height: 80,),
                                 IconTextButton(
                                     icon: Icon(Icons.logout),
                                     text: "Esci",
