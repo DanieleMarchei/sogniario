@@ -98,6 +98,7 @@ enum TableName {
   organization(label: "Organization", needJwt: true, deletable: false),
 
   downloadApk(label: "file/apk", needJwt: false, deletable: false),
+  apkVersion(label: "file/version", needJwt: false, deletable: false),
 
   checkJwt(label: "auth/check-jwt", needJwt: true, deletable: false);
 
@@ -778,6 +779,17 @@ Future<MobileDBDownloadState?> downloadDatabaseMobileConfirmed(File file) async 
 
   await file.writeAsBytes(response.bodyBytes);
   return MobileDBDownloadState.downloadFinished;
+}
+
+Future<bool?> isAppUpToDate() async {
+  if(kIsWeb) return null;
+
+  var response = await HttpRequest(
+    tableName: TableName.apkVersion,
+    requestType: RequestType.get
+  ).exec();
+
+  return response.body == currentVersion;
 }
 
 Future<void> downloadAndroidApp() async {

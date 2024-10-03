@@ -124,6 +124,7 @@ class _LoginState extends State<Login> {
 
   @override 
   Widget build(BuildContext context) {
+    isAppUpToDate();
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool isScreenWide = MediaQuery.sizeOf(context).width >= widthConstraint;
