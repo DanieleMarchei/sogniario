@@ -444,7 +444,7 @@ class AddDreamWithS2TTextState
                 height: screenHeight * 0.01,
               ),
               Text(
-                "⚠️ Avviso: ricontrolla che il testo registrato sia corretto!",
+                "⚠️ Registra in un luogo silenzioso e ricontrolla che il testo registrato sia corretto!",
                 style: TextStyle(color: Colors.grey.shade900, fontSize: 12),
               ),
               SizedBox(

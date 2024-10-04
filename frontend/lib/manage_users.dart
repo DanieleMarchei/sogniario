@@ -313,7 +313,7 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
   TextEditingController controllerPassword = TextEditingController();
 
   String getRandomString(int length){
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
     Random rnd = Random.secure();
     return String.fromCharCodes(Iterable.generate(length, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
   }
@@ -623,35 +623,37 @@ class _ManageUserDialogState extends State<ManageUserDialog> {
         SimpleDialogOption(
             child: FormButton(
           text: "Modifica",
-          onPressed: (widget.user == tmpUser || tmpUser!.password.isEmpty) ? null :() async {
-            bool updated = await updateUserPassword(tmpUser!.username, tmpUser!.password);
-            if(!updated){
-              Fluttertoast.showToast(
-                msg: "Modifica non riuscita.",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 12.0
-              );
-              return;
+          onPressed: (widget.user == tmpUser) ? null :() async {
+            List<String> errors = [];
+            if(tmpUser!.password.isNotEmpty){
+              bool updated = await updateUserPassword(tmpUser!.username, tmpUser!.password);
+              if(!updated){
+                errors.add("Modifica della password non riuscita.");
+              }
             }
+
             
-            updated = await updateUserGeneralInfo(
+            bool updated = await updateUserGeneralInfo(
                 tmpUser!.id, tmpUser!.sex!, tmpUser!.birthdate!);
             if(!updated){
-              Fluttertoast.showToast(
-                msg: "Modifica non riuscita.",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 12.0
-              );
+              errors.add("Modifica dei dati personali non riuscita.");
+            }
+
+            if(errors.isNotEmpty){
+              for (var error in errors) {
+                Fluttertoast.showToast(
+                  msg: error,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 12.0
+                );
+              }
               return;
             }
+
             if (widget.onSubmitted != null) widget.onSubmitted!();
             Fluttertoast.showToast(
               msg: "Modifica effettuata!",

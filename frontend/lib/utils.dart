@@ -262,6 +262,7 @@ class UserData {
     user.sex = sex;
     user.organizationId = organizationId;
     user.organizationName = organizationName;
+    user.deleted = deleted;
 
     return user;
   }

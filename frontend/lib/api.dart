@@ -180,15 +180,23 @@ class HttpRequest {
       headers[HttpHeaders.authorizationHeader] = jwtHeader(jwt!);
     }
     
-    if(requestType.needBody){
-      headers[HttpHeaders.contentTypeHeader] = 'application/json';
-      String jsonbody = convert.jsonEncode(body);
-      return requestType.func(url, headers: headers, body: jsonbody);
+    try {
+      if(requestType.needBody){
+        headers[HttpHeaders.contentTypeHeader] = 'application/json';
+        String jsonbody = convert.jsonEncode(body);
+        return requestType.func(url, headers: headers, body: jsonbody);
+      }
+      else{
+        return requestType.func(url, headers: headers);
+      
+      }
+    } on Exception catch (e) {
+      return http.Response("", 503);
+    } on Error catch (e) {
+      return http.Response("", 503);
     }
-    else{
-      return requestType.func(url, headers: headers);
 
-    }
+    
 
   }
 }
