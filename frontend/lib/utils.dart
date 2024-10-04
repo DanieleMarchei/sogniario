@@ -238,6 +238,7 @@ class UserData {
   Sex? sex = null;
   int? organizationId;
   String? organizationName;
+  bool? deleted;
 
   @override
   bool operator ==(other){

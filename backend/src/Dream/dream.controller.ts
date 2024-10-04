@@ -8,7 +8,7 @@ import { UserType } from "src/entities/user_type.enum";
 import { JwtService } from "@nestjs/jwt";
 import { AuthUser } from "src/Auth/auth.decorator";
 import { UserService } from "src/User/user.service";
-import { protectByRole } from "src/Auth/roles.util";
+import { User } from "src/entities/user.entity";
 
 @Crud({
   model: {
@@ -29,48 +29,80 @@ export class DreamController implements CrudController<Dream> {
   @Roles(UserType.ADMIN, UserType.RESEARCHER, UserType.USER)
   async getMany(@ParsedRequest() req: CrudRequest, @AuthUser() user: any): Promise<GetManyDefaultResponse<Dream> | Dream[]> {
 
+    let data = await this.base.getManyBase(req);
     let userType = user.type;
+
+    if (userType == UserType.ADMIN) return data;
     
-    if(userType == UserType.USER || userType == UserType.RESEARCHER){
+    let dataToCheck : Dream[] = data["data"] !== undefined ? data["data"] : data;
 
-        let q = await protectByRole(req, user, this.service, "Dream");
-        let usePagination = this.service.decidePagination(req.parsed, req.options);
+    for(let i = 0; i < dataToCheck.length; i++){
+      let element = dataToCheck[i];
+      let targetUser : User = undefined;
 
-        if (usePagination){
-          const data = await q.execute();
-          const total = await q.getCount();
-          const limit = q.expressionMap.take;
-          const offset = q.expressionMap.skip;
-    
-          return this.service.createPageInfo(data, total, limit || total, offset || 0);
-
+      if (element.user !== undefined){
+        targetUser = element.user;
+      }else{
+        let res = await this.service.findOne({
+          where: {
+            id: element.id,
+            deleted: false
+          },
+          relations: ["user"]
+        });
+        if(res === null){
+          throw new UnauthorizedException();
         }
-        
-        return await q.execute();
+        targetUser = res.user;
+      }
 
+      if (userType == UserType.USER){
+        if (targetUser.id !== user.sub) throw new UnauthorizedException();
+      }
+
+      if (userType == UserType.RESEARCHER){
+        if (targetUser.organization.id !== user.organization) throw new UnauthorizedException();
+      }
     }
 
-
-    return this.base.getManyBase(req);
+    return data;
   }
 
   @Override()
   @Roles(UserType.ADMIN, UserType.RESEARCHER, UserType.USER)
   async getOne(@ParsedRequest() req: CrudRequest, @AuthUser() user: any): Promise<Dream> {
+    let data = await this.base.getOneBase(req);
     let userType = user.type;
+
+    if (userType == UserType.ADMIN) return data;
     
-    if(userType == UserType.USER || userType == UserType.RESEARCHER){
+    let targetUser : User = undefined;
 
-        let q = await protectByRole(req, user, this.service, "Dream");
-        let result = await q.execute();
-        if(result.length !== 1){
-          throw new UnauthorizedException();
-        }
-
-        return result[0];
-
+    if (data.user !== undefined){
+      targetUser = data.user;
+    }else{
+      let res = await this.service.findOne({
+        where: {
+          id: data.id,
+          deleted: false
+        },
+        relations: ["user"]
+      });
+      if(res === null){
+        throw new UnauthorizedException();
+      }
+      targetUser = res.user;
     }
-    return this.base.getOneBase(req);
+
+    if (userType == UserType.USER){
+      if (targetUser.id !== user.sub) throw new UnauthorizedException();
+    }
+
+    if (userType == UserType.RESEARCHER){
+      if (targetUser.organization.id !== user.organization) throw new UnauthorizedException();
+    }
+
+    return data;
   }
 
   @Override()

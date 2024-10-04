@@ -58,6 +58,7 @@ class _ManageUsersState extends State<ManageUsers> {
         }
 
         List<UserData> users = snapshot.data!;
+        users.removeWhere((u) => u.deleted != null && u.deleted! == true);
         users.sort((a, b) {
           return a.username.compareTo(b.username);
         });

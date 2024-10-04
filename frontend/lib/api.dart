@@ -229,6 +229,7 @@ UserData _jsonToUser(Map<String, dynamic> json){
   user.sex = json["sex"] != null ? Sex.values[json["sex"]] : null;
   user.organizationId = json["organization"] != null ? json["organization"]["id"] : null;
   user.organizationName = json["organization"] != null ? json["organization"]["name"] : null;
+  user.deleted = json["deleted"];
 
   return user;
 }

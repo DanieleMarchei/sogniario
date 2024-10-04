@@ -6,7 +6,7 @@ import { Psqi } from "src/entities/psqi.entity";
 import { UserType } from "src/entities/user_type.enum";
 import { CreateType, ProtectAlter, ProtectCreate, ProtectDelete, Roles } from "src/Auth/roles.decorator";
 import { AuthUser } from "src/Auth/auth.decorator";
-import { protectByRole } from "src/Auth/roles.util";
+import { User } from "src/entities/user.entity";
 
 @Crud({
   model: {
@@ -27,46 +27,75 @@ export class PsqiController implements CrudController<Psqi> {
   @Override()
   @Roles(UserType.ADMIN, UserType.RESEARCHER, UserType.USER)
   async getMany(@ParsedRequest() req: CrudRequest, @AuthUser() user : any): Promise<GetManyDefaultResponse<Psqi> | Psqi[]> {
+    let data = await this.base.getManyBase(req);
     let userType = user.type;
+
+    if (userType == UserType.ADMIN) return data;
     
-    if(userType == UserType.USER || userType == UserType.RESEARCHER){
+    let dataToCheck : Psqi[] = data["data"] !== undefined ? data["data"] : data;
 
-        let q = await protectByRole(req, user, this.service, "Psqi");
-        let usePagination = this.service.decidePagination(req.parsed, req.options);
+    for(let i = 0; i < dataToCheck.length; i++){
+      let element = dataToCheck[i];
+      let targetUser : User = undefined;
 
-        if (usePagination){
-          const data = await q.execute();
-          const total = await q.getCount();
-          const limit = q.expressionMap.take;
-          const offset = q.expressionMap.skip;
-    
-          return this.service.createPageInfo(data, total, limit || total, offset || 0);
+      if (element.user !== undefined){
+        targetUser = element.user;
+      }else{
+        let res = await this.service.findOne({
+          where: {
+            id: element.id,
+          },
+          relations: ["user"]
+        });
+        targetUser = res.user;
+      }
 
-        }
-        
-        return await q.execute();
+      if (userType == UserType.USER){
+        if (targetUser.id !== user.sub) throw new UnauthorizedException();
+      }
 
+      if (userType == UserType.RESEARCHER){
+        if (targetUser.organization.id !== user.organization) throw new UnauthorizedException();
+      }
     }
-    return this.base.getManyBase(req);
+
+    return data;
   }
 
   @Override()
   @Roles(UserType.ADMIN, UserType.RESEARCHER, UserType.USER)
   async getOne(@ParsedRequest() req: CrudRequest, @AuthUser() user : any): Promise<Psqi> {
+    let data = await this.base.getOneBase(req);
     let userType = user.type;
+
+    if (userType == UserType.ADMIN) return data;
     
-    if(userType == UserType.USER || userType == UserType.RESEARCHER){
+    let targetUser : User = undefined;
 
-        let q = await protectByRole(req, user, this.service, "Psqi");
-        let result = await q.execute();
-        if(result.length !== 1){
-          throw new UnauthorizedException();
-        }
-
-        return result[0];
-
+    if (data.user !== undefined){
+      targetUser = data.user;
+    }else{
+      let res = await this.service.findOne({
+        where: {
+          id: data.id,
+        },
+        relations: ["user"]
+      });
+      if(res === null){
+        throw new UnauthorizedException();
+      }
+      targetUser = res.user;
     }
-    return this.base.getOneBase(req);
+
+    if (userType == UserType.USER){
+      if (targetUser.id !== user.sub) throw new UnauthorizedException();
+    }
+
+    if (userType == UserType.RESEARCHER){
+      if (targetUser.organization.id !== user.organization) throw new UnauthorizedException();
+    }
+
+    return data;
   }
 
   @Override()

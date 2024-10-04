@@ -15,7 +15,6 @@ import { AuthUser, Public } from "src/Auth/auth.decorator";
 import { CreateType, ProtectAlter, ProtectCreateUser, ProtectDelete, Roles } from "src/Auth/roles.decorator";
 import { DownloadDto } from "./DTO/download.dto";
 import { UserType } from "src/entities/user_type.enum";
-import { protectByRole } from "src/Auth/roles.util";
 
 @Crud({
   model: {
@@ -43,27 +42,22 @@ export class UserController implements CrudController<User> {
   @Override()
   @Roles(UserType.ADMIN, UserType.RESEARCHER)
   async getMany(@ParsedRequest() req: CrudRequest, @AuthUser() user : any): Promise<GetManyDefaultResponse<User> | User[]> {
+    let data = await this.base.getManyBase(req);
     let userType = user.type;
+
+    if (userType == UserType.ADMIN) return data;
     
-    if(userType == UserType.RESEARCHER){
+    let dataToCheck : User[] = data["data"] !== undefined ? data["data"] : data;
 
-        let q = await protectByRole(req, user, this.service, "User");
-        let usePagination = this.service.decidePagination(req.parsed, req.options);
+    for(let i = 0; i < dataToCheck.length; i++){
+      let element = dataToCheck[i];
 
-        if (usePagination){
-          const data = await q.execute();
-          const total = await q.getCount();
-          const limit = q.expressionMap.take;
-          const offset = q.expressionMap.skip;
-    
-          return this.service.createPageInfo(data, total, limit || total, offset || 0);
-
-        }
-        
-        return await q.execute();
-
+      if (userType == UserType.RESEARCHER){
+        if (element.organization.id !== user.organization) throw new UnauthorizedException();
+      }
     }
-    return this.base.getManyBase(req);
+
+    return data;
   }
 
   @Override()
