@@ -14,7 +14,7 @@ bool isDevelopment = false;
 
 String wsAuthority = isDevelopment ? (kIsWeb ? "localhost:2700" : "10.0.2.2:2700") : "sogniario.unicam.it:2700";
 
-String authority = isDevelopment ? (kIsWeb ? "localhost:3000" : "10.0.2.2:3000") : "sogniario.unicam.it/api";
+String authority = isDevelopment ? (kIsWeb ? "localhost:3000" : "10.0.2.2:3000") : "sogniario.unicam.it:3000";
 String server = isDevelopment ? "http://$authority" : "https://$authority";
 
 var tokenBox = Hive.box('tokens');

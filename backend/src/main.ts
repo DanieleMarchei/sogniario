@@ -21,7 +21,7 @@ async function bootstrap() {
   //development
   // const app = await NestFactory.create(AppModule);
   
-  //app.use(helmet());
+  app.use(helmet());
 
   const config = new DocumentBuilder()
     .setTitle("Sognario API description")
