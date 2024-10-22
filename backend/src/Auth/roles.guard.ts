@@ -23,13 +23,15 @@ import { ResearcherController } from 'src/Researcher/researcher.controller';
 import { Researcher } from 'src/entities/researcher.entity';
 import { UserService } from 'src/User/user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ResearcherService } from 'src/Researcher/researcher.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private jwtService: JwtService, 
     private reflector: Reflector,
-    private userRepo: UserService
+    private userRepo: UserService,
+    private researcherRepo: ResearcherService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -65,12 +67,24 @@ export class RolesGuard implements CanActivate {
     const userType = jwtBody["type"];
     const userId = jwtBody["sub"];
 
-    let user = await this.userRepo.findOne({
-      where: {id: userId}
-    });
+    if(userType === UserType.USER){
+      let user = await this.userRepo.findOne({
+        where: {id: userId}
+      });
 
-    if(user.deleted){
-      throw new UnauthorizedException();
+      if(user.deleted){
+        throw new UnauthorizedException();
+      }
+    }
+    
+    if(userType === UserType.RESEARCHER){
+      let researcher = await this.researcherRepo.findOne({
+        where: {id: userId}
+      });
+      
+      if(researcher.deleted){
+        throw new UnauthorizedException();
+      }
     }
 
     return requiredRoles.some((role) => userType === role);
