@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-String currentVersion = "8 Ottobre 2024";
+String currentVersion = "29 Ottobre 2024";
 
 double widthConstraint = 1080;
 double halfWidthConstraint = widthConstraint / 2;
@@ -49,10 +49,23 @@ class QA {
     }
 }
 
+enum DreamType {
+  dreamed(id: 0, text: ""),
+  notDreamed(id: 1, text: "Non ho sognato"),
+  dontRemember(id: 2, text: "Ho sognato ma non ricordo cosa");
+
+  const DreamType({required this.id, required this.text});
+  final int id;
+  final String text;
+}
+
 class DreamData {
-  String dreamText = "";
+  String? dreamText = "";
+  DreamType type = DreamType.dreamed;
+
   List<dynamic> report = List<dynamic>.generate(7, (index) => null);
   DateTime? createdAt;
+  bool deleted = false;
 
   @override
   String toString() {

@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { User } from "./user.entity";
 import { IPostgresInterval } from "postgres-interval";
+import { DreamType } from "./dreamType.entity";
 @Entity()
 export class Dream {
   @ApiProperty()
@@ -15,8 +16,17 @@ export class Dream {
   id: number;
 
   @ApiProperty()
-  @Column("text", { nullable: false })
+  @Column("text", { nullable: true })
   text: string;
+
+  @ApiProperty()
+  @Column({
+    type: "enum",
+    enum: DreamType,
+    default: DreamType.DREAMED,
+    nullable: false,
+  })
+  type: DreamType;
 
   @ApiProperty()
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
@@ -47,7 +57,7 @@ export class Dream {
   control: number;
 
   @ApiProperty()
-  @Column({ type: 'interval' })
+  @Column({ type: 'interval', nullable: true})
   percived_elapsed_time: IPostgresInterval;
 
   @ApiProperty({ minimum: 0, default: 0 })

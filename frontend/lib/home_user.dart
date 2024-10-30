@@ -32,6 +32,51 @@ class HomeUser extends StatelessWidget {
   }
 
   alertReportOnPressed(BuildContext context, bool showChronoBtn, bool showPsqiAlert, String routeName) async {
+    if (showChronoBtn || showPsqiAlert){
+      List<(String, String)> q = [];
+      if(showChronoBtn) q.add(("Cronotipo", Routes.chronotype.name));
+      if(showPsqiAlert) q.add(("PSQI", Routes.psqi.name));
+      String text = "Prima di continuare è necessario compilare ";
+      if (q.length == 1){
+        text += "il questionario sul ${q[0].$1}.";
+      }else{
+        text += "i questionari ${q[0].$1} e ${q[1].$1}.";
+      }
+
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text("Attenzione"),
+                insetPadding: EdgeInsets.all(16),
+                content: Text(text, textAlign: TextAlign.justify,),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Annulla'),
+                    onPressed: () {
+                      context.pop();
+                    },
+                  ),
+                  ...List.generate(q.length, (int index) {
+                    return TextButton(
+                      child: Text(q[index].$1),
+                      onPressed: () {
+                        context.goNamed(q[index].$2);
+                      },
+                    );
+                  }
+                  )
+                ],
+              );
+          }
+      );
+    }else{
+      context.goNamed(routeName);
+    }
+  }
+
+
+  alertReportOrSendNullDream(BuildContext context, bool showChronoBtn, bool showPsqiAlert, String routeName) async {
       if (showChronoBtn || showPsqiAlert){
         List<(String, String)> q = [];
         if(showChronoBtn) q.add(("Cronotipo", Routes.chronotype.name));
@@ -71,9 +116,101 @@ class HomeUser extends StatelessWidget {
             }
         );
       }else{
-        context.goNamed(routeName);
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  title: Text("Nessun sogno"),
+                  insetPadding: EdgeInsets.all(16),
+                  content: Text("Confermi di voler comunicare di non aver sognato?", textAlign: TextAlign.justify,),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Non ho sognato'),
+                      onPressed: () async {
+                        await addNullDream();
+                        context.pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Annulla'),
+                      onPressed: () {
+                        context.pop();
+                      },
+                    ),
+                  ],
+                );
+            }
+        );
       }
     }
+
+  alertReportOrSendDreamNotRemembered(BuildContext context, bool showChronoBtn, bool showPsqiAlert, String routeName) async {
+    if (showChronoBtn || showPsqiAlert){
+      List<(String, String)> q = [];
+      if(showChronoBtn) q.add(("Cronotipo", Routes.chronotype.name));
+      if(showPsqiAlert) q.add(("PSQI", Routes.psqi.name));
+      String text = "Prima di continuare è necessario compilare ";
+      if (q.length == 1){
+        text += "il questionario sul ${q[0].$1}.";
+      }else{
+        text += "i questionari ${q[0].$1} e ${q[1].$1}.";
+      }
+
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text("Attenzione"),
+                insetPadding: EdgeInsets.all(16),
+                content: Text(text, textAlign: TextAlign.justify,),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Annulla'),
+                    onPressed: () {
+                      context.pop();
+                    },
+                  ),
+                  ...List.generate(q.length, (int index) {
+                    return TextButton(
+                      child: Text(q[index].$1),
+                      onPressed: () {
+                        context.goNamed(q[index].$2);
+                      },
+                    );
+                  }
+                  )
+                ],
+              );
+          }
+      );
+    }else{
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                title: Text("Non ricordo"),
+                insetPadding: EdgeInsets.all(16),
+                content: Text("Confermi di voler comunicare di aver sognato ma di non ricordare cosa?", textAlign: TextAlign.justify,),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Ho sognato ma non ricordo cosa'),
+                    onPressed: () async {
+                      await addDreamNotRemembered();
+                      context.pop();
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('Annulla'),
+                    onPressed: () {
+                      context.pop();
+                    },
+                  ),
+                ],
+              );
+          }
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +331,24 @@ class HomeUser extends StatelessWidget {
       IconTextButton(
         icon: const Icon(Icons.cloud_upload),
         text: "Racconta un sogno",
-        onPressed: () => alertReportOnPressed(context, showChronoBtn, showPsqiAlert, Routes.addDream.name)
+        onPressed: () => alertReportOnPressed(context, showChronoBtn, showPsqiAlert, Routes.addDream.name),
+        backgroundColor: Colors.blue.shade100,
       ),
       SizedBox(height: screenHeight * .01),
+      IconTextButton(
+        icon: const Icon(Icons.cloud_done),
+        text: "Ho sognato ma non ricordo cosa",
+        onPressed: () => alertReportOrSendDreamNotRemembered(context, showChronoBtn, showPsqiAlert, Routes.addDream.name),
+        backgroundColor: Colors.yellow.shade100,
+      ),
+      SizedBox(height: screenHeight * .01),
+      IconTextButton(
+        icon: const Icon(Icons.cloud_off),
+        text: "Non ho sognato nulla",
+        onPressed: () => alertReportOrSendNullDream(context, showChronoBtn, showPsqiAlert, Routes.addDream.name),
+        backgroundColor: Colors.green.shade100,
+      ),
+      SizedBox(height: screenHeight * .05),
       IconTextButton(
         icon: const Icon(Icons.rocket_launch),
         text: "I miei sogni",
@@ -238,7 +390,22 @@ class HomeUser extends StatelessWidget {
       IconTextButton(
           icon: const Icon(Icons.cloud_upload),
           text: "Racconta un sogno",
-          onPressed: () => alertReportOnPressed(context, showChronoBtn, showPsqiAlert, Routes.addDream.name)
+          onPressed: () => alertReportOnPressed(context, showChronoBtn, showPsqiAlert, Routes.addDream.name),
+          backgroundColor: Colors.blue.shade100,
+      ),
+      SizedBox(height: screenHeight * .01),
+      IconTextButton(
+        icon: const Icon(Icons.cloud_done),
+        text: "Ho sognato ma non ricordo cosa",
+        onPressed: () => alertReportOrSendDreamNotRemembered(context, showChronoBtn, showPsqiAlert, Routes.addDream.name),
+        backgroundColor: Colors.yellow.shade100,
+      ),
+      SizedBox(height: screenHeight * .01),
+      IconTextButton(
+        icon: const Icon(Icons.cloud_off),
+        text: "Non ho sognato nulla",
+        onPressed: () => alertReportOrSendNullDream(context, showChronoBtn, showPsqiAlert, Routes.addDream.name),
+        backgroundColor: Colors.green.shade100,
       ),
       SizedBox(height: screenHeight * .01),
       IconTextButton(

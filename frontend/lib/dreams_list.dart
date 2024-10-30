@@ -30,6 +30,7 @@ class _DreamsListState extends State<DreamsList> {
           );
         }
         List<DreamData> dreams = snapshot.data!;
+        dreams = dreams.where((d) => d.deleted == false).toList();
 
         return ScaffoldWithCircles(
             context: context,
@@ -86,12 +87,22 @@ class DreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    Color color = switch (dream.type) {
+      DreamType.dreamed => Colors.blue.shade100,
+
+      DreamType.notDreamed => Colors.green.shade100,
+      
+      DreamType.dontRemember => Colors.yellow.shade100,
+    };
+
     String day = "${dream.createdAt!.day}/${dream.createdAt!.month}/${dream.createdAt!.year}";
     String min = "${dream.createdAt!.minute}";
     if (dream.createdAt!.minute < 10) min = "0" + min;
     String time = "${dream.createdAt!.hour}:${min}";
+
     return Card(
-      color: Colors.blue.shade100,
+      color: color,
       child: ExpansionTile(
         title: Text(
           "${day} - ${time}"
@@ -100,7 +111,7 @@ class DreamCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              dream.dreamText,
+              dream.type == DreamType.dreamed ? dream.dreamText! : dream.type.text,
               textAlign: TextAlign.justify,
             ),
           ),

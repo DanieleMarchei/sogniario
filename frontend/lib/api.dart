@@ -245,6 +245,7 @@ UserData _jsonToUser(Map<String, dynamic> json){
 DreamData _jsonToDream(Map<String, dynamic> json){
   DreamData dream = DreamData();
   dream.dreamText = json["text"];
+  dream.type =  DreamType.values[json["type"]];
   dream.report[0] = json["emotional_content"];
   dream.report[1] = json["conscious"];
   dream.report[2] = json["control"];
@@ -252,6 +253,7 @@ DreamData _jsonToDream(Map<String, dynamic> json){
   dream.report[4] = json["hours_of_sleep"];
   dream.report[5] = json["sleep_quality"];
   dream.createdAt = json["created_at"] != null ? DateTime.parse(json["created_at"]).toLocal() : null;
+  dream.deleted = json["deleted"];
 
   return dream;
 }
@@ -668,12 +670,50 @@ Future<List<PSQIData>> getMyPSQIs() async {
   return psqis;
 }
 
+Future<bool> addNullDream() async {
+  int id = myJwtData()["sub"];
+  
+  var body = {
+    "text": null,
+    "type" : DreamType.notDreamed.id,
+    "user": id
+  };
+
+
+  var response = await HttpRequest(
+    tableName: TableName.dream,
+    requestType: RequestType.post,
+    body: body,
+  ).exec();
+
+  return response.success;
+} 
+
+Future<bool> addDreamNotRemembered() async {
+  int id = myJwtData()["sub"];
+  
+  var body = {
+    "text": null,
+    "type" : DreamType.dontRemember.id,
+    "user": id
+  };
+
+
+  var response = await HttpRequest(
+    tableName: TableName.dream,
+    requestType: RequestType.post,
+    body: body,
+  ).exec();
+
+  return response.success;
+} 
 
 Future<bool> addDream(DreamData dream) async {
   int id = myJwtData()["sub"];
   
   var body = {
     "text": dream.dreamText,
+    "type" : DreamType.dreamed.id,
     "emotional_content": dream.report[0],
     "emotional_intensity": dream.report[1],
     "concious": dream.report[2],

@@ -162,7 +162,7 @@ class _AddDreamWithS2TState extends State<AddDreamWithS2T> {
       },
       unansweredQuestions: () {
         List<int> uq = [];
-        if (dream.dreamText.split(" ").length < 1) {
+        if (dream.dreamText!.split(" ").length < 1) {
           uq.add(0);
         }
         for (var i = 0; i < dream.report.length; i++) {
