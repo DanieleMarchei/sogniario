@@ -90945,7 +90945,7 @@ else B.b.K(q,A.bs([n,B.Ah,m],l))
 n=p.x?B.ne:B.I_
 B.b.K(q,A.bs([B.Sp,A.dU(j,n,new A.aw1(p),"Scarica l'app (Android)")],l))
 q.push(A.aH(j,o,j))
-q.push(A.ao("Versione: 29 Ottobre 2024",j,j,j,j,B.bG,j,j))
+q.push(A.ao("Versione: 4 Novembre 2024",j,j,j,j,B.bG,j,j))
 return A.aZm(!1,A.lb(j,new A.bb(B.dT,A.cW(new A.de(i,A.iK(B.bI,A.b([r,A.oq(q,j,j,!1)],s),B.I,B.bh,j),j),j,j),j),a),j,t.z)},
 $S:537}
 A.avZ.prototype={
@@ -103586,7 +103586,7 @@ $.qj=null
 $.aPc=1
 $.aGW=-9007199254740992
 $.b6D="sogniario.unicam.it:2700"
-$.b4g="sogniario.unicam.it:3000"
+$.b4g="sogniario.unicam.it:8765"
 $.b43=A.b([B.Be,B.m6],t.yM)
 $.b5U=A.b(["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"],t.s)
 $.aIU=B.fM
