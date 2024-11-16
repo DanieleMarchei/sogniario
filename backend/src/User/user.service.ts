@@ -82,6 +82,13 @@ export class UserService extends TypeOrmCrudService<User> {
           if(b !== null && typeof b === "object" && b.constructor.name === "PostgresInterval"){
             b = (b as IPostgresInterval).toPostgres();
           }
+
+          // sanitize text to prevent errors when parsing csv
+          if(b !== null && typeof b === "string"){
+            b = b.split('"').join('""'); // hack to emulate replaceAll
+            b = '"' + b + '"';
+          }
+
           v.push(b);
         });
         return v.toString();
