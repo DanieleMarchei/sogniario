@@ -2,6 +2,9 @@ import { ApiProperty, ApiTags } from "@nestjs/swagger";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Organization } from "./organization.entity";
 import { UserType } from "./user_type.enum";
+import { Transform, TransformFnParams } from "class-transformer";
+import * as sanitizeHtml from 'sanitize-html';
+
 @Entity()
 export class Researcher {
   @ApiProperty()
@@ -10,10 +13,20 @@ export class Researcher {
 
   @ApiProperty()
   @Column({ nullable: false })
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
   username: string;
 
   @ApiProperty()
   @Column({ nullable: false })
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
   password: string;
 
   @ApiProperty()

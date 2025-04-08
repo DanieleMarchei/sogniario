@@ -9,6 +9,9 @@ import {
 import { User } from "./user.entity";
 import { IPostgresInterval } from "postgres-interval";
 import { DreamType } from "./dreamType.entity";
+import * as sanitizeHtml from 'sanitize-html';
+import { Transform, TransformFnParams } from "class-transformer";
+
 @Entity()
 export class Dream {
   @ApiProperty()
@@ -17,6 +20,11 @@ export class Dream {
 
   @ApiProperty()
   @Column("text", { nullable: true })
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
   text: string;
 
   @ApiProperty()

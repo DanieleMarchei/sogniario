@@ -10,3 +10,6 @@ backend/dist/
 frontend/.build.sh
 frontend/build/
 frontend/*.log
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/pubspec.lock

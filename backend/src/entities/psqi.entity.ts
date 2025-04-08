@@ -2,6 +2,9 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { IPostgresInterval } from "postgres-interval";
+import * as sanitizeHtml from 'sanitize-html';
+import { Transform, TransformFnParams } from "class-transformer";
+
 @Entity()
 export class Psqi {
   @ApiProperty()
@@ -10,14 +13,24 @@ export class Psqi {
 
   @ApiProperty({ type: 'time'})
   @Column({type: "time"})
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
   q1: string;
-
+  
   @ApiProperty({ type: "number" })
   @Column()
   q2: number;
-
+  
   @ApiProperty({ type: 'time'})
   @Column({type: "time" })
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
   q3: string;
 
   @ApiProperty()
@@ -66,6 +79,11 @@ export class Psqi {
 
   @ApiProperty()
   @Column({ nullable: true })
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
   q5j_text: String;
 
   @ApiProperty({ type: "number", nullable : true })

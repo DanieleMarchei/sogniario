@@ -19,6 +19,8 @@ import { ResearcherModule } from "./Researcher/researcher.module";
 import { FileController } from "./Downloads/downloads.controller";
 import { Admin } from "./entities/admin.entity";
 import { AdminModule } from "./Admin/admin.module";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { APP_GUARD } from "@nestjs/core";
 
 @Module({
   imports: [
@@ -33,12 +35,21 @@ import { AdminModule } from "./Admin/admin.module";
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       entities: [User, Dream, Chronotype, Psqi, Organization, Researcher, Admin],
-      synchronize: true,
+      synchronize: process.env.SYNCH == "TRUE",
+      // logging: true
     }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: "60d" },
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 50,
+        },
+      ],
     }),
     UserModule,
     DreamModule,
@@ -50,6 +61,11 @@ import { AdminModule } from "./Admin/admin.module";
     AdminModule
   ],
   controllers: [FileController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class AppModule {}

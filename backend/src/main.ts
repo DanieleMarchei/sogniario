@@ -19,7 +19,7 @@ async function bootstrap() {
 
   
   //development
-  //const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
   
   app.use(helmet());
 
@@ -40,12 +40,12 @@ async function bootstrap() {
   };
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document, options2);
+  //SwaggerModule.setup("api", app, document, options2);
   app.enableCors({
     origin: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   });
 
-  await app.listen(3000);
+  await app.listen(8765);
 }
 bootstrap();
