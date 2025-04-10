@@ -8,10 +8,11 @@ async function bootstrap() {
   // console.log(process.cwd());
   //Production
   const httpsOptions = {
-    key: fs.readFileSync(process.cwd() + "/src/cert/sognario_unicam_it.key"),
+    key: fs.readFileSync(process.cwd() + process.env.KEY_PATH),
     cert: fs.readFileSync(
-      process.cwd() + "/src/cert/sognario_unicam_it_cert.cer"
+      process.cwd() + process.env.CERT_PATH
     ),
+    passphrase: process.env.CERT_PWD
   };
   const app = await NestFactory.create(AppModule, {
     httpsOptions,
