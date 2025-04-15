@@ -1,0 +1,2 @@
+/home/michele-bellesi/Desktop/sogniario/frontend/android/app/.cxx/Debug/2y704l4l/x86/CMakeFiles/rebuild_cache.dir
+/home/michele-bellesi/Desktop/sogniario/frontend/android/app/.cxx/Debug/2y704l4l/x86/CMakeFiles/edit_cache.dir
