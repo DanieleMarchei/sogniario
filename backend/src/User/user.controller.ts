@@ -65,7 +65,6 @@ export class UserController implements CrudController<User> {
   async getOne(@ParsedRequest() req: CrudRequest, @AuthUser() user : any): Promise<User> {
     if(user.type === UserType.USER || user.type === UserType.RESEARCHER){
       let requestedId = req.parsed.paramsFilter[0].value;
-
       let targetUser = await this.service.findOne({
         where: {
           id: requestedId,

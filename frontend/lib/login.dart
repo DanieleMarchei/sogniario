@@ -122,6 +122,10 @@ class _LoginState extends State<Login> {
     }
   }
 
+  void redirectToSignUp() async {
+    context.goNamed(Routes.signUp.name);
+  }
+
   @override 
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -139,6 +143,12 @@ class _LoginState extends State<Login> {
                                     text: 'Entra come ricercatore',
                                     onPressed: submitResearcher,
                                     backgroundColor: Colors.orange.shade400,
+                                  );
+    var signUpBtn = IconTextButton(
+                                    icon: const Icon(Icons.single_bed_outlined),
+                                    text: 'Registrati',
+                                    onPressed: redirectToSignUp,
+                                    backgroundColor: Colors.yellow.shade400,
                                   );
 
     return FutureBuilder(
@@ -257,8 +267,12 @@ class _LoginState extends State<Login> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                researcherLoginBtn
+                                researcherLoginBtn,
                               },
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              signUpBtn,
                               if (kIsWeb) ...{
                                 const SizedBox(
                                   height: 50,

@@ -13,3 +13,6 @@ frontend/*.log
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
 frontend/pubspec.lock
+backend/smtp_server.py
+backend/mails/
+backend/mymail.html

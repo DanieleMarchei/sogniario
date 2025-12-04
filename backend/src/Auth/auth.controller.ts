@@ -24,8 +24,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post("login/user")
-  signInUser(@Body() signInDto: SignInDto) {
-    return this.authService.signInUser(signInDto.username, signInDto.password);
+  async signInUser(@Body() signInDto: SignInDto) {
+    var token = await this.authService.signInUser(signInDto.username, signInDto.password);
+
+    return token;
   }
 
   @HttpCode(HttpStatus.OK)

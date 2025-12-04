@@ -121,6 +121,7 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('tokens');
   await Hive.openBox('userData');
+  await Hive.openBox("signUp");
   runApp(Frontend());
   SecurityContext.defaultContext
         .setTrustedCertificatesBytes(Uint8List.fromList(sogniarioCert.codeUnits));

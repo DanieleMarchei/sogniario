@@ -84,12 +84,11 @@ export class AuthService {
     pass: string
   ): Promise<{ access_token: string }> {
     const bcrypt = require("bcrypt");
-
     const user = await this.usersService.findOne({
       where: { username: username, deleted: false },
       relations: ['organization']
     });
-
+    
     if (!user || !(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException();
     }

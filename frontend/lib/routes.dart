@@ -10,12 +10,15 @@ import 'package:frontend/info_privacy.dart';
 import 'package:frontend/login.dart';
 import 'package:frontend/manage_users.dart';
 import 'package:frontend/psqi.dart';
+import 'package:frontend/signUp.dart';
 import 'package:frontend/utils.dart';
+import 'package:frontend/verify_otp.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 var userDataBox = Hive.box('userData');
+var signUpBox = Hive.box('signUp');
 UserType userType = UserType.notLogged;
 
 
@@ -39,6 +42,9 @@ enum Routes {
 
   homeResearcher(path: "/home_researcher", name: "homeResearcher"),
   manageUsers(path: "/manage_users", name: "manageUsers"),
+
+  signUp(path: "/sign_up", name: "signUp"),
+  otp(path: "/verify_otp", name: "verifyOTP"),
   
   homeUser(path: "/home_user", name: "homeUser"),
   psqi(path: "/psqi", name: "psqi"),
@@ -72,6 +78,17 @@ List<String> userRoutesNames = [
 final routes = GoRouter(
   initialLocation: Routes.login.path,
   redirect: (context, state) async {
+    if(state.fullPath == Routes.signUp.path){
+      return Routes.signUp.path;
+    }
+
+    if(state.fullPath == Routes.otp.path){
+      bool canUserCheckOTP = signUpBox.containsKey(HiveBoxes.signUpUUID.label) && signUpBox.containsKey(HiveBoxes.signUpEmail.label);
+      if(canUserCheckOTP){
+        return Routes.otp.path;
+      }
+    }
+
     userType = await getMyUserType();
 
     if(state.fullPath != Routes.addDream.path){
@@ -141,6 +158,16 @@ final routes = GoRouter(
       name: Routes.login.name,
       path: Routes.login.path,
       pageBuilder: (context, state) => MyPageTransition(state.pageKey, const Login())
+    ),
+    GoRoute(
+      name: Routes.signUp.name,
+      path: Routes.signUp.path,
+      pageBuilder: (context, state) => MyPageTransition(state.pageKey, const SignUp())
+    ),
+    GoRoute(
+      name: Routes.otp.name,
+      path: Routes.otp.path,
+      pageBuilder: (context, state) => MyPageTransition(state.pageKey, const VerifyOTP())
     ),
     GoRoute(
       name: Routes.homeUser.name,

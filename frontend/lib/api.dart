@@ -10,7 +10,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
 
-bool isDevelopment = false;
+bool isDevelopment = true;
 
 String wsAuthority = isDevelopment ? (kIsWeb ? "localhost:2700" : "10.0.2.2:2700") : "sogniario.unicam.it:2700";
 
@@ -19,6 +19,7 @@ String server = isDevelopment ? "http://$authority" : "https://$authority";
 
 var tokenBox = Hive.box('tokens');
 var userDataBox = Hive.box('userData');
+var signUpBox = Hive.box('signUp');
 
 Future<bool> doIHaveJwt() async {
   if(!tokenBox.containsKey(HiveBoxes.jwt.label)) return false;
@@ -61,6 +62,8 @@ void deleteJwtAndUserData(){
   tokenBox.delete(HiveBoxes.jwt.label);
   userDataBox.delete(HiveBoxes.hasGeneralInfo.label);
   userDataBox.delete(HiveBoxes.hasChronotype.label);
+  signUpBox.delete(HiveBoxes.signUpUUID.label);
+  signUpBox.delete(HiveBoxes.signUpEmail.label);
 }
 
 
@@ -100,7 +103,9 @@ enum TableName {
   downloadApk(label: "file/apk", needJwt: false, deletable: false),
   apkVersion(label: "file/version", needJwt: false, deletable: false),
 
-  checkJwt(label: "auth/check-jwt", needJwt: true, deletable: false);
+  checkJwt(label: "auth/check-jwt", needJwt: true, deletable: false),
+  signUpOTP(label: "otp/sign_up", needJwt: false, deletable: false),
+  checkOTP(label: "otp/check_otp", needJwt: false, deletable: false);
 
   const TableName({required this.label, required this.needJwt, required this.deletable});
   final String label;
@@ -335,6 +340,53 @@ Future<bool> isValidLoginUser(String username, String password) async{
   tokenBox.put(HiveBoxes.jwt.label, token!);
 
   return true;
+}
+
+Future<bool> sendEmailSignUp(String email, String confermEmail, String password, String confermPassword) async{
+  var response = await HttpRequest(
+    tableName: TableName.signUpOTP,
+    requestType: RequestType.post,
+    body: {
+      "email" : email,
+      "confirm_email" : confermEmail,
+      "password" : password,
+      "confirm_password" : confermPassword
+    })
+    .exec();
+  
+    bool isValid = response.success;
+    if(!isValid) return false;
+
+    var uuid = response.body;
+    signUpBox.put(HiveBoxes.signUpUUID.label, uuid);
+    signUpBox.put(HiveBoxes.signUpEmail.label, email);
+    return true;
+
+}
+
+Future<bool?> verifyOTP(String otp) async{
+  var response = await HttpRequest(
+    tableName: TableName.checkOTP,
+    requestType: RequestType.post,
+    body: {
+      "uuid" : signUpBox.get(HiveBoxes.signUpUUID.label),
+      "email" : signUpBox.get(HiveBoxes.signUpEmail.label),
+      "otp" : otp
+    })
+    .exec();
+
+    // signUpBox.delete(HiveBoxes.signUpUUID.label);
+    // signUpBox.delete(HiveBoxes.signUpEmail.label);
+  
+    bool isValid = response.success;
+    if(!isValid) return null;
+
+    return response.body == "true";
+
+}
+
+Future<void> sendEmailForgotPwd(String email) async{
+
 }
 
 Future<bool> isValidLoginResearcher(String username, String password) async{

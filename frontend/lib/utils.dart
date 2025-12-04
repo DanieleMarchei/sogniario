@@ -10,7 +10,9 @@ enum HiveBoxes{
   jwt(label: "jwt"),
   hasGeneralInfo(label: "hasGeneralInfo"),
   hasChronotype(label: "hasChronotype"),
-  lastTimeCheckedVersion(label: "lastTimeCheckedVersion");
+  lastTimeCheckedVersion(label: "lastTimeCheckedVersion"),
+  signUpUUID(label: "signUpUUID"),
+  signUpEmail(label: "signUpEmail");
 
   const HiveBoxes({required this.label});
   final String label;

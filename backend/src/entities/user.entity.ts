@@ -62,6 +62,15 @@ export class User {
   sex: Gender;
 
   @ApiProperty()
+  @Column({ nullable: true, unique: true })
+  @Transform((params: TransformFnParams) => sanitizeHtml(params.value , {
+    disallowedTagsMode: 'recursiveEscape',
+    allowedTags: [],
+    allowedAttributes: {}
+}))
+  email: string;
+
+  @ApiProperty()
   @Column({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
 

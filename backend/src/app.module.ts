@@ -21,6 +21,9 @@ import { Admin } from "./entities/admin.entity";
 import { AdminModule } from "./Admin/admin.module";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
+import { MailModule } from "./mail/mail.module";
+import { OTPModule } from "./OTP/otp.module";
+import { OTP } from "./entities/otp.entity";
 
 @Module({
   imports: [
@@ -34,7 +37,7 @@ import { APP_GUARD } from "@nestjs/core";
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Dream, Chronotype, Psqi, Organization, Researcher, Admin],
+      entities: [User, Dream, Chronotype, Psqi, Organization, Researcher, Admin, OTP],
       synchronize: process.env.SYNCH == "TRUE",
       // logging: true
     }),
@@ -58,7 +61,9 @@ import { APP_GUARD } from "@nestjs/core";
     AuthModule,
     OrganizationModule,
     ResearcherModule,
-    AdminModule
+    AdminModule,
+    OTPModule,
+    MailModule,
   ],
   controllers: [FileController],
   providers: [

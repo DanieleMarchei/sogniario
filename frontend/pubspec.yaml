@@ -55,6 +55,7 @@ dependencies:
   record: ^5.1.2
   universal_io: ^2.2.2
   wakelock_plus: ^1.2.8
+  email_validator: ^3.0.0
 
 dev_dependencies:
   flutter_test:

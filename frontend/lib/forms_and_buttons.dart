@@ -190,6 +190,7 @@ class _InputFieldState extends State<InputField> {
       decoration: InputDecoration(
         labelText: widget.labelText,
         errorText: widget.errorText,
+        errorMaxLines: 5,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
