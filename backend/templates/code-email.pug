@@ -7,25 +7,28 @@ html(lang="en")
     style.
       body {
         font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
-        margin: 0;
+        background-color: #76bcf5f3;
         padding: 20px;
-      }
-      .container {
         max-width: 600px;
         margin: auto;
-        background-color: #ffffff;
-        padding: 20px;
-        border: 1px solid #dddddd;
       }
       .header {
         text-align: center;
         margin-bottom: 20px;
       }
+      .code {
+        text-align: center;
+        margin-bottom: 30px;
+        margin-top: 30px;
+        background-color: #ffffffff;
+        border-radius: 20px;
+        overflow: hidden;
+      }
   body
-    .container
-      .header
-        h1 Verifica l'iscrizione a Sogniario!
-      p Grazie per la tua iscrizione a Sogniario! Come ultimo passo, inserisci questo codice in Sogniario per confermare la tua iscrizione:
-      p #{code}
-      p Se non hai creato questo account, ignora questa mail.
+    .header
+      h1 Verifica l'iscrizione a Sogniario!
+    p Grazie per la tua iscrizione a Sogniario! Come ultimo passo, inserisci questo codice in Sogniario per confermare la tua iscrizione:
+    .code
+      h3 #{code}
+    p Il codice sarà valido per 5 minuti.
+    p Se non hai creato questo account, ignora questa mail.
