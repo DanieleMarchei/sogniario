@@ -29,7 +29,7 @@ export class OTPService extends TypeOrmCrudService<OTP> {
 		const hmac = cr.createHmac('sha256', salt);
 		hmac.update(data);
 		var hdata = hmac.digest("hex");
-		return bc.hashSync(hdata, 15);
+		return bc.hashSync(hdata, 13);
 	}
 
 	longCompare(data, digest, salt): boolean {
@@ -42,7 +42,7 @@ export class OTPService extends TypeOrmCrudService<OTP> {
 	}
 
 
-	async createOTP(otpDTO: CreateOTPDto): Promise<[string, string]> {
+	async createOTP(otpDTO: CreateOTPDto, insert = true): Promise<[string, string]> {
 		const bc = require("bcrypt");
 		const cr = require("crypto");
 
@@ -53,7 +53,10 @@ export class OTPService extends TypeOrmCrudService<OTP> {
 		var new_otp = new OTP();
 		new_otp.id = uuid;
 		new_otp.expiration_date = expire_date;
-		new_otp.hashed_email = bc.hashSync(otpDTO.email, 15);
+		const hmac = cr.createHmac('sha512', process.env.EMAIL_SALT);
+		hmac.update(otpDTO.email);
+		var hemail = hmac.digest("hex");
+		new_otp.hashed_email = hemail;
 		new_otp.hashed_password = bc.hashSync(otpDTO.password, 10);
 
 		var data_to_hash = new_otp.hashed_email + new_otp.hashed_password + otp + uuid + `${expire_date}`
@@ -62,7 +65,9 @@ export class OTPService extends TypeOrmCrudService<OTP> {
 		new_otp.bcred = b_cred;
 		new_otp.salt = salt;
 
-		await this.repo.save(new_otp)
+		if(insert){
+			this.repo.save(new_otp)
+		}
 
 		return [uuid, otp];
 	}

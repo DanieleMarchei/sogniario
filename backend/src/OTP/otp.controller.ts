@@ -29,28 +29,30 @@ export class OTPController {
   @UseGuards(OTPGuard)
   @Post("sign_up")
   async signUpUser(@Body() createOTPDto: CreateOTPDto) {
-    // in theory, a bad actor could keep singing up with a victim's email
-    // to spam email to their inbox. A solution could be to check if an email
-    // was already registered but this require to use unsalted or plain-text
-    // email, which I don't find accettable for privacy concerns.
-    // In any case, we will throttle this path to at least mitigate this problem 
-    
-    // const existingEmail = await this.userService.findOne({
-    //   where: { email: createOTPDto.email },
-    // });
+    const cr = require("crypto");
+    const hmac = cr.createHmac('sha512', process.env.EMAIL_SALT);
+    hmac.update(createOTPDto.email);
+    var hemail = hmac.digest("hex");
 
-    // if (existingEmail) {
-    //   // we give the user a random id to make it undistinguishable 
-    //   // with the case when the email was not already registered
-    //   // if we returned a different value, one can check if a certain mail
-    //   // is registered in the database, which can be a possible privacy violation
-    //   const cr = require("crypto");
-    //   return cr.randomUUID()
-    // }
+    var user = await this.userService.findOne({ where: { email: hemail } });
+
+    if (user !== null) {
+      // we give the user a random id to make it undistinguishable 
+      // with the case when the email was not already registered
+      // if we returned a different value, one can check if a certain mail
+      // is registered in the database, which can be a possible privacy violation
+
+      // we also execute the same function to reduce the possibility of a timing attack
+      // but we do not insert the otp in the database
+      var [uuid, otp] = await this.otpService.createOTP(createOTPDto, false);
+      return uuid;
+    }
+
+
 
     var [uuid, otp] = await this.otpService.createOTP(createOTPDto);
 
-    await this.mailService.sendEmail({
+    this.mailService.sendEmail({
       email: createOTPDto.email,
       subject: "Verifica l'iscrizione a Sogniario",
       template: 'code-email',
@@ -58,6 +60,7 @@ export class OTPController {
         code: otp
       },
     });
+
     return uuid;
   }
 
@@ -67,11 +70,11 @@ export class OTPController {
   @Post("check_otp")
   async checkOtp(@Body() checkOTPDto: CheckOTPDto): Promise<boolean> {
     var [is_valid, hashed_email, hashed_password] = await this.otpService.checkOTP(checkOTPDto);
-    if (is_valid && hashed_email !== null && hashed_password !== null)  {
+    if (is_valid && hashed_email !== null && hashed_password !== null) {
       var organization = await this.organizationService.findOne({
-        where: {name: process.env.SIGNUP_USERS_ORGANIZATION_NAME}
+        where: { name: process.env.SIGNUP_USERS_ORGANIZATION_NAME }
       });
-      do{
+      do {
         var username = this.randomString(8);
 
         var newUser = new User();
@@ -82,13 +85,13 @@ export class OTPController {
         var inserted = true;
         try {
           await this.userService.insertUser(newUser);
-          
+
         } catch (error) {
           inserted = false;
         }
 
-      }while(!inserted);
-      
+      } while (!inserted);
+
 
 
       await this.mailService.sendEmail({
@@ -110,7 +113,7 @@ export class OTPController {
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    
+
     for (var i = 0; i < length; i++) {
       var idx = cr.randomInt(charactersLength);
       result += characters.charAt(idx);
