@@ -9,6 +9,7 @@ import { CreateOTPDto } from "./DTO/createOTP.dto";
 import { OTPGuard } from "./otp.guard";
 import { UUID } from "typeorm/driver/mongodb/bson.typings";
 import { CheckOTPDto } from "./DTO/checkOTP.dto";
+import { LessThan } from "typeorm";
 
 @Injectable()
 export class OTPService extends TypeOrmCrudService<OTP> {
@@ -106,6 +107,17 @@ export class OTPService extends TypeOrmCrudService<OTP> {
 
 	async deleteOTP(uuid: string) {
 		await this.repo.delete({ "id": uuid });
+	}
+
+	async deleteInvalidOTP(){
+		var now = new Date();
+		var otps = await this.repo.find({
+			where: [
+				{ checked: true },
+				{ expiration_date: LessThan(now) }
+			]
+		});
+		otps.forEach((otp) => {this.deleteOTP(otp.id)});
 	}
 
 	async markOTPAsChecked(uuid: string) {

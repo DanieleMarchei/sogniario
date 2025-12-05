@@ -24,6 +24,8 @@ import { APP_GUARD } from "@nestjs/core";
 import { MailModule } from "./mail/mail.module";
 import { OTPModule } from "./OTP/otp.module";
 import { OTP } from "./entities/otp.entity";
+import { ScheduleModule } from "@nestjs/schedule";
+import { TasksModule } from "./tasks/task.module";
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { OTP } from "./entities/otp.entity";
     AdminModule,
     OTPModule,
     MailModule,
+    ScheduleModule.forRoot(),
+    TasksModule
   ],
   controllers: [FileController],
   providers: [

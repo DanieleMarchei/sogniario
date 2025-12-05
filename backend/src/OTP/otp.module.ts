@@ -19,5 +19,6 @@ import { OrganizationModule } from "src/Organization/organization.module";
 		// 	useClass: OTPGuard
 		// }
 	],
+	exports: [OTPService]
 })
 export class OTPModule { }
