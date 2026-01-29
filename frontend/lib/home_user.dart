@@ -25,7 +25,7 @@ class HomeUser extends StatelessWidget {
     if(psqis.isNotEmpty){
       DateTime now = DateTime.now();
       Duration d = now.difference(psqis.last.compiled_date!);
-      showPsqiBtn |= d.inDays >= 31;
+      showPsqiBtn |= d.inDays >= psqi_frequency;
       // showPsqiBtn = false;
     }
     return (chrono == null, showPsqiBtn);      

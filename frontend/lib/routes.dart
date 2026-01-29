@@ -119,32 +119,47 @@ final routes = GoRouter(
         return Routes.homeUser.path;
       }
 
-      if (doIHaveGeneralInfo()) return null;
+      if (!doIHaveGeneralInfo()){
+        DateTime? birthdate;
+        Sex? sex;
+        try{
+          (birthdate, sex) = await getMyGeneralInfo();
+
+        }catch(error){
+          return Routes.login.path;
+        }
+
+        if(birthdate == null || sex == null) {
+          userDataBox.delete(HiveBoxes.hasGeneralInfo.label);
+          return Routes.generalInfo.path;
+        }else{
+          userDataBox.put(HiveBoxes.hasGeneralInfo.label, true);
+        }
+      }
+
+
+      if(state.fullPath == Routes.psqi.path){
+        if(!await canDoPSQI()){
+          return Routes.homeUser.path;
+        }
+      }
+
+      if(state.fullPath == Routes.chronotype.path){
+        ChronoTypeData? chrono = await getMyChronotype();
+
+        if(chrono == null) {
+          userDataBox.delete(HiveBoxes.hasChronotype.label);
+          return Routes.chronotype.path;
+        }else{
+          userDataBox.put(HiveBoxes.hasChronotype.label, true);
+          return Routes.homeUser.path;
+        }
+
+      }
+
+
       
-      DateTime? birthdate;
-      Sex? sex;
-      try{
-        (birthdate, sex) = await getMyGeneralInfo();
 
-      }catch(error){
-        return Routes.login.path;
-      }
-
-      if(birthdate == null || sex == null) {
-        userDataBox.delete(HiveBoxes.hasGeneralInfo.label);
-        return Routes.generalInfo.path;
-      }else{
-        userDataBox.put(HiveBoxes.hasGeneralInfo.label, true);
-      }
-
-      // ChronoTypeData? chrono = await getMyChronotype();
-
-      // if(chrono == null) {
-      //   userDataBox.delete(HiveBoxes.hasChronotype.label);
-      //   return Routes.chronotype.path;
-      // }else{
-      //   userDataBox.put(HiveBoxes.hasChronotype.label, true);
-      // }
       
       return null;
     }
@@ -229,4 +244,19 @@ Route<dynamic> errorPage() {
                       fontWeight: FontWeight.bold,
                     ))),
           ));
+}
+
+Future<bool> canDoPSQI() async{
+  List<PSQIData> psqis = await getMyPSQIs();
+
+  psqis.sort((p1,p2) => p1.compiled_date!.compareTo(p2.compiled_date!));
+
+  bool showPsqi = psqis.isEmpty;
+  if(psqis.isNotEmpty){
+    DateTime now = DateTime.now();
+    Duration d = now.difference(psqis.last.compiled_date!);
+    showPsqi |= d.inDays >= psqi_frequency;
+    // showPsqi = false;
+  }
+  return showPsqi;      
 }

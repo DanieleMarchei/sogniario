@@ -16,3 +16,4 @@ frontend/pubspec.lock
 backend/smtp_server.py
 backend/mails/
 backend/mymail.html
+backend/.env_bkp

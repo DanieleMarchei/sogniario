@@ -38,6 +38,7 @@ class _PSQIState extends State<PSQI> {
   late List<QuestionWithDirection> psqiQuestions;
 
   bool showScore = false;
+  int? psqiscore;
 
   @override
   void initState() {
@@ -309,7 +310,8 @@ class _PSQIState extends State<PSQI> {
       homeButtonTooltip: "Vuoi annullare la compilazione del PSQI e tornare alla schermata principale?",
       title: "PSQI", 
       onSubmitted: () async {
-        bool success = await addMyPSQI(psqi);
+        var (success, score) = await addMyPSQI(psqi);
+        
         if(!success){
           Fluttertoast.showToast(
             msg: "Errore: impossibile inviare il questionario.",
@@ -319,10 +321,13 @@ class _PSQIState extends State<PSQI> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 12.0);
+        }else{
+          print(score);
+          setState(() {
+            psqiscore = score;
+            showScore = true;
+          });
         }
-        setState(() {
-          showScore = true;
-        });
       },
       unansweredQuestions: () { 
         List<int> uq = [];
@@ -410,7 +415,11 @@ class _PSQIState extends State<PSQI> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text("${psqi.score()}"),
+                    if(psqiscore != null)...{
+                      Text("${psqiscore}"),
+                    }else...{
+                      const Text("PSQI invalido, per favore comunicarlo ad un ricercatore."),
+                    },
                     SizedBox(height: screenHeight * 0.01,),
                     FormButton(
                       text: "Torna alla home",

@@ -13,9 +13,13 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
         transport: {
           host: process.env.SMTP_HOST,
           port: +process.env.SMTP_PORT,
-          secure: false,
+          secure: true,
+          auth: {
+            user: process.env.SMTP_FROM,
+            pass: process.env.SMTP_EMAIL_PASSWORD
+          },
           tls: {
-            rejectUnauthorized: false,
+            ciphers:'SSLv3',
           },
         },
         defaults: {

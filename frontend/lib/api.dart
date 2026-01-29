@@ -306,6 +306,7 @@ PSQIData _jsonToPSQI(Map<String, dynamic> json){
   psqi.drugs = json["q7"];
   psqi.difficultiesBeingAwake = json["q8"];
   psqi.enoughEnergies = json["q9"];
+  psqi.score = json["score"];
 
 
   return psqi;
@@ -632,7 +633,7 @@ Future<bool> addMyChronotype(ChronoTypeData chronotype) async{
 //   return response.success;
 // }
 
-Future<bool> addMyPSQI(PSQIData psqi) async{
+Future<(bool, int?)> addMyPSQI(PSQIData psqi) async{
   Map<String, dynamic> body = {};
   body["q1"] = timeOfDaytoString(psqi.timeToBed!);
   body["q2"] = psqi.minutesToFallAsleep;
@@ -686,7 +687,27 @@ Future<bool> addMyPSQI(PSQIData psqi) async{
     body: body
   ).exec();
 
-  return response.success;
+  if(!response.success){
+    return (false, null);
+  }
+
+  var jsonResponse = convert.jsonDecode(response.body);
+  int? score;
+  try{
+    print(jsonResponse);
+    var psqi = _jsonToPSQI(jsonResponse);
+    print(psqi.score);
+    score = psqi.score;
+    if(score != null && score! < 0){
+      score = null;
+    }
+    print(score);
+  }catch (error) {}
+
+
+  
+
+  return (response.success, score);
 }
 
 

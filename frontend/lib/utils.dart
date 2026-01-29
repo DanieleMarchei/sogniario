@@ -5,6 +5,7 @@ String currentVersion = "15 Aprile 2025";
 
 double widthConstraint = 1080;
 double halfWidthConstraint = widthConstraint / 2;
+double psqi_frequency = 31;
 
 enum HiveBoxes{
   jwt(label: "jwt"),
@@ -112,6 +113,8 @@ class PSQIData {
   int? enoughEnergies;
 
   DateTime? compiled_date;
+
+  int? score;
   
   Duration? get hoursInBed {
     if(timeToBed == null || timeWokeUp == null) return null;
@@ -122,90 +125,90 @@ class PSQIData {
     return d2.difference(d1);
   }
 
-  double score(){
-    double ninf = double.negativeInfinity;
-    double inf = double.infinity;
-    // #9 score
-    double c1 = sleepQuality!.toDouble();
+  // double score(){
+  //   double ninf = double.negativeInfinity;
+  //   double inf = double.infinity;
+  //   // #9 score
+  //   double c1 = sleepQuality!.toDouble();
 
-    // #2 Score (<=15min (0), 16-30min (1), 31-60 min (2), >60min (3))
-    // + #5a Score (if sum is equal 0=0; 1-2=1; 3-4=2; 5-6=3) 
-    late double c2;
-    late double two = mapValueFromInterval(minutesToFallAsleep!.toDouble(), [
-      (ninf, 15, 0),
-      (16, 30, 1),
-      (31, 60, 2),
-      (60, inf, 3),
-    ]);
+  //   // #2 Score (<=15min (0), 16-30min (1), 31-60 min (2), >60min (3))
+  //   // + #5a Score (if sum is equal 0=0; 1-2=1; 3-4=2; 5-6=3) 
+  //   late double c2;
+  //   late double two = mapValueFromInterval(minutesToFallAsleep!.toDouble(), [
+  //     (ninf, 15, 0),
+  //     (16, 30, 1),
+  //     (31, 60, 2),
+  //     (60, inf, 3),
+  //   ]);
 
-    double fiveA = notFallAsleepWithin30Minutes!.toDouble();
-    c2 = mapValueFromInterval(fiveA + two, [
-      (0, 0, 0),
-      (1, 2, 1),
-      (3, 4, 2),
-      (4, 6, 3),
-    ]);
-
-
-    // #4 Score (>7(0), 6-7 (1), 5-6 (2), <5 (3)
-    double c3;
-    double hoursOfSleep = timeAsleep!.inHours + timeAsleep!.inMinutes.remainder(60);
-    c3 = mapValueFromInterval(hoursOfSleep.toDouble(), [
-      (7.05, inf, 0), // 7.05 instead of 7.1 just to be on the safe side. Comparing floats is tricky
-      (6, 7, 1),
-      (5, 6, 2),
-      (ninf, 5, 3),
-    ]);
+  //   double fiveA = notFallAsleepWithin30Minutes!.toDouble();
+  //   c2 = mapValueFromInterval(fiveA + two, [
+  //     (0, 0, 0),
+  //     (1, 2, 1),
+  //     (3, 4, 2),
+  //     (4, 6, 3),
+  //   ]);
 
 
-    // (total # of hours asleep)/(total # of hours in bed) x 100
-    // >85%=0, 75%-84%=1, 65%-74%=2, <65%=3
-    double c4;
-    double hib = hoursInBed!.inHours + hoursInBed!.inMinutes.remainder(60);
-    double fraction = (hoursOfSleep / hib) * 100;
-    c4 = mapValueFromInterval(fraction, [
-      (85, inf, 0),
-      (75, 84, 1),
-      (65, 74, 2),
-      (ninf, 64, 3),
-    ]);
-
-    // Sum of Scores #5b to #5j (0=0; 1-9=1; 10-18=2; 19-27=3).
-    double c5;
-    int opf = otherProblemsFrequency ?? 0;
-    int sumBtoJ = wakeUpWithoutFallingAsleepAgain! + 
-                  goToTheBathroom! + 
-                  notBreethingCorrectly! + 
-                  coughOrSnort! + 
-                  tooCold! + 
-                  tooHot! + 
-                  badDreams! + 
-                  havingPain! + 
-                  opf;
-    c5 = mapValueFromInterval(sumBtoJ.toDouble(), [
-      (0, 0, 0),
-      (1, 9, 1),
-      (10, 18, 2),
-      (19, 27, 3),
-    ]);
-
-    // #6 Score
-    double c6 = drugs!.toDouble();
-
-    // #7 Score + #8 Score (0=0; 1-2=1; 3-4=2; 5-6=3)
-    double c7;
-    double sum7and8 = difficultiesBeingAwake!.toDouble() + enoughEnergies!.toDouble();
-    c7 = mapValueFromInterval(sum7and8, [
-      (0, 0, 0),
-      (1, 2, 1),
-      (3, 4, 2),
-      (5, 6, 3),
-    ]);
+  //   // #4 Score (>7(0), 6-7 (1), 5-6 (2), <5 (3)
+  //   double c3;
+  //   double hoursOfSleep = timeAsleep!.inHours + timeAsleep!.inMinutes.remainder(60);
+  //   c3 = mapValueFromInterval(hoursOfSleep.toDouble(), [
+  //     (7.05, inf, 0), // 7.05 instead of 7.1 just to be on the safe side. Comparing floats is tricky
+  //     (6, 7, 1),
+  //     (5, 6, 2),
+  //     (ninf, 5, 3),
+  //   ]);
 
 
-    return c1 + c2 + c3 + c4 + c5 + c6 + c7;
+  //   // (total # of hours asleep)/(total # of hours in bed) x 100
+  //   // >85%=0, 75%-84%=1, 65%-74%=2, <65%=3
+  //   double c4;
+  //   double hib = hoursInBed!.inHours + hoursInBed!.inMinutes.remainder(60);
+  //   double fraction = (hoursOfSleep / hib) * 100;
+  //   c4 = mapValueFromInterval(fraction, [
+  //     (85, inf, 0),
+  //     (75, 84, 1),
+  //     (65, 74, 2),
+  //     (ninf, 64, 3),
+  //   ]);
 
-  }
+  //   // Sum of Scores #5b to #5j (0=0; 1-9=1; 10-18=2; 19-27=3).
+  //   double c5;
+  //   int opf = otherProblemsFrequency ?? 0;
+  //   int sumBtoJ = wakeUpWithoutFallingAsleepAgain! + 
+  //                 goToTheBathroom! + 
+  //                 notBreethingCorrectly! + 
+  //                 coughOrSnort! + 
+  //                 tooCold! + 
+  //                 tooHot! + 
+  //                 badDreams! + 
+  //                 havingPain! + 
+  //                 opf;
+  //   c5 = mapValueFromInterval(sumBtoJ.toDouble(), [
+  //     (0, 0, 0),
+  //     (1, 9, 1),
+  //     (10, 18, 2),
+  //     (19, 27, 3),
+  //   ]);
+
+  //   // #6 Score
+  //   double c6 = drugs!.toDouble();
+
+  //   // #7 Score + #8 Score (0=0; 1-2=1; 3-4=2; 5-6=3)
+  //   double c7;
+  //   double sum7and8 = difficultiesBeingAwake!.toDouble() + enoughEnergies!.toDouble();
+  //   c7 = mapValueFromInterval(sum7and8, [
+  //     (0, 0, 0),
+  //     (1, 2, 1),
+  //     (3, 4, 2),
+  //     (5, 6, 3),
+  //   ]);
+
+
+  //   return c1 + c2 + c3 + c4 + c5 + c6 + c7;
+
+  // }
 
 }
 
