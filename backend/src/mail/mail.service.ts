@@ -32,9 +32,7 @@ export class MailService {
 			// );
 		} catch (error) {
 			this.logger.error(
-				`Error while sending mail with the following parameters : ${JSON.stringify(
-					params,
-				)}`,
+				`Error while sending mail`,
 				error,
 			);
 		}

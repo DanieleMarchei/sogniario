@@ -10,11 +10,13 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
 import "package:universal_html/html.dart" as html;
 
-bool isDevelopment = true;
+bool isDevelopment = false;
 
-String wsAuthority = isDevelopment ? (kIsWeb ? "localhost:2700" : "10.0.2.2:2700") : "sogniario.unicam.it:2700";
+// String wsAuthority = isDevelopment ? (kIsWeb ? "localhost:2700" : "10.0.2.2:2700") : "sogniario.unicam.it:2700";
+String wsAuthority = isDevelopment ? (kIsWeb ? "localhost:2700" : "192.168.178.57:2700") : "sogniario.unicam.it:2700";
 
-String authority = isDevelopment ? (kIsWeb ? "localhost:8765" : "10.0.2.2:8765") : "sogniario.unicam.it:8765";
+// String authority = isDevelopment ? (kIsWeb ? "localhost:8765" : "10.0.2.2:8765") : "sogniario.unicam.it:8765";
+String authority = isDevelopment ? (kIsWeb ? "localhost:8765" : "192.168.178.57:8765") : "sogniario.unicam.it:8765";
 String server = isDevelopment ? "http://$authority" : "https://$authority";
 
 var tokenBox = Hive.box('tokens');

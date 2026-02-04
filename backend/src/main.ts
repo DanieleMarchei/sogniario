@@ -7,20 +7,20 @@ import helmet from "helmet";
 async function bootstrap() {
   // console.log(process.cwd());
   //Production
-  // const httpsOptions = {
-  //   key: fs.readFileSync(process.cwd() + process.env.KEY_PATH),
-  //   cert: fs.readFileSync(
-  //     process.cwd() + process.env.CERT_PATH
-  //   ),
-  //   passphrase: process.env.CERT_PWD
-  // };
-  // const app = await NestFactory.create(AppModule, {
-  //   httpsOptions,
-  // });
+  const httpsOptions = {
+    key: fs.readFileSync(process.cwd() + process.env.KEY_PATH),
+    cert: fs.readFileSync(
+      process.cwd() + process.env.CERT_PATH
+    ),
+    passphrase: process.env.CERT_PWD
+  };
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+  });
 
   
   //development
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
 
@@ -41,7 +41,7 @@ async function bootstrap() {
   };
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document, options2);
+  // SwaggerModule.setup("api", app, document, options2);
   app.enableCors({
     origin: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
