@@ -117,7 +117,7 @@ export class Psqi {
 
   score: number;
 
-  @AfterInsert()
+  // @AfterInsert()
   @AfterLoad()
   @AfterUpdate()
   computeScore(){
@@ -131,6 +131,7 @@ export class Psqi {
     }
 
     this.score = s;
+
 
   }
 
@@ -153,7 +154,6 @@ class TimeOfDay{
     if(sec_diff < 0){
       sec_diff = other.to_seconds_until_midnight() + this.to_seconds_from_midnight();
     }
-    console.log(this.to_seconds_until_midnight())
     let date = new Date(sec_diff * 1000);
     let hours = date.getUTCHours();
     let minutes = date.getUTCMinutes();
@@ -182,11 +182,18 @@ class TimeOfDay{
   }
 }
 
-function mapValueFromInterval(value : number, intervalsWithResults : Array<[number, number, number]>){
+function mapValueFromInterval(
+  value : number, 
+  intervalsWithResults : Array<[number, number, number]>,
+  name : string
+){
 
   for (let interval of intervalsWithResults) {
     let [from, to, result] = interval;
-    if(from <= value && value <= to) return result;
+    if(from <= value && value <= to){
+      // console.log(`${name}=${value} is between ${from} and ${to}, therefore ${result}.`);
+      return result;
+    }
     
   }
 
@@ -206,7 +213,9 @@ function computeScore(psqi : Psqi) : number{
     [16, 30, 1],
     [31, 60, 2],
     [61, inf, 3],
-  ]);
+  ],
+  "psqi.q2"
+);
 
   let fiveA = psqi.q5a;
   let c2 = mapValueFromInterval(fiveA + two, [
@@ -214,40 +223,40 @@ function computeScore(psqi : Psqi) : number{
     [1, 2, 1],
     [3, 4, 2],
     [5, 6, 3],
-  ]);
+  ],
+  `fiveA ${fiveA} + two ${two}`
+);
 
 
   // #4 Score (>7(0), 6-7 (1), 5-6 (2), <5 (3) numero A
   let q4_minutes = psqi.q4.minutes === null || psqi.q4.minutes === undefined ? 0 : psqi.q4.minutes
-  console.log(q4_minutes)
   let hoursOfSleep = Math.round(psqi.q4.hours + q4_minutes / 60);
-  console.log(`hoursOfSleep ${hoursOfSleep}`)
   let c3 = mapValueFromInterval(hoursOfSleep, [
     [ninf, 4, 3],
     [5, 6, 2], 
     [6, 7, 1],
     [8, inf, 0],
-  ]);
+  ],
+  `hoursOfSleep`
+);
 
 
   // (total # of hours asleep)/(total # of hours in bed) x 100     (4a / 4b)
   // >85%=0, 75%-84%=1, 65%-74%=2, <65%=3
   let t_tosleep = TimeOfDay.parse(psqi.q1);
   let t_wakeup = TimeOfDay.parse(psqi.q3);
-  console.log(`t_tosleep ${t_tosleep.toString()}`)
-  console.log(`t_wakeup ${t_wakeup.toString()}`)
   
   let hoursInBed = t_wakeup.difference(t_tosleep);
-  console.log(`hoursInBed ${hoursInBed.toString()}`)
   let hib = hoursInBed.hours + hoursInBed.minutes / 60;
   let fraction = Math.round((hoursOfSleep / hib) * 100);
-  console.log(`fraction ${fraction}`)
   let c4 = mapValueFromInterval(fraction, [
     [85, inf, 0],
     [75, 84, 1],
     [65, 74, 2],
     [ninf, 64, 3],
-  ]);
+  ],
+  `fraction (${hoursOfSleep} / ${hib})`
+);
 
   // Sum of Scores #5b to #5j (0=0; 1-9=1; 10-18=2; 19-27=3).
   let opf = psqi.q5j_frequency === null ? 0 : psqi.q5j_frequency;
@@ -265,7 +274,9 @@ function computeScore(psqi : Psqi) : number{
     [1, 9, 1],
     [10, 18, 2],
     [19, 27, 3],
-  ]);
+  ],
+  `sumBtoJ (opf is ${opf})`
+);
 
   // #6 Score
   let c6 = psqi.q6;
@@ -277,9 +288,12 @@ function computeScore(psqi : Psqi) : number{
     [1, 2, 1],
     [3, 4, 2],
     [5, 6, 3],
-  ]);
+  ],
+  `sum7and8 (${psqi.q7}, ${psqi.q8}})`
+);
 
-  console.log(`${c1} , ${c2} , ${c3} , ${c4} , ${c5} , ${c6} , ${c7}`);
+  // console.log(c1 , c2 , c3 , c4 , c5 , c6 , c7)
+
   return c1 + c2 + c3 + c4 + c5 + c6 + c7;
 
 }

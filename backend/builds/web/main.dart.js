@@ -92666,7 +92666,7 @@ q.push(k.r)
 n=p.x?B.nu:B.I2
 B.b.M(q,A.be([B.SA,A.dA(j,n,new A.awP(p),"Scarica l'app (Android)")],l))
 q.push(A.ay(j,o,j))
-q.push(A.as("Versione: 15 Aprile 2025",j,j,j,j,B.aT,j,j))
+q.push(A.as("Versione: 04 Febbraio 2026",j,j,j,j,B.aT,j,j))
 return A.aIc(!1,A.jn(j,new A.bf(B.cU,A.cX(new A.cY(i,A.iL(B.bL,A.b([r,A.l8(q,j,j,!1)],s),B.H,B.bi,j),j),j,j),j),a),j,t.z)},
 $S:544}
 A.awM.prototype={

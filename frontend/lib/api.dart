@@ -913,9 +913,11 @@ Future<bool?> isAppUpToDate() async {
     requestType: RequestType.get
   ).exec();
 
+  var server_version = response.body.trim();
+
   userDataBox.put(HiveBoxes.lastTimeCheckedVersion.label, DateTime.now());
 
-  return response.body == currentVersion;
+  return server_version == currentVersion;
 }
 
 Future<void> downloadAndroidApp() async {
