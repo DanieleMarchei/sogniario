@@ -117,20 +117,43 @@ export class Psqi {
 
   score: number;
 
+  c1: number;
+  c2: number;
+  c3: number;
+  c4: number;
+  c5: number;
+  c6: number;
+  c7: number;
+
   // @AfterInsert()
   @AfterLoad()
   @AfterUpdate()
   computeScore(){
 
-    let s = -1000;
+    let final_score = -1000;
+    let c1 = -1000;
+    let c2 = -1000;
+    let c3 = -1000;
+    let c4 = -1000;
+    let c5 = -1000;
+    let c6 = -1000;
+    let c7 = -1000;
+
     try {
-      s = computeScore(this);
+      [final_score, c1, c2, c3, c4, c5, c6, c7] = computeScore(this);
       
     } catch (error) {
       console.log(`WARNIGN!\nPSQI ${this.id} raised an error during score calculation. ${error}`);
     }
 
-    this.score = s;
+    this.score = final_score;
+    this.c1 = c1;
+    this.c2 = c2;
+    this.c3 = c3;
+    this.c4 = c4;
+    this.c5 = c5;
+    this.c6 = c6;
+    this.c7 = c7;
 
 
   }
@@ -200,7 +223,7 @@ function mapValueFromInterval(
   throw RangeError(`Not enough interval to cover all possibilities: ${value} is not inside ${intervalsWithResults}`);
 }
 
-function computeScore(psqi : Psqi) : number{
+function computeScore(psqi : Psqi) : [number, number, number, number, number, number, number, number]{
   let ninf = Number.NEGATIVE_INFINITY;
   let inf = Number.POSITIVE_INFINITY;
   // #9 score
@@ -294,6 +317,7 @@ function computeScore(psqi : Psqi) : number{
 
   // console.log(c1 , c2 , c3 , c4 , c5 , c6 , c7)
 
-  return c1 + c2 + c3 + c4 + c5 + c6 + c7;
+  var final_score = c1 + c2 + c3 + c4 + c5 + c6 + c7;
+  return [final_score, c1, c2, c3, c4, c5, c6, c7];
 
 }
