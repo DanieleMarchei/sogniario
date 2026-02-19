@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-String currentVersion = "04 Febbraio 2026";
+String currentVersion = "19 Febbraio 2026";
 
 double widthConstraint = 1080;
 double halfWidthConstraint = widthConstraint / 2;
